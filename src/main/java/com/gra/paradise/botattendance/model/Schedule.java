@@ -3,6 +3,7 @@ package com.gra.paradise.botattendance.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,9 @@ public class Schedule {
     private Long id;
 
     private String title;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private String createdBy;
+    private Instant startTime;
+    private Instant endTime;
     private boolean active = true;
 
     @Enumerated(EnumType.STRING)
@@ -25,6 +27,13 @@ public class Schedule {
 
     @Enumerated(EnumType.STRING)
     private MissionType missionType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private ActionSubType actionSubType;
+
+    @Column(nullable = true)
+    private String actionOption;
 
     @ManyToMany
     @JoinTable(
@@ -40,11 +49,9 @@ public class Schedule {
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduleLog> logs = new ArrayList<>();
 
-    // Mensagem no Discord que contém esta escala (para atualização)
     private String messageId;
     private String channelId;
 
-    // Métodos auxiliares
     public void addCrewMember(User user) {
         crewMembers.add(user);
         user.getSchedules().add(this);

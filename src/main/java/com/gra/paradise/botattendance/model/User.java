@@ -23,7 +23,7 @@ public class User {
     private List<Schedule> schedules = new ArrayList<>();
 
     // Construtor necessário para JPA
-    protected User() {}
+    public User() {}
 
     public User(String discordId, String username, String nickname) {
         this.discordId = discordId;

@@ -1,7 +1,7 @@
 package com.gra.paradise.botattendance.discord.commands;
 
 import com.gra.paradise.botattendance.model.MissionType;
-import com.gra.paradise.botattendance.service.ScheduleService;
+import com.gra.paradise.botattendance.service.ScheduleLogManager;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
@@ -17,7 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SetupLogChannelsCommand implements Command {
 
-    private final ScheduleService scheduleService;
+    private final ScheduleLogManager scheduleLogManager;
 
     @Override
     public String getName() {
@@ -69,7 +69,7 @@ public class SetupLogChannelsCommand implements Command {
         return event.reply()
                 .withEphemeral(true)
                 .withContent("✅ Este canal foi configurado como canal de logs para " + finalLogTypeMessage + ".")
-                .then(scheduleService.configureLogChannel(channelId, finalMissionType))
+                .then(scheduleLogManager.configureLogChannel(channelId, finalMissionType))
                 .onErrorResume(e -> {
                     log.error("Erro ao configurar canal de logs: {}", e.getMessage(), e);
                     return event.createFollowup("❌ Erro ao configurar o canal: " + e.getMessage())

@@ -12,24 +12,25 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ButtonDispatcher {
 
-    private final ScheduleSystemButtonHandler scheduleSystemButtonHandler;
+    private final ScheduleInteractionHandler interactionHandler;
+    private final ScheduleActionHandler actionHandler;
 
     public Mono<Void> handleButtonEvent(ButtonInteractionEvent event) {
         String customId = event.getCustomId();
         log.debug("Botão clicado: {}", customId);
 
         if (customId.equals("create_schedule")) {
-            return scheduleSystemButtonHandler.handleCreateScheduleButton(event);
+            return interactionHandler.handleCreateScheduleButton(event);
         } else if (customId.startsWith("confirm_schedule:")) {
-            return scheduleSystemButtonHandler.handleConfirmSchedule(event);
+            return interactionHandler.handleConfirmSchedule(event);
         } else if (customId.equals("cancel_schedule")) {
-            return scheduleSystemButtonHandler.handleCancelSchedule(event);
+            return interactionHandler.handleCancelSchedule(event);
         } else if (customId.startsWith("board_schedule:")) {
-            return scheduleSystemButtonHandler.handleBoardSchedule(event);
+            return actionHandler.handleBoardSchedule(event);
         } else if (customId.startsWith("leave_schedule:")) {
-            return scheduleSystemButtonHandler.handleLeaveSchedule(event);
+            return actionHandler.handleLeaveSchedule(event);
         } else if (customId.startsWith("end_schedule:")) {
-            return scheduleSystemButtonHandler.handleEndSchedule(event);
+            return actionHandler.handleEndSchedule(event);
         }
 
         log.warn("Botão não reconhecido: {}", customId);
@@ -43,9 +44,13 @@ public class ButtonDispatcher {
         log.debug("Menu selecionado: {}", customId);
 
         if (customId.equals("aircraft_select")) {
-            return scheduleSystemButtonHandler.handleAircraftSelection(event);
+            return interactionHandler.handleAircraftSelection(event);
         } else if (customId.startsWith("mission_select:")) {
-            return scheduleSystemButtonHandler.handleMissionSelection(event);
+            return interactionHandler.handleMissionSelection(event);
+        } else if (customId.startsWith("action_subtype_select:")) {
+            return interactionHandler.handleActionSubTypeSelection(event);
+        } else if (customId.startsWith("action_option_select:")) {
+            return interactionHandler.handleActionOptionSelection(event);
         }
 
         log.warn("Menu não reconhecido: {}", customId);

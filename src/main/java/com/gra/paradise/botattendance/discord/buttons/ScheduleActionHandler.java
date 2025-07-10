@@ -22,37 +22,21 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ButtonHandler {
+public class ScheduleActionHandler {
 
     private final ScheduleManager scheduleManager;
-    private final ScheduleLogManager scheduleLogManager;
     private final EmbedFactory embedFactory;
     private final ScheduleMessageManager scheduleMessageManager;
+    private final ScheduleLogManager scheduleLogManager;
 
-    public Mono<Void> handleButtonClick(ButtonInteractionEvent event) {
+    public Mono<Void> handleBoardSchedule(ButtonInteractionEvent event) {
         String customId = event.getCustomId();
-        log.debug("Button clicked: {}", customId);
-
-        if (customId.startsWith("board_schedule:")) {
-            return handleJoin(event, customId);
-        } else if (customId.startsWith("leave_schedule:")) {
-            return handleLeave(event, customId);
-        } else if (customId.startsWith("end_schedule:")) {
-            return handleClose(event, customId);
-        }
-
-        return Mono.empty();
-    }
-
-    private Mono<Void> handleJoin(ButtonInteractionEvent event, String customId) {
         Long scheduleId = Long.parseLong(customId.substring("board_schedule:".length()));
-        discord4j.core.object.entity.User discordUser = event.getInteraction().getUser();
-        String userId = discordUser.getId().asString();
-        String username = discordUser.getUsername();
+        String userId = event.getInteraction().getUser().getId().asString();
+        String username = event.getInteraction().getUser().getUsername();
 
-        return event.deferReply(InteractionCallbackSpec.builder()
-                        .ephemeral(true)
-                        .build())
+        return event.deferReply(InteractionCallbackSpec.builder().ephemeral(true).build())
+                .then(event.deleteReply())
                 .then(Mono.justOrEmpty(event.getInteraction().getMember())
                         .flatMap(member -> {
                             String nickname = member.getNickname().orElse(username);
@@ -64,6 +48,7 @@ public class ButtonHandler {
                                 for (User user : updatedSchedule.getInitializedCrewMembers()) {
                                     crewNicknames.add(user.getNickname());
                                 }
+                                log.info("Crew nicknames for schedule {}: {}", scheduleId, crewNicknames);
                                 return new ScheduleActionResult(updatedSchedule, crewNicknames);
                             });
                         })
@@ -74,47 +59,46 @@ public class ButtonHandler {
                             for (User user : updatedSchedule.getInitializedCrewMembers()) {
                                 crewNicknames.add(user.getNickname());
                             }
+                            log.info("Crew nicknames for schedule {}: {}", scheduleId, crewNicknames);
                             return new ScheduleActionResult(updatedSchedule, crewNicknames);
                         })))
                 .flatMap(result -> {
                     Schedule updatedSchedule = result.schedule;
-                    List<String> crewNicknames = new ArrayList<>();
-                    for (User user : updatedSchedule.getInitializedCrewMembers()) {
-                        crewNicknames.add(user.getNickname());
-                    }
+                    List<String> crewNicknames = result.crewNicknames;
                     EmbedCreateSpec embed = embedFactory.createSchedulePublicEmbed(updatedSchedule, crewNicknames);
 
-                    Button joinButton = Button.success("board_schedule:" + updatedSchedule.getId(), "Embarcar")
+                    Button boardButton = Button.success("board_schedule:" + updatedSchedule.getId(), "Embarcar")
                             .disabled(!updatedSchedule.isActive());
                     Button leaveButton = Button.danger("leave_schedule:" + updatedSchedule.getId(), "Desembarcar")
                             .disabled(!updatedSchedule.isActive());
-                    Button closeButton = Button.secondary("end_schedule:" + updatedSchedule.getId(), "Encerrar Escala")
+                    Button endButton = Button.secondary("end_schedule:" + updatedSchedule.getId(), "Encerrar Escala")
                             .disabled(!updatedSchedule.isActive());
-
-                    return event.createFollowup("Você embarcou na aeronave com sucesso!")
-                            .withEphemeral(true)
-                            .then(scheduleMessageManager.updateScheduleMessage(String.valueOf(updatedSchedule.getId()), result.crewNicknames))
+                    return scheduleLogManager.updateScheduleLogMessage(updatedSchedule, "JOINED")
+                            .then()
+                            .then(scheduleLogManager.updateScheduleLogMessage(updatedSchedule, "Usuário " + username + " embarcou"))
+                            .then(scheduleMessageManager.updateScheduleMessage(String.valueOf(updatedSchedule.getId()), crewNicknames))
                             .then(Mono.justOrEmpty(event.getMessage())
                                     .flatMap(message -> message.edit()
                                             .withEmbeds(embed)
-                                            .withComponents(ActionRow.of(joinButton, leaveButton, closeButton)))
+                                            .withComponents(ActionRow.of(boardButton, leaveButton, endButton)))
                                     .then());
                 })
                 .onErrorResume(e -> {
-                    log.error("Erro ao processar botão board_schedule", e);
-                    return event.createFollowup("Erro: " + e.getMessage()).withEphemeral(true).then();
+                    log.error("Erro ao processar botão board_schedule para escala {}: {}", scheduleId, e.getMessage(), e);
+                    return event.createFollowup("❌ Erro ao embarcar: " + e.getMessage())
+                            .withEphemeral(true)
+                            .then();
                 });
     }
 
-    private Mono<Void> handleLeave(ButtonInteractionEvent event, String customId) {
+    public Mono<Void> handleLeaveSchedule(ButtonInteractionEvent event) {
+        String customId = event.getCustomId();
         Long scheduleId = Long.parseLong(customId.substring("leave_schedule:".length()));
-        discord4j.core.object.entity.User discordUser = event.getInteraction().getUser();
-        String userId = discordUser.getId().asString();
-        String username = discordUser.getUsername();
+        String userId = event.getInteraction().getUser().getId().asString();
+        String username = event.getInteraction().getUser().getUsername();
 
-        return event.deferReply(InteractionCallbackSpec.builder()
-                        .ephemeral(true)
-                        .build())
+        return event.deferReply(InteractionCallbackSpec.builder().ephemeral(true).build())
+                .then(event.deleteReply())
                 .then(Mono.justOrEmpty(event.getInteraction().getMember())
                         .flatMap(member -> {
                             String nickname = member.getNickname().orElse(username);
@@ -126,57 +110,58 @@ public class ButtonHandler {
                                 for (User user : updatedSchedule.getInitializedCrewMembers()) {
                                     crewNicknames.add(user.getNickname());
                                 }
+                                log.info("Crew nicknames for schedule {}: {}", scheduleId, crewNicknames);
                                 return new ScheduleActionResult(updatedSchedule, crewNicknames);
                             });
                         })
                         .switchIfEmpty(Mono.fromCallable(() -> {
-                            log.info("Usando username padrão para usuário desembarcando: {}", username);
+                            log.info("Usando username padrão para usuário: {}", username);
                             Schedule updatedSchedule = scheduleManager.removeCrewMemberAndInitialize(scheduleId, userId, username);
                             List<String> crewNicknames = new ArrayList<>();
                             for (User user : updatedSchedule.getInitializedCrewMembers()) {
                                 crewNicknames.add(user.getNickname());
                             }
+                            log.info("Crew nicknames for schedule {}: {}", scheduleId, crewNicknames);
                             return new ScheduleActionResult(updatedSchedule, crewNicknames);
                         })))
                 .flatMap(result -> {
                     Schedule updatedSchedule = result.schedule;
-                    List<String> crewNicknames = new ArrayList<>();
-                    for (User user : updatedSchedule.getInitializedCrewMembers()) {
-                        crewNicknames.add(user.getNickname());
-                    }
+                    List<String> crewNicknames = result.crewNicknames;
                     EmbedCreateSpec embed = embedFactory.createSchedulePublicEmbed(updatedSchedule, crewNicknames);
 
-                    Button joinButton = Button.success("board_schedule:" + updatedSchedule.getId(), "Embarcar")
+                    Button boardButton = Button.success("board_schedule:" + updatedSchedule.getId(), "Embarcar")
                             .disabled(!updatedSchedule.isActive());
                     Button leaveButton = Button.danger("leave_schedule:" + updatedSchedule.getId(), "Desembarcar")
                             .disabled(!updatedSchedule.isActive());
-                    Button closeButton = Button.secondary("end_schedule:" + updatedSchedule.getId(), "Encerrar Escala")
+                    Button endButton = Button.secondary("end_schedule:" + updatedSchedule.getId(), "Encerrar Escala")
                             .disabled(!updatedSchedule.isActive());
 
-                    return event.createFollowup("Você desembarcou da aeronave com sucesso!")
-                            .withEphemeral(true)
-                            .then(scheduleMessageManager.updateScheduleMessage(String.valueOf(updatedSchedule.getId()), result.crewNicknames))
+                    return scheduleLogManager.updateScheduleLogMessage(updatedSchedule, "LEFT")
+                            .then()
+                            .then(scheduleLogManager.updateScheduleLogMessage(updatedSchedule, "Usuário " + username + " desembarcou"))
+                            .then(scheduleMessageManager.updateScheduleMessage(String.valueOf(updatedSchedule.getId()), crewNicknames))
                             .then(Mono.justOrEmpty(event.getMessage())
                                     .flatMap(message -> message.edit()
                                             .withEmbeds(embed)
-                                            .withComponents(ActionRow.of(joinButton, leaveButton, closeButton)))
+                                            .withComponents(ActionRow.of(boardButton, leaveButton, endButton)))
                                     .then());
                 })
                 .onErrorResume(e -> {
-                    log.error("Erro ao processar botão leave_schedule", e);
-                    return event.createFollowup("Erro: " + e.getMessage()).withEphemeral(true).then();
+                    log.error("Erro ao processar botão leave_schedule para escala {}: {}", scheduleId, e.getMessage(), e);
+                    return event.createFollowup("❌ Erro ao desembarcar: " + e.getMessage())
+                            .withEphemeral(true)
+                            .then();
                 });
     }
 
-    private Mono<Void> handleClose(ButtonInteractionEvent event, String customId) {
+    public Mono<Void> handleEndSchedule(ButtonInteractionEvent event) {
+        String customId = event.getCustomId();
         Long scheduleId = Long.parseLong(customId.substring("end_schedule:".length()));
-        discord4j.core.object.entity.User discordUser = event.getInteraction().getUser();
-        String userId = discordUser.getId().asString();
-        String username = discordUser.getUsername();
+        String userId = event.getInteraction().getUser().getId().asString();
+        String username = event.getInteraction().getUser().getUsername();
 
-        return event.deferReply(InteractionCallbackSpec.builder()
-                        .ephemeral(true)
-                        .build())
+        return event.deferReply(InteractionCallbackSpec.builder().ephemeral(true).build())
+                .then(event.deleteReply())
                 .then(Mono.justOrEmpty(event.getInteraction().getMember())
                         .flatMap(member -> {
                             String nickname = member.getNickname().orElse(username);
@@ -188,6 +173,7 @@ public class ButtonHandler {
                                 for (User user : updatedSchedule.getInitializedCrewMembers()) {
                                     crewNicknames.add(user.getNickname());
                                 }
+                                log.info("Crew nicknames for schedule {}: {}", scheduleId, crewNicknames);
                                 return new ScheduleActionResult(updatedSchedule, crewNicknames);
                             });
                         })
@@ -198,45 +184,51 @@ public class ButtonHandler {
                             for (User user : updatedSchedule.getInitializedCrewMembers()) {
                                 crewNicknames.add(user.getNickname());
                             }
+                            log.info("Crew nicknames for schedule {}: {}", scheduleId, crewNicknames);
                             return new ScheduleActionResult(updatedSchedule, crewNicknames);
                         })))
                 .flatMap(result -> {
                     Schedule updatedSchedule = result.schedule;
-                    List<String> crewNicknames = new ArrayList<>();
-                    for (User user : updatedSchedule.getInitializedCrewMembers()) {
-                        crewNicknames.add(user.getNickname());
-                    }
+                    List<String> crewNicknames = result.crewNicknames;
                     EmbedCreateSpec embed = embedFactory.createSchedulePublicEmbed(updatedSchedule, crewNicknames);
 
-                    Button joinButton = Button.success("board_schedule:" + updatedSchedule.getId(), "Embarcar")
+                    Button boardButton = Button.success("board_schedule:" + updatedSchedule.getId(), "Embarcar")
                             .disabled(true);
                     Button leaveButton = Button.danger("leave_schedule:" + updatedSchedule.getId(), "Desembarcar")
                             .disabled(true);
-                    Button closeButton = Button.secondary("end_schedule:" + updatedSchedule.getId(), "Encerrar Escala")
+                    Button endButton = Button.secondary("end_schedule:" + updatedSchedule.getId(), "Encerrar Escala")
                             .disabled(true);
 
-                    return event.createFollowup("Escala encerrada com sucesso!")
-                            .withEphemeral(true)
-                            .then(scheduleMessageManager.removeScheduleMessage(String.valueOf(updatedSchedule.getId())))
+                    return scheduleLogManager.updateScheduleLogMessage(updatedSchedule, "CLOSED")
+                            .then()
+                            .then(scheduleLogManager.createFinalScheduleLogMessage(
+                                    updatedSchedule.getId(),
+                                    updatedSchedule.getTitle(),
+                                    updatedSchedule.getAircraftType(),
+                                    updatedSchedule.getMissionType(),
+                                    updatedSchedule.getActionSubType(),
+                                    updatedSchedule.getActionOption(),
+                                    updatedSchedule.getStartTime(),
+                                    updatedSchedule.getEndTime(),
+                                    updatedSchedule.getCreatedByUsername(),
+                                    username,
+                                    crewNicknames))
+                            .then(scheduleMessageManager.updateScheduleMessage(String.valueOf(updatedSchedule.getId()), crewNicknames))
                             .then(Mono.justOrEmpty(event.getMessage())
                                     .flatMap(message -> message.edit()
                                             .withEmbeds(embed)
-                                            .withComponents(ActionRow.of(joinButton, leaveButton, closeButton)))
-                                    .then());
+                                            .withComponents(ActionRow.of(boardButton, leaveButton, endButton)))
+                                    .then())
+                            .then(scheduleMessageManager.updateSystemMessage());
                 })
                 .onErrorResume(e -> {
-                    log.error("Erro ao processar botão end_schedule", e);
-                    return event.createFollowup("Erro: " + e.getMessage()).withEphemeral(true).then();
+                    log.error("Erro ao processar botão end_schedule para escala {}: {}", scheduleId, e.getMessage(), e);
+                    return event.createFollowup("❌ Erro ao encerrar escala: " + e.getMessage())
+                            .withEphemeral(true)
+                            .then();
                 });
     }
 
-    private static class ScheduleActionResult {
-        Schedule schedule;
-        List<String> crewNicknames;
-
-        ScheduleActionResult(Schedule schedule, List<String> crewNicknames) {
-            this.schedule = schedule;
-            this.crewNicknames = crewNicknames;
-        }
+    private record ScheduleActionResult(Schedule schedule, List<String> crewNicknames) {
     }
 }

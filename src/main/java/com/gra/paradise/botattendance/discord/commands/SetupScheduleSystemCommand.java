@@ -1,6 +1,6 @@
 package com.gra.paradise.botattendance.discord.commands;
 
-import com.gra.paradise.botattendance.service.ScheduleService;
+import com.gra.paradise.botattendance.service.ScheduleMessageManager;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.component.ActionRow;
 import discord4j.core.object.component.Button;
@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class SetupScheduleSystemCommand implements Command {
 
-    private final ScheduleService scheduleService;
+    private final ScheduleMessageManager scheduleMessageManager;
 
     @Override
     public String getName() {
@@ -36,7 +36,7 @@ public class SetupScheduleSystemCommand implements Command {
         return event.reply()
                 .withEphemeral(true)
                 .withContent("⏳ Configurando sistema de escalas neste canal...")
-                .doOnSuccess(success -> {
+                .then(Mono.fromRunnable(() -> {
                     // Configurar o sistema em background após responder
                     CompletableFuture.runAsync(() -> {
                         try {
@@ -52,7 +52,8 @@ public class SetupScheduleSystemCommand implements Command {
                                     .doOnNext(message -> {
                                         String messageId = message.getId().asString();
                                         log.debug("Mensagem de sistema criada no canal: {}", messageId);
-                                        scheduleService.registerSystemMessage(channelId, messageId).subscribe();
+                                        scheduleMessageManager.registerSystemMessage(channelId, messageId).subscribe();
+                                        scheduleMessageManager.updateSystemMessage().subscribe();
                                     })
                                     .subscribe();
 
@@ -67,7 +68,7 @@ public class SetupScheduleSystemCommand implements Command {
                                     .subscribe();
                         }
                     });
-                });
+                }));
     }
 
     private EmbedCreateSpec createSystemEmbed() {
