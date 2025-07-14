@@ -64,6 +64,7 @@ public class ButtonHandler {
                                 for (User user : updatedSchedule.getInitializedCrewMembers()) {
                                     crewNicknames.add(user.getNickname());
                                 }
+                                scheduleLogManager.createScheduleLog(updatedSchedule, "JOIN", userId, nickname, nickname + " embarcou na escala");
                                 return new ScheduleActionResult(updatedSchedule, crewNicknames);
                             });
                         })
@@ -74,6 +75,7 @@ public class ButtonHandler {
                             for (User user : updatedSchedule.getInitializedCrewMembers()) {
                                 crewNicknames.add(user.getNickname());
                             }
+                            scheduleLogManager.createScheduleLog(updatedSchedule, "JOIN", userId, username, username + " embarcou na escala");
                             return new ScheduleActionResult(updatedSchedule, crewNicknames);
                         })))
                 .flatMap(result -> {
@@ -94,6 +96,7 @@ public class ButtonHandler {
                     return event.createFollowup("Você embarcou na aeronave com sucesso!")
                             .withEphemeral(true)
                             .then(scheduleMessageManager.updateScheduleMessage(String.valueOf(updatedSchedule.getId()), result.crewNicknames))
+                            .then(scheduleLogManager.updateScheduleLogMessage(updatedSchedule, result.crewNicknames.toString()))
                             .then(Mono.justOrEmpty(event.getMessage())
                                     .flatMap(message -> message.edit()
                                             .withEmbeds(embed)
@@ -126,6 +129,7 @@ public class ButtonHandler {
                                 for (User user : updatedSchedule.getInitializedCrewMembers()) {
                                     crewNicknames.add(user.getNickname());
                                 }
+                                scheduleLogManager.createScheduleLog(updatedSchedule, "LEAVE", userId, nickname, nickname + " desembarcou da escala");
                                 return new ScheduleActionResult(updatedSchedule, crewNicknames);
                             });
                         })
@@ -136,6 +140,7 @@ public class ButtonHandler {
                             for (User user : updatedSchedule.getInitializedCrewMembers()) {
                                 crewNicknames.add(user.getNickname());
                             }
+                            scheduleLogManager.createScheduleLog(updatedSchedule, "LEAVE", userId, username, username + " desembarcou da escala");
                             return new ScheduleActionResult(updatedSchedule, crewNicknames);
                         })))
                 .flatMap(result -> {
@@ -156,6 +161,7 @@ public class ButtonHandler {
                     return event.createFollowup("Você desembarcou da aeronave com sucesso!")
                             .withEphemeral(true)
                             .then(scheduleMessageManager.updateScheduleMessage(String.valueOf(updatedSchedule.getId()), result.crewNicknames))
+                            .then(scheduleLogManager.updateScheduleLogMessage(updatedSchedule, result.crewNicknames.toString()))
                             .then(Mono.justOrEmpty(event.getMessage())
                                     .flatMap(message -> message.edit()
                                             .withEmbeds(embed)
@@ -188,6 +194,7 @@ public class ButtonHandler {
                                 for (User user : updatedSchedule.getInitializedCrewMembers()) {
                                     crewNicknames.add(user.getNickname());
                                 }
+                                scheduleLogManager.createScheduleLog(updatedSchedule, "CLOSE", userId, nickname, nickname + " encerrou a escala");
                                 return new ScheduleActionResult(updatedSchedule, crewNicknames);
                             });
                         })
@@ -198,36 +205,38 @@ public class ButtonHandler {
                             for (User user : updatedSchedule.getInitializedCrewMembers()) {
                                 crewNicknames.add(user.getNickname());
                             }
+                            scheduleLogManager.createScheduleLog(updatedSchedule, "CLOSE", userId, username, username + " encerrou a escala");
                             return new ScheduleActionResult(updatedSchedule, crewNicknames);
                         })))
-                .flatMap(result -> {
-                    Schedule updatedSchedule = result.schedule;
-                    List<String> crewNicknames = new ArrayList<>();
-                    for (User user : updatedSchedule.getInitializedCrewMembers()) {
-                        crewNicknames.add(user.getNickname());
-                    }
-                    EmbedCreateSpec embed = embedFactory.createSchedulePublicEmbed(updatedSchedule, crewNicknames);
-
-                    Button joinButton = Button.success("board_schedule:" + updatedSchedule.getId(), "Embarcar")
-                            .disabled(true);
-                    Button leaveButton = Button.danger("leave_schedule:" + updatedSchedule.getId(), "Desembarcar")
-                            .disabled(true);
-                    Button closeButton = Button.secondary("end_schedule:" + updatedSchedule.getId(), "Encerrar Escala")
-                            .disabled(true);
-
-                    return event.createFollowup("Escala encerrada com sucesso!")
-                            .withEphemeral(true)
-                            .then(scheduleMessageManager.removeScheduleMessage(String.valueOf(updatedSchedule.getId())))
-                            .then(Mono.justOrEmpty(event.getMessage())
-                                    .flatMap(message -> message.edit()
-                                            .withEmbeds(embed)
-                                            .withComponents(ActionRow.of(joinButton, leaveButton, closeButton)))
-                                    .then());
-                })
+                .flatMap(result ->
+                        event.createFollowup("Escala encerrada com sucesso!")
+                                .withEphemeral(true)
+                                .then(scheduleMessageManager.removeScheduleMessage(String.valueOf(result.schedule.getId())))
+                                .then(scheduleLogManager.createFinalScheduleLogMessage(
+                                        result.schedule.getId(),
+                                        result.schedule.getTitle(),
+                                        result.schedule.getAircraftType(),
+                                        result.schedule.getMissionType(),
+                                        result.schedule.getActionSubType(),
+                                        result.schedule.getActionOption(),
+                                        result.schedule.getStartTime(),
+                                        result.schedule.getEndTime(),
+                                        result.schedule.getCreatedByUsername(),
+                                        username,
+                                        result.crewNicknames))
+                                .then(Mono.justOrEmpty(event.getMessage())
+                                        .flatMap(message -> {
+                                            log.info("Tentando deletar mensagem com ID: {}", message.getId().asString());
+                                            return message.delete().then(Mono.empty());
+                                        })
+                                        .switchIfEmpty(Mono.defer(() -> {
+                                            log.warn("Mensagem não encontrada para deleção no evento.");
+                                            return Mono.empty();
+                                        }))))
                 .onErrorResume(e -> {
                     log.error("Erro ao processar botão end_schedule", e);
                     return event.createFollowup("Erro: " + e.getMessage()).withEphemeral(true).then();
-                });
+                }).then();
     }
 
     private static class ScheduleActionResult {

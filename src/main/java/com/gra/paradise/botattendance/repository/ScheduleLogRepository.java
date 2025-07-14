@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ScheduleLogRepository extends JpaRepository<ScheduleLog, Long> {
-    List<ScheduleLog> findByScheduleIdOrderByTimestampDesc(Long scheduleId);
+    List<ScheduleLog> findByScheduleIdOrderByTimestampAsc(Long scheduleId);
 }

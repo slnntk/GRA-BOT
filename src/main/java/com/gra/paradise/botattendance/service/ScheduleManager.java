@@ -4,14 +4,14 @@ import com.gra.paradise.botattendance.model.*;
 import com.gra.paradise.botattendance.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -26,57 +26,88 @@ public class ScheduleManager {
     public Schedule createSchedule(String title, AircraftType aircraftType, MissionType missionType,
                                    String creatorId, String creatorNickname, ActionSubType actionSubType,
                                    String actionOption) {
-        Schedule schedule = new Schedule();
-        schedule.setTitle(title);
-        schedule.setAircraftType(aircraftType);
-        schedule.setMissionType(missionType);
-        schedule.setActionSubType(actionSubType);
-        schedule.setActionOption(actionOption);
-        schedule.setStartTime(Instant.now());
-        schedule.setCreatedById(creatorId);
-        schedule.setCreatedByUsername(creatorNickname);
-        schedule.setActive(true);
+        try {
+            // Validate inputs
+            if (title == null || title.trim().isEmpty()) {
+                throw new IllegalArgumentException("Título não pode ser nulo ou vazio");
+            }
+            if (aircraftType == null || missionType == null) {
+                throw new IllegalArgumentException("Tipo de aeronave e missão são obrigatórios");
+            }
+            if (creatorId == null || creatorNickname == null) {
+                throw new IllegalArgumentException("ID e apelido do criador são obrigatórios");
+            }
 
-        Schedule savedSchedule = scheduleRepository.save(schedule);
-        log.info("Escala criada: {} (ID: {}, Tipo: {}, Subtipo: {}, Opção: {})",
-                title, savedSchedule.getId(), missionType.getDisplayName(),
-                actionSubType != null ? actionSubType.getDisplayName() : "N/A",
-                actionOption != null ? actionOption : "N/A");
+            Schedule schedule = new Schedule();
+            schedule.setTitle(title);
+            schedule.setAircraftType(aircraftType);
+            schedule.setMissionType(missionType);
+            schedule.setActionSubType(actionSubType);
+            schedule.setActionOption(actionOption);
+            schedule.setStartTime(Instant.now());
+            schedule.setCreatedById(creatorId);
+            schedule.setCreatedByUsername(creatorNickname);
+            schedule.setActive(true);
 
-        logManager.createScheduleLog(savedSchedule, "CREATED", creatorId, creatorNickname,
-                "Escala criada com aeronave " + aircraftType.getDisplayName() +
-                        " para missão de " + missionType.getDisplayName() +
-                        (actionSubType != null ? " (" + actionSubType.getDisplayName() + ": " + actionOption + ")" : ""));
+            Schedule savedSchedule = scheduleRepository.save(schedule);
+            log.info("Escala criada: {} (ID: {}, Tipo: {}, Subtipo: {}, Opção: {})",
+                    title, savedSchedule.getId(), missionType.getDisplayName(),
+                    actionSubType != null ? actionSubType.getDisplayName() : "N/A",
+                    actionOption != null ? actionOption : "N/A");
 
-        return savedSchedule;
+            logManager.sendScheduleCreationLog(savedSchedule)
+                    .doOnError(e -> log.error("Falha ao criar log inicial para escala {}: {}", savedSchedule.getId(), e.getMessage()))
+                    .subscribe();
+
+            return savedSchedule;
+        } catch (DataAccessException e) {
+            log.error("Erro ao salvar escala no banco de dados: {}", e.getMessage(), e);
+            throw new RuntimeException("Falha ao criar escala devido a erro no banco de dados");
+        }
     }
 
     @Transactional
     public Schedule addCrewMember(Long scheduleId, String discordId, String username, String nickname) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new IllegalArgumentException("Escala não encontrada"));
+        try {
+            if (scheduleId == null || discordId == null || username == null || nickname == null) {
+                throw new IllegalArgumentException("Parâmetros não podem ser nulos");
+            }
 
-        if (!schedule.isActive()) {
-            throw new IllegalStateException("Esta escala já foi encerrada");
+            Schedule schedule = scheduleRepository.findById(scheduleId)
+                    .orElseThrow(() -> new IllegalArgumentException("Escala não encontrada"));
+
+            if (!schedule.isActive()) {
+                throw new IllegalStateException("Esta escala já foi encerrada");
+            }
+
+            List<User> crewMembers = schedule.getCrewMembers();
+            if (crewMembers == null) {
+                schedule.setCrewMembers(new ArrayList<>());
+                crewMembers = schedule.getCrewMembers();
+            }
+
+            boolean alreadyInCrew = crewMembers.stream()
+                    .anyMatch(user -> discordId.equals(user.getDiscordId()));
+
+            if (alreadyInCrew) {
+                throw new IllegalStateException("Você já está embarcado nesta aeronave");
+            }
+
+            User user = userService.getOrCreateUser(discordId, username, nickname);
+            schedule.addCrewMember(user);
+
+            Schedule updatedSchedule = scheduleRepository.save(schedule);
+            log.info("Tripulante {} embarcou na escala {} (ID: {})", nickname, schedule.getTitle(), scheduleId);
+
+            logManager.createScheduleLog(updatedSchedule, "JOINED", discordId, nickname,
+                    "Tripulante embarcou na aeronave");
+            logManager.updateScheduleLogMessage(updatedSchedule, nickname + " embarcou na aeronave").subscribe();
+
+            return updatedSchedule;
+        } catch (DataAccessException e) {
+            log.error("Erro ao adicionar tripulante na escala {}: {}", scheduleId, e.getMessage(), e);
+            throw new RuntimeException("Falha ao adicionar tripulante devido a erro no banco de dados");
         }
-
-        boolean alreadyInCrew = schedule.getCrewMembers().stream()
-                .anyMatch(user -> user.getDiscordId().equals(discordId));
-
-        if (alreadyInCrew) {
-            throw new IllegalStateException("Você já está embarcado nesta aeronave");
-        }
-
-        User user = userService.getOrCreateUser(discordId, username, nickname);
-        schedule.addCrewMember(user);
-
-        Schedule updatedSchedule = scheduleRepository.save(schedule);
-        log.info("Tripulante {} embarcou na escala {} (ID: {})", nickname, schedule.getTitle(), scheduleId);
-
-        logManager.createScheduleLog(updatedSchedule, "JOINED", discordId, nickname,
-                "Tripulante embarcou na aeronave");
-
-        return updatedSchedule;
     }
 
     @Transactional
@@ -88,27 +119,42 @@ public class ScheduleManager {
 
     @Transactional
     public Schedule removeCrewMember(Long scheduleId, String discordId, String nickname) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new IllegalArgumentException("Escala não encontrada"));
+        try {
+            if (scheduleId == null || discordId == null || nickname == null) {
+                throw new IllegalArgumentException("Parâmetros não podem ser nulos");
+            }
 
-        if (!schedule.isActive()) {
-            throw new IllegalStateException("Esta escala já foi encerrada");
+            Schedule schedule = scheduleRepository.findById(scheduleId)
+                    .orElseThrow(() -> new IllegalArgumentException("Escala não encontrada"));
+
+            if (!schedule.isActive()) {
+                throw new IllegalStateException("Esta escala já foi encerrada");
+            }
+
+            List<User> crewMembers = schedule.getCrewMembers();
+            if (crewMembers == null) {
+                throw new IllegalStateException("Nenhum tripulante encontrado na escala");
+            }
+
+            User user = crewMembers.stream()
+                    .filter(u -> discordId.equals(u.getDiscordId()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Você não está embarcado nesta aeronave"));
+
+            schedule.removeCrewMember(user);
+
+            Schedule updatedSchedule = scheduleRepository.save(schedule);
+            log.info("Tripulante {} desembarcou da escala {} (ID: {})", nickname, schedule.getTitle(), scheduleId);
+
+            logManager.createScheduleLog(updatedSchedule, "LEFT", discordId, nickname,
+                    "Tripulante desembarcou da aeronave");
+            logManager.updateScheduleLogMessage(updatedSchedule, nickname + " desembarcou da aeronave").subscribe();
+
+            return updatedSchedule;
+        } catch (DataAccessException e) {
+            log.error("Erro ao remover tripulante da escala {}: {}", scheduleId, e.getMessage(), e);
+            throw new RuntimeException("Falha ao remover tripulante devido a erro no banco de dados");
         }
-
-        User user = schedule.getCrewMembers().stream()
-                .filter(u -> u.getDiscordId().equals(discordId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Você não está embarcado nesta aeronave"));
-
-        schedule.removeCrewMember(user);
-
-        Schedule updatedSchedule = scheduleRepository.save(schedule);
-        log.info("Tripulante {} desembarcou da escala {} (ID: {})", nickname, schedule.getTitle(), scheduleId);
-
-        logManager.createScheduleLog(updatedSchedule, "LEFT", discordId, nickname,
-                "Tripulante desembarcou da aeronave");
-
-        return updatedSchedule;
     }
 
     @Transactional
@@ -120,46 +166,56 @@ public class ScheduleManager {
 
     @Transactional
     public Schedule closeSchedule(Long scheduleId, String discordId, String nickname) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new IllegalArgumentException("Escala não encontrada"));
-
-        if (!schedule.isActive()) {
-            throw new IllegalStateException("Esta escala já foi encerrada");
-        }
-
-        Instant endTime = Instant.now();
-        schedule.setActive(false);
-        schedule.setEndTime(endTime);
-
-        Schedule updatedSchedule = scheduleRepository.save(schedule);
-        log.info("Escala {} (ID: {}) encerrada por {}", schedule.getTitle(), scheduleId, nickname);
-
-        logManager.createScheduleLog(updatedSchedule, "CLOSED", discordId, nickname, "Escala encerrada");
-
-        List<String> crewNicknames = new ArrayList<>();
-        if (updatedSchedule.getCrewMembers() != null) {
-            for (User user : updatedSchedule.getCrewMembers()) {
-                crewNicknames.add(user.getNickname());
+        try {
+            if (scheduleId == null || discordId == null || nickname == null) {
+                throw new IllegalArgumentException("Parâmetros não podem ser nulos");
             }
+
+            Schedule schedule = scheduleRepository.findById(scheduleId)
+                    .orElseThrow(() -> new IllegalArgumentException("Escala não encontrada"));
+
+            if (!schedule.isActive()) {
+                throw new IllegalStateException("Esta escala já foi encerrada");
+            }
+
+            Instant endTime = Instant.now();
+            schedule.setActive(false);
+            schedule.setEndTime(endTime);
+
+            Schedule updatedSchedule = scheduleRepository.save(schedule);
+            log.info("Escala {} (ID: {}) encerrada por {}", schedule.getTitle(), scheduleId, nickname);
+
+            logManager.createScheduleLog(updatedSchedule, "CLOSED", discordId, nickname, "Escala encerrada");
+
+            List<String> crewNicknames = new ArrayList<>();
+            List<User> crewMembers = updatedSchedule.getCrewMembers();
+            if (crewMembers != null) {
+                for (User user : crewMembers) {
+                    crewNicknames.add(user.getNickname());
+                }
+            }
+
+            logManager.createFinalScheduleLogMessage(
+                    scheduleId,
+                    updatedSchedule.getTitle(),
+                    updatedSchedule.getAircraftType(),
+                    updatedSchedule.getMissionType(),
+                    updatedSchedule.getActionSubType(),
+                    updatedSchedule.getActionOption(),
+                    updatedSchedule.getStartTime(),
+                    endTime,
+                    updatedSchedule.getCreatedByUsername(),
+                    nickname,
+                    crewNicknames
+            ).block();
+
+            log.info("Escala {} (ID: {}) e seus logs foram finalizados", schedule.getTitle(), scheduleId);
+
+            return updatedSchedule;
+        } catch (DataAccessException e) {
+            log.error("Erro ao encerrar escala {}: {}", scheduleId, e.getMessage(), e);
+            throw new RuntimeException("Falha ao encerrar escala devido a erro no banco de dados");
         }
-
-        logManager.createFinalScheduleLogMessage(
-                scheduleId,
-                updatedSchedule.getTitle(),
-                updatedSchedule.getAircraftType(),
-                updatedSchedule.getMissionType(),
-                updatedSchedule.getActionSubType(),
-                updatedSchedule.getActionOption(),
-                updatedSchedule.getStartTime(),
-                endTime,
-                updatedSchedule.getCreatedByUsername(),
-                nickname,
-                crewNicknames
-        ).block();
-
-        log.info("Escala {} (ID: {}) e seus logs foram excluídos do banco", schedule.getTitle(), scheduleId);
-
-        return updatedSchedule;
     }
 
     @Transactional
@@ -169,99 +225,14 @@ public class ScheduleManager {
         return schedule;
     }
 
-    @Transactional
-    public boolean addPassenger(String scheduleId, String userId, String userName) {
-        try {
-            Long id = Long.parseLong(scheduleId);
-            addCrewMember(id, userId, userName, userName);
-            return true;
-        } catch (Exception e) {
-            log.error("Erro ao adicionar passageiro: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    @Transactional
-    public boolean removePassenger(String scheduleId, String userId) {
-        try {
-            Long id = Long.parseLong(scheduleId);
-            Schedule schedule = scheduleRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Escala não encontrada"));
-
-            String nickname = schedule.getCrewMembers().stream()
-                    .filter(u -> u.getDiscordId().equals(userId))
-                    .findFirst()
-                    .map(User::getNickname)
-                    .orElse("Desconhecido");
-
-            removeCrewMember(id, userId, nickname);
-            return true;
-        } catch (Exception e) {
-            log.error("Erro ao remover passageiro: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    @Transactional
-    public boolean endSchedule(String scheduleId) {
-        try {
-            Long id = Long.parseLong(scheduleId);
-            Schedule schedule = scheduleRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Escala não encontrada"));
-
-            closeSchedule(id, schedule.getCreatedById(), schedule.getCreatedByUsername());
-            return true;
-        } catch (Exception e) {
-            log.error("Erro ao encerrar escala {}: {}", scheduleId, e.getMessage(), e);
-            return false;
-        }
-    }
-
-    @Transactional(readOnly = true)
-    public boolean canEndSchedule(String scheduleId, String userId) {
-        try {
-            Long id = Long.parseLong(scheduleId);
-            Schedule schedule = scheduleRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Escala não encontrada"));
-
-            boolean canEnd = schedule.getCreatedById().equals(userId);
-            log.debug("Verificação para encerrar escala {}: usuário {} {} permissão",
-                    scheduleId, userId, canEnd ? "tem" : "não tem");
-            return canEnd;
-        } catch (Exception e) {
-            log.error("Erro ao verificar permissão para encerrar: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
     @Transactional(readOnly = true)
     public List<Schedule> getActiveSchedules() {
-        return scheduleRepository.findByActiveTrue();
-    }
-
-    @Transactional(readOnly = true)
-    public List<Schedule> getActiveSchedulesWithDetails() {
-        List<Schedule> schedules = getActiveSchedules();
-        for (Schedule schedule : schedules) {
-            schedule.initializeCrewMembers();
+        try {
+            return scheduleRepository.findByActiveTrue();
+        } catch (DataAccessException e) {
+            log.error("Erro ao buscar escalas ativas: {}", e.getMessage(), e);
+            return Collections.emptyList();
         }
-        return schedules;
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Schedule> findByMessageInfo(String messageId, String channelId) {
-        return scheduleRepository.findByMessageIdAndChannelId(messageId, channelId);
-    }
-
-    @Transactional
-    public void updateMessageInfo(Long scheduleId, String messageId, String channelId) {
-        Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new IllegalArgumentException("Escala não encontrada"));
-
-        schedule.setMessageId(messageId);
-        schedule.setChannelId(channelId);
-
-        scheduleRepository.save(schedule);
     }
 
     @Transactional(readOnly = true)

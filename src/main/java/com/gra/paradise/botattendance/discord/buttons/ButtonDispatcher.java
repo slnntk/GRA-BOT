@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -14,8 +17,16 @@ public class ButtonDispatcher {
 
     private final ScheduleInteractionHandler interactionHandler;
     private final ScheduleActionHandler actionHandler;
+    private final Set<String> acknowledgedInteractions = ConcurrentHashMap.newKeySet();
 
     public Mono<Void> handleButtonEvent(ButtonInteractionEvent event) {
+        String interactionId = event.getInteraction().getId().asString();
+        if (acknowledgedInteractions.contains(interactionId)) {
+            log.debug("Interaction {} already processed", interactionId);
+            return Mono.empty();
+        }
+        acknowledgedInteractions.add(interactionId);
+
         String customId = event.getCustomId();
         log.debug("Botão clicado: {}", customId);
 
@@ -40,6 +51,13 @@ public class ButtonDispatcher {
     }
 
     public Mono<Void> handleSelectMenuEvent(SelectMenuInteractionEvent event) {
+        String interactionId = event.getInteraction().getId().asString();
+        if (acknowledgedInteractions.contains(interactionId)) {
+            log.debug("Interaction {} already processed", interactionId);
+            return Mono.empty();
+        }
+        acknowledgedInteractions.add(interactionId);
+
         String customId = event.getCustomId();
         log.debug("Menu selecionado: {}", customId);
 

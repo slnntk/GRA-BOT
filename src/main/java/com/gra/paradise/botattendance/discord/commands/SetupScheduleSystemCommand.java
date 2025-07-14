@@ -14,6 +14,8 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 
+import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_GRA_BLUE_URL;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -73,12 +75,18 @@ public class SetupScheduleSystemCommand implements Command {
 
     private EmbedCreateSpec createSystemEmbed() {
         return EmbedCreateSpec.builder()
+                .image(FOOTER_GRA_BLUE_URL)  // Large image at the top
                 .title("Sistema de Escalas de Voo")
-                .description("Clique no botão abaixo para criar uma nova escala de voo.")
-                .addField("Instruções", "1. Clique em 'Criar Escala'\n2. Selecione a aeronave\n3. Selecione o tipo de missão\n4. Confirme", false)
-                .addField("Escalas Ativas", "Nenhuma escala ativa no momento", false)
+                .description("Organize suas escalas de voo com estilo! Clique no botão abaixo para começar.")
+                .color(Color.CYAN)
+                .addField("Instruções",
+                        "1. Clique em 'Criar Escala'\n" +
+                                "2. Escolha a aeronave\n" +
+                                "3. Defina o tipo de missão\n" +
+                                "4. Confirme sua escala", false)
+                .addField("Escalas Ativas", "Nenhuma escala ativa no momento. Que tal criar uma agora?", false)
+                .footer("G.R.A Bot - Escala de Voo", FOOTER_GRA_BLUE_URL)
                 .timestamp(Instant.now())
-                .color(Color.BLUE)
                 .build();
     }
 }
