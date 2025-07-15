@@ -50,17 +50,6 @@
             <version>4.1.118.Final</version>
         </dependency>
 
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.5.13</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>1.5.13</version>
-        </dependency>
-
         <!-- Discord4J - Discord API library -->
         <dependency>
             <groupId>com.discord4j</groupId>
