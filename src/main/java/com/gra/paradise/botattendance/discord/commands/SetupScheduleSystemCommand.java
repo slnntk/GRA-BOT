@@ -1,6 +1,9 @@
 package com.gra.paradise.botattendance.discord.commands;
 
+import com.gra.paradise.botattendance.model.GuildConfig;
+import com.gra.paradise.botattendance.repository.GuildConfigRepository;
 import com.gra.paradise.botattendance.service.ScheduleMessageManager;
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.component.ActionRow;
 import discord4j.core.object.component.Button;
@@ -12,7 +15,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
 
 import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_GRA_BLUE_URL;
 
@@ -22,6 +24,7 @@ import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_GRA_BLU
 public class SetupScheduleSystemCommand implements Command {
 
     private final ScheduleMessageManager scheduleMessageManager;
+    private final GuildConfigRepository guildConfigRepository;
 
     @Override
     public String getName() {
@@ -32,50 +35,48 @@ public class SetupScheduleSystemCommand implements Command {
     public Mono<Void> handle(ChatInputInteractionEvent event) {
         log.info("Comando setup-escala recebido de {}", event.getInteraction().getUser().getUsername());
 
+        String guildId = event.getInteraction().getGuildId()
+                .map(Snowflake::asString)
+                .orElseThrow(() -> new IllegalStateException("Comando deve ser executado em um servidor"));
         String channelId = event.getInteraction().getChannelId().asString();
 
-        // Responder imediatamente
-        return event.reply()
-                .withEphemeral(true)
-                .withContent("⏳ Configurando sistema de escalas neste canal...")
-                .then(Mono.fromRunnable(() -> {
-                    // Configurar o sistema em background após responder
-                    CompletableFuture.runAsync(() -> {
-                        try {
-                            // Criar embed e botão
-                            EmbedCreateSpec embed = createSystemEmbed();
-                            Button createButton = Button.primary("create_schedule", "Criar Escala");
+        // Salvar o canal no banco de dados
+        return Mono.fromCallable(() -> {
+            GuildConfig config = guildConfigRepository.findById(guildId)
+                    .orElse(new GuildConfig());
+            config.setGuildId(guildId);
+            config.setSystemChannelId(channelId);
+            guildConfigRepository.save(config);
+            return config;
+        }).flatMap(config -> {
+            log.info("Canal de sistema configurado para guilda {}: canal {}", guildId, channelId);
+            // Criar a mensagem do sistema
+            EmbedCreateSpec embed = createSystemEmbed();
+            Button createButton = Button.primary("create_schedule", "Criar Escala");
 
-                            // Enviar mensagem no canal
-                            event.getInteraction().getChannel()
-                                    .flatMap(channel -> channel.createMessage()
-                                            .withEmbeds(embed)
-                                            .withComponents(ActionRow.of(createButton)))
-                                    .doOnNext(message -> {
-                                        String messageId = message.getId().asString();
-                                        log.debug("Mensagem de sistema criada no canal: {}", messageId);
-                                        scheduleMessageManager.registerSystemMessage(channelId, messageId).subscribe();
-                                        scheduleMessageManager.updateSystemMessage().subscribe();
-                                    })
-                                    .subscribe();
-
-                            // Enviar mensagem de confirmação para o usuário
-                            event.createFollowup("✅ Sistema de escalas configurado com sucesso!")
-                                    .withEphemeral(true)
-                                    .subscribe();
-                        } catch (Exception e) {
-                            log.error("Erro ao configurar sistema de escalas: {}", e.getMessage(), e);
-                            event.createFollowup("❌ Erro ao configurar o sistema de escalas: " + e.getMessage())
-                                    .withEphemeral(true)
-                                    .subscribe();
-                        }
+            return event.getInteraction().getChannel()
+                    .flatMap(channel -> channel.createMessage()
+                            .withEmbeds(embed)
+                            .withComponents(ActionRow.of(createButton)))
+                    .flatMap(message -> {
+                        String messageId = message.getId().asString();
+                        return scheduleMessageManager.registerSystemMessage(guildId, channelId, messageId)
+                                .then(scheduleMessageManager.updateSystemMessage(guildId))
+                                .then(event.reply()
+                                        .withEphemeral(true)
+                                        .withContent("✅ Sistema de escalas configurado com sucesso!"));
                     });
-                }));
+        }).onErrorResume(e -> {
+            log.error("Erro ao configurar sistema de escalas para guilda {}: {}", guildId, e.getMessage(), e);
+            return event.reply()
+                    .withEphemeral(true)
+                    .withContent("❌ Erro ao configurar o sistema de escalas: " + e.getMessage());
+        });
     }
 
     private EmbedCreateSpec createSystemEmbed() {
         return EmbedCreateSpec.builder()
-                .image(FOOTER_GRA_BLUE_URL)  // Large image at the top
+                .image(FOOTER_GRA_BLUE_URL)
                 .title("Sistema de Escalas de Voo")
                 .description("Organize suas escalas de voo com estilo! Clique no botão abaixo para começar.")
                 .color(Color.CYAN)

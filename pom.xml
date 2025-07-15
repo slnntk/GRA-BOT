@@ -45,9 +45,20 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.jasync-sql</groupId>
-            <artifactId>jasync-postgresql</artifactId>
-            <version>2.2.4</version>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>4.1.118.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.13</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.5.13</version>
         </dependency>
 
         <!-- Discord4J - Discord API library -->
@@ -65,12 +76,12 @@
             <scope>runtime</scope>
         </dependency>
         <!-- H2 Database -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>2.3.232</version>
-            <scope>runtime</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.h2database</groupId>-->
+<!--            <artifactId>h2</artifactId>-->
+<!--            <version>2.3.232</version>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
 
         <!-- Lombok for reducing boilerplate code -->
         <dependency>

@@ -2,7 +2,6 @@ package com.gra.paradise.botattendance.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 
@@ -14,18 +13,16 @@ public class ScheduleLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id")
-    @Getter
     private Schedule schedule;
 
     private LocalDateTime timestamp;
-    private String action; // CREATED, JOINED, LEFT, CLOSED
+    private String action;
     private String userId;
     private String username;
     private String details;
 
-    // Construtor necessário para JPA
     protected ScheduleLog() {}
 
     public ScheduleLog(Schedule schedule, String action, String userId, String username, String details) {
@@ -35,5 +32,18 @@ public class ScheduleLog {
         this.userId = userId;
         this.username = username;
         this.details = details;
+    }
+
+    @Override
+    public String toString() {
+        return "ScheduleLog{" +
+                "id=" + id +
+                ", scheduleId=" + (schedule != null ? schedule.getId() : "null") +
+                ", timestamp=" + (timestamp != null ? timestamp.toString() : "null") +
+                ", action='" + action + '\'' +
+                ", userId='" + userId + '\'' +
+                ", username='" + username + '\'' +
+                ", details='" + details + '\'' +
+                '}';
     }
 }

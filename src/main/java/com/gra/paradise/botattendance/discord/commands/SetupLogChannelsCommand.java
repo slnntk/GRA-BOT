@@ -1,7 +1,9 @@
 package com.gra.paradise.botattendance.discord.commands;
 
+import com.gra.paradise.botattendance.model.GuildConfig;
 import com.gra.paradise.botattendance.model.MissionType;
-import com.gra.paradise.botattendance.service.ScheduleLogManager;
+import com.gra.paradise.botattendance.repository.GuildConfigRepository;
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
@@ -17,7 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SetupLogChannelsCommand implements Command {
 
-    private final ScheduleLogManager scheduleLogManager;
+    private final GuildConfigRepository guildConfigRepository;
 
     @Override
     public String getName() {
@@ -28,7 +30,9 @@ public class SetupLogChannelsCommand implements Command {
     public Mono<Void> handle(ChatInputInteractionEvent event) {
         log.info("Comando setup-log-channel recebido de {}", event.getInteraction().getUser().getUsername());
 
-        // Obter o canal atual
+        String guildId = event.getInteraction().getGuildId()
+                .map(Snowflake::asString)
+                .orElseThrow(() -> new IllegalStateException("Comando deve ser executado em um servidor"));
         String channelId = event.getInteraction().getChannelId().asString();
 
         // Log todos os parâmetros para debug
@@ -44,37 +48,43 @@ public class SetupLogChannelsCommand implements Command {
 
         log.info("Parâmetro tipo recebido: {}", missionTypeStr.orElse("não especificado"));
 
-        // Definir o tipo de missão (null = todos os tipos)
-        MissionType missionType = null;
-        String logTypeMessage = "todas as missões";
-
-        if (missionTypeStr.isPresent()) {
-            try {
-                missionType = MissionType.valueOf(missionTypeStr.get().toUpperCase());
-                logTypeMessage = "missões do tipo " + missionType.getDisplayName();
-                log.info("Tipo de missão configurado: {}", missionType);
-            } catch (IllegalArgumentException e) {
-                log.error("Tipo de missão inválido: {}", missionTypeStr.get());
-                return event.reply()
-                        .withEphemeral(true)
-                        .withContent("❌ Tipo de missão inválido. Valores permitidos: PATROL, ACTION");
-            }
+        // Validar tipo de missão
+        MissionType missionType;
+        String logTypeMessage;
+        try {
+            missionType = missionTypeStr.map(str -> MissionType.valueOf(str.toUpperCase()))
+                    .orElseThrow(() -> new IllegalArgumentException("Tipo de missão é obrigatório"));
+            logTypeMessage = "missões do tipo " + missionType.getDisplayName();
+            log.info("Tipo de missão configurado: {}", missionType);
+        } catch (IllegalArgumentException e) {
+            log.error("Tipo de missão inválido: {}", missionTypeStr.orElse("não especificado"));
+            return event.reply()
+                    .withEphemeral(true)
+                    .withContent("❌ Tipo de missão inválido ou não especificado. Valores permitidos: ACTION, PATROL");
         }
 
-        // Variáveis finais para uso dentro do lambda
-        final MissionType finalMissionType = missionType;
-        final String finalLogTypeMessage = logTypeMessage;
-
-        // Configurar o canal e responder ao usuário
-        return event.reply()
-                .withEphemeral(true)
-                .withContent("✅ Este canal foi configurado como canal de logs para " + finalLogTypeMessage + ".")
-                .then(scheduleLogManager.configureLogChannel(channelId, finalMissionType))
-                .onErrorResume(e -> {
-                    log.error("Erro ao configurar canal de logs: {}", e.getMessage(), e);
-                    return event.createFollowup("❌ Erro ao configurar o canal: " + e.getMessage())
-                            .withEphemeral(true)
-                            .then();
-                });
+        // Configurar o canal no banco de dados
+        return Mono.fromCallable(() -> {
+            GuildConfig config = guildConfigRepository.findById(guildId)
+                    .orElse(new GuildConfig());
+            config.setGuildId(guildId);
+            if (missionType == MissionType.ACTION) {
+                config.setActionLogChannelId(channelId);
+            } else if (missionType == MissionType.PATROL) {
+                config.setPatrolLogChannelId(channelId);
+            }
+            guildConfigRepository.save(config);
+            return config;
+        }).flatMap(config -> {
+            log.info("Canal de log configurado para guilda {}: {} para {}", guildId, channelId, logTypeMessage);
+            return event.reply()
+                    .withEphemeral(true)
+                    .withContent("✅ Este canal foi configurado como canal de logs para " + logTypeMessage + ".");
+        }).onErrorResume(e -> {
+            log.error("Erro ao configurar canal de logs para guilda {}: {}", guildId, e.getMessage(), e);
+            return event.reply()
+                    .withEphemeral(true)
+                    .withContent("❌ Erro ao configurar o canal: " + e.getMessage());
+        });
     }
 }

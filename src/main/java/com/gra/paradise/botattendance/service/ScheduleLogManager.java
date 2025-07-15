@@ -2,6 +2,7 @@ package com.gra.paradise.botattendance.service;
 
 import com.gra.paradise.botattendance.config.DiscordConfig;
 import com.gra.paradise.botattendance.model.*;
+import com.gra.paradise.botattendance.repository.GuildConfigRepository;
 import com.gra.paradise.botattendance.repository.ScheduleLogRepository;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
@@ -11,7 +12,9 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.core.spec.MessageCreateSpec;
 import discord4j.core.spec.MessageEditSpec;
 import discord4j.rest.util.Color;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -19,6 +22,7 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,45 +30,42 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ScheduleLogManager {
 
     private final ScheduleLogRepository scheduleLogRepository;
     private final GatewayDiscordClient discordClient;
+    private final DiscordConfig discordConfig;
+    private final GuildConfigRepository guildConfigRepository;
 
-    private final Map<MissionType, String> logChannelIds = new HashMap<>();
-    private final Map<Long, String> scheduleLogMessages = new HashMap<>();
+    private final Map<String, Map<Long, String>> scheduleLogMessages = new HashMap<>();
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
             .withZone(ZoneId.of("America/Sao_Paulo"));
-
-    // Initialize default channel IDs
-    public ScheduleLogManager(ScheduleLogRepository scheduleLogRepository, GatewayDiscordClient discordClient) {
-        this.scheduleLogRepository = scheduleLogRepository;
-        this.discordClient = discordClient;
-        logChannelIds.put(MissionType.ACTION, "1392491828237832332");
-        logChannelIds.put(MissionType.PATROL, "1392491968218665030");
-        log.info("Default log channels configured: ACTION -> {}, PATROL -> {}",
-                logChannelIds.get(MissionType.ACTION), logChannelIds.get(MissionType.PATROL));
-    }
+    private static final int MAX_FIELD_LENGTH = 1024; // Discord embed field character limit
 
     @Transactional
     public void createScheduleLog(Schedule schedule, String action, String userId, String username, String details) {
         ScheduleLog scheduleLog = new ScheduleLog(schedule, action, userId, username, details);
         scheduleLogRepository.save(scheduleLog);
-        log.info("Log salvo: {} para escala {} por usuário {}", action, schedule.getId(), username);
+        log.info("Log salvo: {} para escala {} por usuário {} na guilda {}", action, schedule.getId(), username, schedule.getGuildId());
     }
 
-    public Mono<Void> sendScheduleCreationLog(Schedule schedule) {
+    @Transactional
+    public Mono<Void> sendScheduleCreationLog(String guildId, Schedule schedule) {
+        Hibernate.initialize(schedule);
+        Hibernate.initialize(schedule.getCrewMembers());
+        schedule.initializeCrewMembers();
         List<String> crewNicknames = schedule.getInitializedCrewMembers().stream()
                 .map(User::getNickname)
+                .filter(nickname -> nickname != null)
                 .collect(Collectors.toList());
         String crewList = crewNicknames.isEmpty() ? "Nenhum tripulante embarcado" : String.join(", ", crewNicknames);
         String aircraftImageUrl = DiscordConfig.AIRCRAFT_IMAGE_URLS.getOrDefault(schedule.getAircraftType(), DiscordConfig.FOOTER_GRA_BLUE_URL);
 
-        // Save the creation log entry
         createScheduleLog(schedule, "CREATED", schedule.getCreatedById(), schedule.getCreatedByUsername(),
                 "Escala criada: " + schedule.getTitle());
 
-        EmbedCreateSpec logEmbed = EmbedCreateSpec.builder()
+        EmbedCreateSpec.Builder logEmbedBuilder = EmbedCreateSpec.builder()
                 .title("✅ Nova Escala Criada")
                 .description("Uma nova escala de voo foi criada")
                 .addField("Escala", schedule.getTitle(), true)
@@ -75,54 +76,56 @@ public class ScheduleLogManager {
                 .addField("Piloto", schedule.getCreatedByUsername(), true)
                 .addField("Início", DATE_TIME_FORMATTER.format(schedule.getStartTime()), true)
                 .addField("Tripulação", crewList, false)
-                .addField("Últimas atividades", formatActivity(
-                        schedule.getCreatedByUsername() + ": Escala criada: " + schedule.getTitle(),
-                        schedule.getStartTime()), false)
-                .color(getMissionColor(schedule.getMissionType()))
-                .footer("G.R.A Bot - Escala de Voo", aircraftImageUrl)
-                .timestamp(Instant.now())
-                .build();
+                .color(Color.GREEN)
+                .footer(EmbedFactory.FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
+                .timestamp(Instant.now());
 
-        String channelId = getLogChannelId(schedule.getMissionType());
+        // Add initial activity
+        String initialActivity = formatActivity(
+                schedule.getCreatedByUsername() + ": Escala criada: " + schedule.getTitle(),
+                schedule.getStartTime());
+        logEmbedBuilder.addField("Últimas atividades", initialActivity, false);
+
+        String channelId = discordConfig.getLogChannelId(guildId, schedule.getMissionType());
         if (channelId == null) {
-            log.error("Canal de logs não configurado para a missão {}. Não é possível enviar log de criação para a escala {}",
-                    schedule.getMissionType(), schedule.getId());
-            return Mono.error(new IllegalStateException("Canal de logs não configurado"));
+            log.error("Canal de logs não configurado para guilda {} e missão {}. Use /setup-log-channel.", guildId, schedule.getMissionType());
+            return Mono.empty();
         }
 
-        return sendLogEmbed(logEmbed, schedule.getMissionType())
+        return sendLogEmbed(guildId, logEmbedBuilder.build(), schedule.getMissionType())
                 .doOnNext(message -> {
                     String messageId = message.getId().asString();
-                    scheduleLogMessages.put(schedule.getId(), messageId);
-                    log.info("Log de criação da escala {} registrado com mensagem ID {}", schedule.getId(), messageId);
+                    scheduleLogMessages.computeIfAbsent(guildId, k -> new HashMap<>()).put(schedule.getId(), messageId);
+                    log.info("Log de criação da escala {} registrado com mensagem ID {} na guilda {}", schedule.getId(), messageId, guildId);
                 })
-                .doOnError(e -> log.error("Erro ao enviar log de criação da escala {}: {}", schedule.getId(), e.getMessage(), e))
+                .doOnError(e -> log.error("Erro ao enviar log de criação da escala {} na guilda {}: {}", schedule.getId(), guildId, e.getMessage()))
                 .then();
     }
 
-    public Mono<Void> updateScheduleLogMessage(Schedule schedule, String activityMessage) {
-        String messageId = scheduleLogMessages.get(schedule.getId());
-        String channelId = getLogChannelId(schedule.getMissionType());
-        String aircraftImageUrl = DiscordConfig.AIRCRAFT_IMAGE_URLS.getOrDefault(schedule.getAircraftType(), DiscordConfig.FOOTER_GRA_BLUE_URL);
+    @Transactional
+    public Mono<Void> updateScheduleLogMessage(String guildId, Schedule schedule, String activityMessage) {
+        Hibernate.initialize(schedule);
+        Hibernate.initialize(schedule.getCrewMembers());
+        schedule.initializeCrewMembers();
+        Map<Long, String> guildMessages = scheduleLogMessages.getOrDefault(guildId, new HashMap<>());
+        String messageId = guildMessages.get(schedule.getId());
+        String channelId = discordConfig.getLogChannelId(guildId, schedule.getMissionType());
 
         if (messageId == null || channelId == null) {
-            log.warn("Não foi possível atualizar log da escala {}. MessageId: {}, ChannelId: {}",
-                    schedule.getId(), messageId, channelId);
-            return sendScheduleCreationLog(schedule);
+            log.warn("Não foi possível atualizar log da escala {}. MessageId: {}, ChannelId: {}", schedule.getId(), messageId, channelId);
+            return sendScheduleCreationLog(guildId, schedule);
         }
 
         List<String> crewNicknames = schedule.getInitializedCrewMembers().stream()
                 .map(User::getNickname)
+                .filter(nickname -> nickname != null)
                 .collect(Collectors.toList());
         String crewList = crewNicknames.isEmpty() ? "Nenhum tripulante embarcado" : String.join(", ", crewNicknames);
 
-        String activityHistory = getRecentLogs(schedule.getId()).stream()
-                .map(log -> formatActivity(
-                        log.getUsername() + ": " + log.getDetails(),
-                        log.getTimestamp().atZone(ZoneId.of("America/Sao_Paulo")).toInstant()))
-                .collect(Collectors.joining("\n"));
+        List<String> activityHistoryChunks = splitActivityHistory(getRecentLogs(schedule.getId()));
+        log.info("Histórico de atividades para escala {}: {}", schedule.getId(), String.join("\n", activityHistoryChunks));
 
-        EmbedCreateSpec updatedLogEmbed = EmbedCreateSpec.builder()
+        EmbedCreateSpec.Builder updatedLogEmbedBuilder = EmbedCreateSpec.builder()
                 .title("✈️ Escala em Andamento: " + schedule.getTitle())
                 .description("Escala de voo ativa")
                 .addField("Aeronave", schedule.getAircraftType().getDisplayName(), true)
@@ -132,29 +135,34 @@ public class ScheduleLogManager {
                 .addField("Piloto", schedule.getCreatedByUsername(), true)
                 .addField("Início", DATE_TIME_FORMATTER.format(schedule.getStartTime()), true)
                 .addField("Tripulação", crewList, false)
-                .addField("Últimas Atividades", activityHistory.isEmpty() ? "Nenhuma atividade registrada" : activityHistory, false)
-                .color(getMissionColor(schedule.getMissionType()))
-                .footer("G.R.A Bot - Escala de Voo", aircraftImageUrl)
-                .timestamp(Instant.now())
-                .build();
+                .color(Color.GREEN)
+                .footer(EmbedFactory.FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
+                .timestamp(Instant.now());
+
+        // Add activity history chunks as separate fields
+        for (int i = 0; i < activityHistoryChunks.size(); i++) {
+            String fieldTitle = i == 0 ? "Últimas Atividades" : "Últimas Atividades (continuação " + (i + 1) + ")";
+            updatedLogEmbedBuilder.addField(fieldTitle, activityHistoryChunks.get(i).isEmpty() ? "Nenhuma atividade registrada" : activityHistoryChunks.get(i), false);
+        }
 
         return discordClient.getChannelById(Snowflake.of(channelId))
                 .ofType(MessageChannel.class)
                 .flatMap(channel -> channel.getMessageById(Snowflake.of(messageId))
                         .flatMap(message -> message.edit(MessageEditSpec.builder()
-                                .addEmbed(updatedLogEmbed)
+                                .addEmbed(updatedLogEmbedBuilder.build())
                                 .build()))
                         .onErrorResume(e -> {
                             log.warn("Erro ao atualizar mensagem de log {}: {}. Criando nova mensagem.", messageId, e.getMessage());
-                            return sendLogEmbed(updatedLogEmbed, schedule.getMissionType())
-                                    .doOnNext(newMessage -> scheduleLogMessages.put(schedule.getId(), newMessage.getId().asString()));
+                            return sendLogEmbed(guildId, updatedLogEmbedBuilder.build(), schedule.getMissionType())
+                                    .doOnNext(newMessage -> scheduleLogMessages.computeIfAbsent(guildId, k -> new HashMap<>()).put(schedule.getId(), newMessage.getId().asString()));
                         }))
                 .then()
-                .doOnSuccess(v -> log.info("Log da escala {} atualizado com sucesso", schedule.getId()))
-                .doOnError(e -> log.error("Erro ao atualizar log da escala {}: {}", schedule.getId(), e.getMessage()));
+                .doOnSuccess(v -> log.info("Log da escala {} atualizado com sucesso na guilda {}", schedule.getId(), guildId))
+                .doOnError(e -> log.error("Erro ao atualizar log da escala {} na guilda {}: {}", schedule.getId(), guildId, e.getMessage()));
     }
 
-    public Mono<Void> createFinalScheduleLogMessage(Long scheduleId, String title, AircraftType aircraftType,
+    @Transactional
+    public Mono<Void> createFinalScheduleLogMessage(String guildId, Long scheduleId, String title, AircraftType aircraftType,
                                                     MissionType missionType, ActionSubType actionSubType,
                                                     String actionOption, Instant startTime,
                                                     Instant endTime, String pilotName, String closedByName,
@@ -163,13 +171,10 @@ public class ScheduleLogManager {
         String crewList = crewNicknames.isEmpty() ? "Nenhum tripulante embarcou nesta escala"
                 : String.join(", ", crewNicknames);
 
-        String activityHistory = getRecentLogs(scheduleId).stream()
-                .map(log -> formatActivity(
-                        log.getUsername() + ": " + log.getDetails(),
-                        log.getTimestamp().atZone(ZoneId.of("America/Sao_Paulo")).toInstant()))
-                .collect(Collectors.joining("\n"));
+        List<String> activityHistoryChunks = splitActivityHistory(getRecentLogs(scheduleId));
+        log.info("Histórico de atividades para escala final {}: {}", scheduleId, String.join("\n", activityHistoryChunks));
 
-        EmbedCreateSpec finalLogEmbed = EmbedCreateSpec.builder()
+        EmbedCreateSpec.Builder finalLogEmbedBuilder = EmbedCreateSpec.builder()
                 .title("🏁 Escala Encerrada: " + title)
                 .description("Esta escala de voo foi concluída")
                 .addField("Aeronave", aircraftType.getDisplayName(), true)
@@ -180,47 +185,85 @@ public class ScheduleLogManager {
                 .addField("Duração Total", duration, true)
                 .addField("Início", DATE_TIME_FORMATTER.format(startTime), true)
                 .addField("Término", DATE_TIME_FORMATTER.format(endTime), true)
-                .addField("Tripulantes e tempos de serviço", crewList, false)
-                .addField("Histórico de Atividades", activityHistory.isEmpty() ? "Nenhuma atividade registrada" : activityHistory, false)
+                .addField("Tripulantes", crewList, false)
                 .color(Color.RED)
-                .footer("G.R.A Bot - Escala de Voo", DiscordConfig.FOOTER_GRA_BLUE_URL)
-                .timestamp(Instant.now())
-                .build();
+                .footer(EmbedFactory.FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
+                .timestamp(Instant.now());
 
-        String messageId = scheduleLogMessages.get(scheduleId);
-        String channelId = getLogChannelId(missionType);
+        // Add activity history chunks as separate fields
+        for (int i = 0; i < activityHistoryChunks.size(); i++) {
+            String fieldTitle = i == 0 ? "Histórico de Atividades" : "Histórico de Atividades (continuação " + (i + 1) + ")";
+            finalLogEmbedBuilder.addField(fieldTitle, activityHistoryChunks.get(i).isEmpty() ? "Nenhuma atividade registrada" : activityHistoryChunks.get(i), false);
+        }
+
+        Map<Long, String> guildMessages = scheduleLogMessages.getOrDefault(guildId, new HashMap<>());
+        String messageId = guildMessages.get(scheduleId);
+        String channelId = discordConfig.getLogChannelId(guildId, missionType);
 
         Mono<Void> sendOrUpdateLog = (messageId != null && channelId != null)
                 ? discordClient.getChannelById(Snowflake.of(channelId))
                 .ofType(MessageChannel.class)
                 .flatMap(channel -> channel.getMessageById(Snowflake.of(messageId))
                         .flatMap(message -> message.edit(MessageEditSpec.builder()
-                                .addEmbed(finalLogEmbed)
+                                .addEmbed(finalLogEmbedBuilder.build())
                                 .build()))
                         .onErrorResume(e -> {
                             log.warn("Erro ao atualizar mensagem de log {}: {}. Criando nova mensagem.", messageId, e.getMessage());
-                            return sendLogEmbed(finalLogEmbed, missionType)
-                                    .doOnNext(newMessage -> scheduleLogMessages.put(scheduleId, newMessage.getId().asString()));
+                            return sendLogEmbed(guildId, finalLogEmbedBuilder.build(), missionType)
+                                    .doOnNext(newMessage -> scheduleLogMessages.computeIfAbsent(guildId, k -> new HashMap<>()).put(scheduleId, newMessage.getId().asString()));
                         })
                         .then())
                 : (channelId != null)
-                ? sendLogEmbed(finalLogEmbed, missionType)
-                .doOnNext(message -> scheduleLogMessages.put(scheduleId, message.getId().asString()))
+                ? sendLogEmbed(guildId, finalLogEmbedBuilder.build(), missionType)
+                .doOnNext(message -> scheduleLogMessages.computeIfAbsent(guildId, k -> new HashMap<>()).put(scheduleId, message.getId().asString()))
                 .then()
-                : Mono.error(new IllegalStateException("Canal de logs não configurado para a missão " + missionType));
+                : Mono.empty();
 
         return sendOrUpdateLog
-                .doOnSuccess(v -> log.info("Log final da escala {} enviado com sucesso", scheduleId))
-                .doOnError(e -> log.error("Falha ao enviar log final da escala {}: {}", scheduleId, e.getMessage()));
+                .doOnSuccess(v -> log.info("Log final da escala {} enviado com sucesso na guilda {}", scheduleId, guildId))
+                .doOnError(e -> log.error("Falha ao enviar log final da escala {} na guilda {}: {}", scheduleId, guildId, e.getMessage()));
     }
 
     @Transactional(readOnly = true)
     public List<ScheduleLog> getRecentLogs(Long scheduleId) {
         List<ScheduleLog> logs = scheduleLogRepository.findByScheduleIdOrderByTimestampAsc(scheduleId);
-        if (logs.size() > 5) {
-            logs = logs.subList(0, 5);
+        for (ScheduleLog log : logs) {
+            Hibernate.initialize(log.getSchedule());
+            Hibernate.initialize(log.getSchedule().getCrewMembers());
+            log.getSchedule().initializeCrewMembers();
         }
-        return logs;
+        log.info("Logs encontrados para escala {}: {}", scheduleId, logs);
+        return logs; // Return all logs without truncation
+    }
+
+    private List<String> splitActivityHistory(List<ScheduleLog> logs) {
+        List<String> chunks = new ArrayList<>();
+        StringBuilder currentChunk = new StringBuilder();
+        int currentLength = 0;
+
+        for (ScheduleLog log : logs) {
+            String activity = formatActivity(
+                    log.getUsername() + ": " + log.getDetails().trim(),
+                    log.getTimestamp().atZone(ZoneId.of("America/Sao_Paulo")).toInstant());
+            int activityLength = activity.length() + 1; // +1 for newline
+
+            if (currentLength + activityLength > MAX_FIELD_LENGTH) {
+                if (currentChunk.length() > 0) {
+                    chunks.add(currentChunk.toString());
+                    currentChunk = new StringBuilder();
+                    currentLength = 0;
+                }
+            }
+
+            currentChunk.append(activity).append("\n");
+            currentLength += activityLength;
+        }
+
+        if (currentChunk.length() > 0) {
+            chunks.add(currentChunk.toString());
+        }
+
+        return chunks;
     }
 
     private String formatDateTime(Instant instant) {
@@ -246,26 +289,30 @@ public class ScheduleLogManager {
         };
     }
 
-    public Mono<Void> configureLogChannel(String channelId, MissionType missionType) {
-        if (missionType == null) {
-            for (MissionType type : MissionType.values()) {
-                this.logChannelIds.put(type, channelId);
+    @Transactional
+    public Mono<Void> configureLogChannel(String guildId, String channelId, MissionType missionType) {
+        return Mono.fromCallable(() -> {
+            GuildConfig config = guildConfigRepository.findById(guildId)
+                    .orElse(new GuildConfig());
+            config.setGuildId(guildId);
+            if (missionType == MissionType.ACTION) {
+                config.setActionLogChannelId(channelId);
+            } else if (missionType == MissionType.PATROL) {
+                config.setPatrolLogChannelId(channelId);
             }
-            log.info("Canal de logs configurado para todos os tipos de missão: {}", channelId);
-        } else {
-            this.logChannelIds.put(missionType, channelId);
-            log.info("Canal de logs configurado para missão {}: {}", missionType, channelId);
-        }
-
-        String confirmMessage = "✅ Sistema de logs de escalas configurado com sucesso para " +
-                (missionType == null ? "todos os tipos de missão" : "missões do tipo " + missionType.getDisplayName()) + ".";
-
-        return sendLogMessage(confirmMessage, missionType);
+            guildConfigRepository.save(config);
+            log.info("Canal de logs configurado para guilda {} e missão {}: {}", guildId, missionType, channelId);
+            return config;
+        }).flatMap(config -> {
+            String confirmMessage = "✅ Sistema de logs de escalas configurado com sucesso para missões do tipo " + missionType.getDisplayName() + ".";
+            return sendLogMessage(guildId, confirmMessage, missionType);
+        });
     }
 
-    private Mono<Void> sendLogMessage(String content, MissionType missionType) {
-        String channelId = getLogChannelId(missionType);
+    private Mono<Void> sendLogMessage(String guildId, String content, MissionType missionType) {
+        String channelId = discordConfig.getLogChannelId(guildId, missionType);
         if (channelId == null || discordClient == null) {
+            log.error("Canal de logs não configurado para guilda {} e missão {}.", guildId, missionType);
             return Mono.empty();
         }
 
@@ -275,17 +322,11 @@ public class ScheduleLogManager {
                 .then();
     }
 
-    public String getLogChannelId(MissionType missionType) {
-        if (missionType != null && logChannelIds.containsKey(missionType)) {
-            return logChannelIds.get(missionType);
-        }
-        return logChannelIds.getOrDefault(MissionType.PATROL, null);
-    }
-
-    private Mono<Message> sendLogEmbed(EmbedCreateSpec embed, MissionType missionType) {
-        String channelId = getLogChannelId(missionType);
+    private Mono<Message> sendLogEmbed(String guildId, EmbedCreateSpec embed, MissionType missionType) {
+        String channelId = discordConfig.getLogChannelId(guildId, missionType);
         if (channelId == null || discordClient == null) {
-            return Mono.error(new IllegalStateException("Canal de logs não configurado"));
+            log.error("Canal de logs não configurado para guilda {} e missão {}.", guildId, missionType);
+            return Mono.empty();
         }
 
         return discordClient.getChannelById(Snowflake.of(channelId))

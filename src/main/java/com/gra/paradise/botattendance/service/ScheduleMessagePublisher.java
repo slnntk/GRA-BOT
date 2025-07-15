@@ -2,6 +2,7 @@ package com.gra.paradise.botattendance.service;
 
 import com.gra.paradise.botattendance.model.Schedule;
 import com.gra.paradise.botattendance.model.User;
+import com.gra.paradise.botattendance.repository.ScheduleRepository;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
 import discord4j.core.object.component.ActionRow;
@@ -26,6 +27,7 @@ public class ScheduleMessagePublisher {
     private final GatewayDiscordClient discordClient;
     private final EmbedFactory embedFactory;
     private final ScheduleMessageManager scheduleMessageManager;
+    private final ScheduleRepository scheduleRepository;
 
     public Mono<Void> createSchedulePublicMessage(ButtonInteractionEvent event, Schedule schedule) {
         List<String> crewNicknames = new ArrayList<>();
@@ -47,9 +49,12 @@ public class ScheduleMessagePublisher {
                 .flatMap(message -> {
                     String messageId = message.getId().asString();
                     String channelId = message.getChannelId().asString();
-                    return scheduleMessageManager.registerScheduleMessage(String.valueOf(schedule.getId()), channelId, messageId);
+                    schedule.setMessageId(messageId);
+                    schedule.setChannelId(channelId);
+                    return Mono.just(scheduleRepository.save(schedule))
+                            .then(scheduleMessageManager.registerScheduleMessage(String.valueOf(schedule.getId()), channelId, messageId));
                 })
-                .doOnSuccess(v -> log.info("Mensagem pública criada para a escala {}", schedule.getId()))
+                .doOnSuccess(v -> log.info("Mensagem pública criada para a escala {} com messageId {} e channelId {}", schedule.getId(), schedule.getMessageId(), schedule.getChannelId()))
                 .doOnError(e -> log.error("Erro ao criar mensagem pública para a escala {}: {}", schedule.getId(), e.getMessage()))
                 .then();
     }

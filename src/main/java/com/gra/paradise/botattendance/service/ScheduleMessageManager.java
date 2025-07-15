@@ -2,13 +2,17 @@ package com.gra.paradise.botattendance.service;
 
 import com.gra.paradise.botattendance.config.DiscordConfig;
 import com.gra.paradise.botattendance.model.Schedule;
+import com.gra.paradise.botattendance.model.SystemMessage;
 import com.gra.paradise.botattendance.repository.ScheduleRepository;
+import com.gra.paradise.botattendance.repository.SystemMessageRepository;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.component.ActionRow;
 import discord4j.core.object.component.Button;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_GRA_BLUE_URL;
+import static com.gra.paradise.botattendance.config.DiscordConfig.GRA_IMAGE_URL;
 
 @Slf4j
 @Service
@@ -30,11 +35,91 @@ public class ScheduleMessageManager {
     private final GatewayDiscordClient discordClient;
     private final EmbedFactory embedFactory;
     private final ScheduleRepository scheduleRepository;
+    private final SystemMessageRepository systemMessageRepository;
+    private final DiscordConfig discordConfig;
 
-    private final Map<String, String> scheduleChannelMap = new HashMap<>();
-    private final Map<String, String> scheduleMessageMap = new HashMap<>();
-    private String systemChannelId;
-    private String systemMessageId;
+    private final Map<String, String> scheduleChannelMap = new HashMap<>(); // scheduleId -> channelId
+    private final Map<String, String> scheduleMessageMap = new HashMap<>(); // scheduleId -> messageId
+    private final Map<String, String> systemChannelMap = new HashMap<>(); // guildId -> channelId
+    private final Map<String, String> systemMessageMap = new HashMap<>(); // guildId -> messageId
+
+    @PostConstruct
+    public void initializeSystemMessages() {
+        systemMessageRepository.findAll().forEach(systemMessage -> {
+            String guildId = systemMessage.getGuildId();
+            systemChannelMap.put(guildId, systemMessage.getChannelId());
+            systemMessageMap.put(guildId, systemMessage.getMessageId());
+            log.info("Mensagem do sistema carregada do banco para guilda {}: canal {}, mensagem {}", guildId, systemMessage.getChannelId(), systemMessage.getMessageId());
+            verifySystemMessage(guildId).subscribe();
+        });
+    }
+
+    private Mono<Void> verifySystemMessage(String guildId) {
+        String systemChannelId = systemChannelMap.get(guildId);
+        String systemMessageId = systemMessageMap.get(guildId);
+
+        if (systemChannelId == null || systemMessageId == null) {
+            log.warn("IDs da mensagem do sistema não disponíveis para guilda {}. Criando nova mensagem.", guildId);
+            return createSystemMessage(guildId);
+        }
+
+        return discordClient.getChannelById(Snowflake.of(systemChannelId))
+                .ofType(MessageChannel.class)
+                .flatMap(channel -> channel.getMessageById(Snowflake.of(systemMessageId))
+                        .then(Mono.empty())
+                        .onErrorResume(e -> {
+                            log.warn("Mensagem do sistema não encontrada para guilda {}: {}. Criando nova mensagem.", guildId, systemMessageId);
+                            return createSystemMessage(guildId);
+                        })).then();
+    }
+
+    public Mono<Void> createSystemMessage(String guildId) {
+        String defaultChannelId = discordConfig.getDefaultSystemChannelId(guildId);
+        if (defaultChannelId == null) {
+            log.error("Canal padrão não configurado para guilda {}. Use /setup-escala para configurar.", guildId);
+            return discordClient.getChannelById(Snowflake.of(guildId))
+                    .ofType(MessageChannel.class)
+                    .flatMap(channel -> channel.createMessage("⚠️ Canal de sistema não configurado. Use o comando `/setup-escala` para configurar."))
+                    .then(Mono.empty());
+        }
+
+        EmbedCreateSpec embed = EmbedCreateSpec.builder()
+                .image(FOOTER_GRA_BLUE_URL)
+                .title("🚁 Sistema de Escalas G.R.A")
+                .description("Bem-vindo ao controle operacional da G.R.A! 🚨\n**Pronto para gerenciar?**")
+                .color(Color.of(0, 102, 204))
+                .addField("📋 Instruções", """
+                        • Clique em **Iniciar** para criar uma nova escala
+                        • Siga os passos para selecionar helicóptero e operação
+                        • Confirme os detalhes no final
+                        """, false)
+                .addField("🔔 Status", "Nenhuma escala ativa. Crie uma agora! 🚁", false)
+                .footer(EmbedFactory.FOOTER_TEXT, GRA_IMAGE_URL)
+                .timestamp(Instant.now())
+                .build();
+
+        Button createButton = Button.primary("create_schedule", "Iniciar Escala");
+
+        return discordClient.getChannelById(Snowflake.of(defaultChannelId))
+                .ofType(MessageChannel.class)
+                .flatMap(channel -> channel.createMessage()
+                        .withEmbeds(embed)
+                        .withComponents(ActionRow.of(createButton))
+                        .flatMap(message -> {
+                            String messageId = message.getId().asString();
+                            systemChannelMap.put(guildId, defaultChannelId);
+                            systemMessageMap.put(guildId, messageId);
+                            SystemMessage systemMessage = new SystemMessage();
+                            systemMessage.setGuildId(guildId);
+                            systemMessage.setChannelId(defaultChannelId);
+                            systemMessage.setMessageId(messageId);
+                            systemMessageRepository.save(systemMessage);
+                            log.info("Nova mensagem do sistema criada para guilda {}: canal {}, mensagem {}", guildId, defaultChannelId, messageId);
+                            return Mono.empty();
+                        }))
+                .doOnError(e -> log.error("Erro ao criar mensagem do sistema para guilda {}: {}", guildId, e.getMessage()))
+                .then();
+    }
 
     public Mono<Void> registerScheduleMessage(String scheduleId, String channelId, String messageId) {
         scheduleChannelMap.put(scheduleId, channelId);
@@ -43,10 +128,15 @@ public class ScheduleMessageManager {
         return Mono.empty();
     }
 
-    public Mono<Void> registerSystemMessage(String channelId, String messageId) {
-        this.systemChannelId = channelId;
-        this.systemMessageId = messageId;
-        log.info("Mensagem de sistema registrada: canal {}, mensagem {}", channelId, messageId);
+    public Mono<Void> registerSystemMessage(String guildId, String channelId, String messageId) {
+        systemChannelMap.put(guildId, channelId);
+        systemMessageMap.put(guildId, messageId);
+        SystemMessage systemMessage = new SystemMessage();
+        systemMessage.setGuildId(guildId);
+        systemMessage.setChannelId(channelId);
+        systemMessage.setMessageId(messageId);
+        systemMessageRepository.save(systemMessage);
+        log.info("Mensagem de sistema registrada para guilda {}: canal {}, mensagem {}", guildId, channelId, messageId);
         return Mono.empty();
     }
 
@@ -60,7 +150,7 @@ public class ScheduleMessageManager {
         }
 
         return discordClient.getChannelById(Snowflake.of(channelId))
-                .ofType(discord4j.core.object.entity.channel.MessageChannel.class)
+                .ofType(MessageChannel.class)
                 .flatMap(channel -> channel.getMessageById(Snowflake.of(messageId)))
                 .flatMap(message -> {
                     Schedule schedule = scheduleRepository.findById(Long.parseLong(scheduleId))
@@ -83,7 +173,7 @@ public class ScheduleMessageManager {
                 .then();
     }
 
-    public Mono<Void> removeScheduleMessage(String scheduleId) {
+    public Mono<Void> removeScheduleMessage(String scheduleId, String guildId) {
         String channelId = scheduleChannelMap.get(scheduleId);
         String messageId = scheduleMessageMap.get(scheduleId);
 
@@ -91,11 +181,11 @@ public class ScheduleMessageManager {
             log.warn("Nenhum canal ou mensagem encontrado para a escala {}. Não é possível excluir a mensagem.", scheduleId);
             scheduleChannelMap.remove(scheduleId);
             scheduleMessageMap.remove(scheduleId);
-            return Mono.empty();
+            return updateSystemMessage(guildId);
         }
 
         return discordClient.getChannelById(Snowflake.of(channelId))
-                .ofType(discord4j.core.object.entity.channel.MessageChannel.class)
+                .ofType(MessageChannel.class)
                 .flatMap(channel -> channel.getMessageById(Snowflake.of(messageId))
                         .flatMap(message -> message.delete("Escala encerrada"))
                         .doOnSuccess(v -> log.info("Mensagem da escala {} excluída do canal {}", scheduleId, channelId))
@@ -104,20 +194,24 @@ public class ScheduleMessageManager {
                     scheduleChannelMap.remove(scheduleId);
                     scheduleMessageMap.remove(scheduleId);
                     log.info("Registros de mensagem removidos para escala {}", scheduleId);
-                }));
+                }))
+                .then(updateSystemMessage(guildId));
     }
 
-    public Mono<Void> updateSystemMessage() {
+    public Mono<Void> updateSystemMessage(String guildId) {
+        String systemChannelId = systemChannelMap.get(guildId);
+        String systemMessageId = systemMessageMap.get(guildId);
+
         if (systemChannelId == null || systemMessageId == null) {
-            log.warn("Mensagem de sistema não registrada para atualização.");
-            return Mono.empty();
+            log.warn("Mensagem de sistema não registrada para guilda {}. Tentando recriar.", guildId);
+            return createSystemMessage(guildId);
         }
 
         return discordClient.getChannelById(Snowflake.of(systemChannelId))
-                .ofType(discord4j.core.object.entity.channel.MessageChannel.class)
+                .ofType(MessageChannel.class)
                 .flatMap(channel -> channel.getMessageById(Snowflake.of(systemMessageId)))
                 .flatMap(message -> {
-                    List<Schedule> activeSchedules = scheduleRepository.findByActiveTrue();
+                    List<Schedule> activeSchedules = scheduleRepository.findByActiveTrueAndGuildId(guildId);
                     String statusMessage;
                     if (activeSchedules.isEmpty()) {
                         statusMessage = "Nenhuma escala ativa. Crie uma agora! 🚁";
@@ -130,28 +224,53 @@ public class ScheduleMessageManager {
                     }
 
                     EmbedCreateSpec embed = EmbedCreateSpec.builder()
-                            .thumbnail(DiscordConfig.GRA_IMAGE_URL)
-                            .title("🚁 Sistema de Escalas Águias")
-                            .description("Bem-vindo ao controle operacional dos Águias! 🚨\n**Pronto para gerenciar?**")
-                            .color(Color.of(0, 102, 204)) // Dark blue
+                            .image(FOOTER_GRA_BLUE_URL)
+                            .title("🚁 Sistema de Escalas G.R.A")
+                            .description("Bem-vindo ao controle operacional da G.R.A! 🚨\n**Pronto para gerenciar?**")
+                            .color(Color.of(0, 102, 204))
                             .addField("📋 Instruções", """
-                            • Clique em **Iniciar** para criar uma nova escala
-                            • Siga os passos para selecionar helicóptero e operação
-                            • Confirme os detalhes no final
-                            """, false)
+                                    • Clique em **Iniciar** para criar uma nova escala
+                                    • Siga os passos para selecionar helicóptero e operação
+                                    • Confirme os detalhes no final
+                                    """, false)
                             .addField("🔔 Status", statusMessage, false)
-                            .footer(EmbedFactory.FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
+                            .footer(EmbedFactory.FOOTER_TEXT, GRA_IMAGE_URL)
                             .timestamp(Instant.now())
                             .build();
 
-                    Button createButton = Button.primary("create_schedule", "Iniciar Operação");
+                    Button createButton = Button.primary("create_schedule", "Iniciar Escala");
 
                     return message.edit()
                             .withEmbeds(embed)
                             .withComponents(ActionRow.of(createButton));
                 })
-                .doOnSuccess(v -> log.info("Mensagem de sistema atualizada com escalas ativas"))
-                .doOnError(e -> log.error("Erro ao atualizar mensagem de sistema: {}", e.getMessage()))
+                .doOnSuccess(v -> log.info("Mensagem de sistema atualizada com escalas ativas para guilda {}", guildId))
+                .doOnError(e -> {
+                    log.error("Erro ao atualizar mensagem do sistema para guilda {}: {}. Tentando recriar.", guildId, e.getMessage());
+                    createSystemMessage(guildId).subscribe();
+                })
                 .then();
+    }
+
+    /**
+     * Recupera os detalhes de uma mensagem de escala com base no scheduleId.
+     *
+     * @param scheduleId O ID da escala
+     * @return Mono contendo o channelId e messageId, ou Mono.empty() se não encontrados
+     */
+    public Mono<Map<String, String>> getScheduleMessageDetails(String scheduleId) {
+        return Mono.justOrEmpty(scheduleChannelMap.get(scheduleId))
+                .map(channelId -> {
+                    String messageId = scheduleMessageMap.get(scheduleId);
+                    Map<String, String> details = new HashMap<>();
+                    details.put("channelId", channelId);
+                    details.put("messageId", messageId != null ? messageId : "");
+                    log.debug("Detalhes da mensagem recuperados para escala {}: {}", scheduleId, details);
+                    return details;
+                })
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.warn("Nenhum detalhe de mensagem encontrado para a escala {}", scheduleId);
+                    return Mono.empty();
+                }));
     }
 }
