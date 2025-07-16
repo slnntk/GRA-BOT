@@ -40,8 +40,8 @@ public class DiscordConfig {
     private String graImageUrl;
     @Value("${footer.gra.blue.url:https://raw.githubusercontent.com/slnntk/BOT-ATTENDANCE-GRA/refs/heads/master/image.png}")
     private String footerGraBlueUrl;
-    @Value("${footer.gra.black.url:https://raw.githubusercontent.com/slnntk/BOT-ATTENDANCE-GRA/refs/heads/master/gra_gutem.png}")
-    private String footerGraBlackUrl;
+    @Value("${heli.first.screen:https://raw.githubusercontent.com/slnntk/BOT-ATTENDANCE-GRA/refs/heads/master/gra_gutem.png}")
+    private String heliFirstScreenUrl;
     @Value("${aircraft.valkyre.url:https://raw.githubusercontent.com/slnntk/GRA-BOT/main/src/main/resources/images/image.png}")
     private String valkyreImageUrl;
     @Value("${aircraft.ec135.url:https://raw.githubusercontent.com/slnntk/GRA-BOT/main/src/main/resources/images/image.png}")
@@ -52,18 +52,18 @@ public class DiscordConfig {
     public static final Map<AircraftType, String> AIRCRAFT_IMAGE_URLS = new HashMap<>();
     public static String GRA_IMAGE_URL;
     public static String FOOTER_GRA_BLUE_URL;
-    public static String FOOTER_GRA_BLACK_URL;
+    public static String FOOTER_CHOOSE_HELI_FIRST_SCREEN_URL;
 
     @PostConstruct
     public void init() {
         GRA_IMAGE_URL = graImageUrl;
         FOOTER_GRA_BLUE_URL = footerGraBlueUrl;
-        FOOTER_GRA_BLACK_URL = footerGraBlackUrl;
+        FOOTER_CHOOSE_HELI_FIRST_SCREEN_URL = heliFirstScreenUrl;
         AIRCRAFT_IMAGE_URLS.put(AircraftType.VALKYRE, valkyreImageUrl);
         AIRCRAFT_IMAGE_URLS.put(AircraftType.EC135, ec135ImageUrl);
         AIRCRAFT_IMAGE_URLS.put(AircraftType.MAVERICK, maverickImageUrl);
-        logger.debug("Initialized URLs: GRA_IMAGE_URL={}, FOOTER_GRA_BLUE_URL={}, FOOTER_GRA_BLACK_URL={}",
-                GRA_IMAGE_URL, FOOTER_GRA_BLUE_URL, FOOTER_GRA_BLACK_URL);
+        logger.debug("Initialized URLs: GRA_IMAGE_URL={}, FOOTER_GRA_BLUE_URL={}, FOOTER_CHOOSE_HELI_FIRST_SCREEN_URL={}",
+                GRA_IMAGE_URL, FOOTER_GRA_BLUE_URL, FOOTER_CHOOSE_HELI_FIRST_SCREEN_URL);
         logger.debug("AIRCRAFT_IMAGE_URLS: {}", AIRCRAFT_IMAGE_URLS);
     }
 

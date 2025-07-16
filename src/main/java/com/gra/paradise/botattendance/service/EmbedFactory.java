@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_GRA_BLACK_URL;
+import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_CHOOSE_HELI_FIRST_SCREEN_URL;
 import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_GRA_BLUE_URL;
 
 @Component
@@ -29,7 +29,7 @@ public class EmbedFactory {
 
     public EmbedCreateSpec createSystemOverviewEmbed() {
         return EmbedCreateSpec.builder()
-                .image(FOOTER_GRA_BLACK_URL)
+                .image(FOOTER_CHOOSE_HELI_FIRST_SCREEN_URL)
                 .title("🚁 Sistema de Escalas Águias")
                 .description("Controle as operações dos helicópteros Águias da Polícia. 🚨\n**Pronto para gerenciar?** Clique no botão para iniciar.")
                 .color(Color.of(0, 102, 204)) // Dark blue for authority
@@ -47,7 +47,7 @@ public class EmbedFactory {
 
     public EmbedCreateSpec createAircraftSelectionEmbed() {
         return EmbedCreateSpec.builder()
-                .image(FOOTER_GRA_BLACK_URL)
+                .image(FOOTER_CHOOSE_HELI_FIRST_SCREEN_URL)
                 .title("🚁 Selecione o Helicóptero")
                 .description("Escolha o helicóptero para a operação.")
                 .color(Color.of(0, 102, 204))
