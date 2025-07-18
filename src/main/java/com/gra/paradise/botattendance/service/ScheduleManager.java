@@ -41,7 +41,10 @@ public class ScheduleManager {
                                    String actionOption) {
         if (guildId == null || title == null || aircraftType == null || missionType == null ||
                 creatorId == null || creatorNickname == null) {
-            throw new MissingRequiredParametersException();
+            throw new MissingRequiredParametersException("Parâmetros obrigatórios não fornecidos.");
+        }
+        if (missionType == MissionType.OTHER && (actionOption == null || actionOption.trim().isEmpty())) {
+            throw new MissingRequiredParametersException("O campo de descrição é obrigatório para missões do tipo 'Outros'.");
         }
 
         Schedule schedule = new Schedule();
@@ -49,7 +52,7 @@ public class ScheduleManager {
         schedule.setTitle(title.trim());
         schedule.setAircraftType(aircraftType);
         schedule.setMissionType(missionType);
-        schedule.setActionSubType(actionSubType);
+        schedule.setActionSubType(missionType == MissionType.OTHER ? null : actionSubType); // Não usar actionSubType para OUTROS
         schedule.setActionOption(actionOption != null ? actionOption.trim() : null);
         schedule.setStartTime(Instant.now());
         schedule.setCreatedById(creatorId.trim());
@@ -81,8 +84,8 @@ public class ScheduleManager {
         schedule.setCrewMembers(crew);
 
         Schedule saved = scheduleRepository.save(schedule);
-        logManager.createScheduleLog(saved, "EMBARKED", discordId, nickname,  " embarcou.");
-        logManager.updateScheduleLogMessage(guildId, saved,  " embarcou.").block();
+        logManager.createScheduleLog(saved, "EMBARKED", discordId, nickname, " embarcou.");
+        logManager.updateScheduleLogMessage(guildId, saved, " embarcou.").block();
         return saved;
     }
 
@@ -104,8 +107,8 @@ public class ScheduleManager {
         schedule.setCrewMembers(crew);
 
         Schedule saved = scheduleRepository.save(schedule);
-        logManager.createScheduleLog(saved, "DISEMBARKED", discordId, nickname,  " desembarcou.");
-        logManager.updateScheduleLogMessage(guildId, saved,  " desembarcou.").block();
+        logManager.createScheduleLog(saved, "DISEMBARKED", discordId, nickname, " desembarcou.");
+        logManager.updateScheduleLogMessage(guildId, saved, " desembarcou.").block();
         return saved;
     }
 
@@ -178,5 +181,9 @@ public class ScheduleManager {
     public Schedule findByIdAndGuildIdWithCrew(Long scheduleId, String guildId) {
         return scheduleRepository.findByIdAndGuildIdWithCrew(scheduleId, guildId)
                 .orElseThrow(() -> new ScheduleNotFoundException(scheduleId));
+    }
+
+    public List<String> getOtherMissionSuggestions() {
+        return OtherMissionSuggestions.getSuggestions();
     }
 }

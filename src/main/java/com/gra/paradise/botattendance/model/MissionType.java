@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum MissionType {
     PATROL("Patrulhamento"),
-    ACTION("Ação");
+    ACTION("Ação"),
+    OTHER("Outros");
 
     private final String displayName;
 

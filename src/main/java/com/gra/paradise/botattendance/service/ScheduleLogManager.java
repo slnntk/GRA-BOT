@@ -76,11 +76,10 @@ public class ScheduleLogManager {
                 .addField("Piloto", schedule.getCreatedByUsername(), true)
                 .addField("Início", DATE_TIME_FORMATTER.format(schedule.getStartTime()), true)
                 .addField("Tripulação", crewList, false)
-                .color(Color.GREEN)
+                .color(getMissionColor(schedule.getMissionType()))
                 .footer(EmbedFactory.FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
                 .timestamp(Instant.now());
 
-        // Add initial activity
         String initialActivity = formatActivity(
                 schedule.getCreatedByUsername() + ": Escala criada: " + schedule.getTitle(),
                 schedule.getStartTime());
@@ -135,11 +134,10 @@ public class ScheduleLogManager {
                 .addField("Piloto", schedule.getCreatedByUsername(), true)
                 .addField("Início", DATE_TIME_FORMATTER.format(schedule.getStartTime()), true)
                 .addField("Tripulação", crewList, false)
-                .color(Color.GREEN)
+                .color(getMissionColor(schedule.getMissionType()))
                 .footer(EmbedFactory.FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
                 .timestamp(Instant.now());
 
-        // Add activity history chunks as separate fields
         for (int i = 0; i < activityHistoryChunks.size(); i++) {
             String fieldTitle = i == 0 ? "Últimas Atividades" : "Últimas Atividades (continuação " + (i + 1) + ")";
             updatedLogEmbedBuilder.addField(fieldTitle, activityHistoryChunks.get(i).isEmpty() ? "Nenhuma atividade registrada" : activityHistoryChunks.get(i), false);
@@ -186,11 +184,10 @@ public class ScheduleLogManager {
                 .addField("Início", DATE_TIME_FORMATTER.format(startTime), true)
                 .addField("Término", DATE_TIME_FORMATTER.format(endTime), true)
                 .addField("Tripulantes", crewList, false)
-                .color(Color.RED)
+                .color(getMissionColor(missionType))
                 .footer(EmbedFactory.FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
                 .timestamp(Instant.now());
 
-        // Add activity history chunks as separate fields
         for (int i = 0; i < activityHistoryChunks.size(); i++) {
             String fieldTitle = i == 0 ? "Histórico de Atividades" : "Histórico de Atividades (continuação " + (i + 1) + ")";
             finalLogEmbedBuilder.addField(fieldTitle, activityHistoryChunks.get(i).isEmpty() ? "Nenhuma atividade registrada" : activityHistoryChunks.get(i), false);
@@ -285,6 +282,7 @@ public class ScheduleLogManager {
         return switch (missionType) {
             case PATROL -> Color.BLUE;
             case ACTION -> Color.RED;
+            case OTHER -> Color.YELLOW;
             default -> Color.GREEN;
         };
     }
@@ -295,10 +293,18 @@ public class ScheduleLogManager {
             GuildConfig config = guildConfigRepository.findById(guildId)
                     .orElse(new GuildConfig());
             config.setGuildId(guildId);
-            if (missionType == MissionType.ACTION) {
-                config.setActionLogChannelId(channelId);
-            } else if (missionType == MissionType.PATROL) {
-                config.setPatrolLogChannelId(channelId);
+            switch (missionType) {
+                case ACTION:
+                    config.setActionLogChannelId(channelId);
+                    break;
+                case PATROL:
+                    config.setPatrolLogChannelId(channelId);
+                    break;
+                case OTHER:
+                    config.setOtherLogChannelId(channelId);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Tipo de missão não suportado: " + missionType);
             }
             guildConfigRepository.save(config);
             log.info("Canal de logs configurado para guilda {} e missão {}: {}", guildId, missionType, channelId);
