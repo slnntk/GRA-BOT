@@ -124,6 +124,10 @@ public class DiscordEventHandler {
                                 ApplicationCommandOptionChoiceData.builder()
                                         .name("Ação")
                                         .value("ACTION")
+                                        .build(),
+                                ApplicationCommandOptionChoiceData.builder()
+                                        .name("Outros")
+                                        .value("OTHER")
                                         .build()
                         ))
                         .build())
