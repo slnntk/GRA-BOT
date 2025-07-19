@@ -210,8 +210,12 @@ public class ScheduleInteractionHandler {
                         }
                     }))
                     .onErrorResume(ClientException.class, e -> {
-                        log.error("Erro ao exibir modal de descrição ou deletar mensagem para usuário {}: {}",
-                                event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
+                        if (e.getStatus().code() == 404) {
+                            log.warn("Mensagem já deletada ou não encontrada para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage());
+                        } else {
+                            log.error("Erro ao exibir modal de descrição ou deletar mensagem para usuário {}: {}",
+                                    event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
+                        }
                         return event.createFollowup()
                                 .withEphemeral(true)
                                 .withContent("❌ Erro ao abrir modal de descrição. Tente novamente. (Hora: " +
