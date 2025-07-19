@@ -450,9 +450,6 @@ public class ScheduleInteractionHandler {
                 return event.createFollowup("❌ Descrição da missão OUTROS não encontrada ou inválida. Reinicie o processo.").withEphemeral(true).then();
             }
             outrosDescriptionCache.remove(sessionId); // Limpar o cache após uso
-        } else {
-            log.error("Formato de customId inesperado para missão {} com {} partes para usuário {}", missionTypeStr, parts.length, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Formato de confirmação inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         AircraftType aircraftType;
@@ -492,7 +489,7 @@ public class ScheduleInteractionHandler {
                 .orElseThrow(() -> new IllegalStateException("Comando deve ser executado em um servidor"));
 
         ActionSubType finalActionSubType = actionSubType;
-        String finalActionOption = (missionType == MissionType.OUTROS) ? null : actionOption; // Forçar null para OUTROS
+        String finalActionOption = actionOption; // Correção: usar actionOption diretamente, sem forçar null para OUTROS
         log.info("Tentando criar escala para usuário {} com title: {}, aircraft: {}, mission: {}, actionSubType: {}, actionOption: {}",
                 userId, title, aircraftType, missionType, finalActionSubType, finalActionOption);
 
