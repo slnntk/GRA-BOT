@@ -221,7 +221,12 @@ public class ScheduleMessageManager {
                                 .map(schedule -> String.format("**%s**: Piloto %s (%s)",
                                         schedule.getTitle(),
                                         schedule.getCreatedByUsername(),
-                                        schedule.getMissionType() == MissionType.OUTROS ? schedule.getOutrosDescription() : schedule.getMissionType().getDisplayName()))
+                                        schedule.getMissionType() == MissionType.OUTROS
+                                                ? schedule.getOutrosDescription()
+                                                : schedule.getMissionType() == MissionType.ACTION
+                                                ? schedule.getActionOption()
+                                                : schedule.getMissionType().getDisplayName()
+                                ))
                                 .collect(Collectors.joining("\n"));
                     }
 
