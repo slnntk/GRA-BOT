@@ -71,12 +71,18 @@ public class ScheduleLogManager {
                 .addField("Escala", schedule.getTitle(), true)
                 .addField("Aeronave", schedule.getAircraftType().getDisplayName(), true)
                 .addField("Tipo de Missão", schedule.getMissionType().getDisplayName(), true)
-                .addField("Subtipo de Ação", schedule.getActionSubType() != null ? schedule.getActionSubType().getDisplayName() : "N/A", true)
+                .addField(
+                        schedule.getOutrosDescription() != null ? "Motivo" : "Subtipo de Ação",
+                        schedule.getOutrosDescription() != null
+                                ? schedule.getOutrosDescription()
+                                : (schedule.getActionSubType() != null ? schedule.getActionSubType().getDisplayName() : "N/A"),
+                        true
+                )
                 .addField("Opção", schedule.getActionOption() != null ? schedule.getActionOption() : "N/A", true)
                 .addField("Piloto", schedule.getCreatedByUsername(), true)
                 .addField("Início", DATE_TIME_FORMATTER.format(schedule.getStartTime()), true)
                 .addField("Tripulação", crewList, false)
-                .color(Color.GREEN)
+                .color(schedule.getOutrosDescription() != null ? Color.DISCORD_WHITE : Color.GREEN)
                 .footer(EmbedFactory.FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
                 .timestamp(Instant.now());
 
