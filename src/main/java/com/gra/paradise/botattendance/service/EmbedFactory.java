@@ -64,7 +64,7 @@ public class EmbedFactory {
                 .title("🚨 Escolha o Tipo de Operação")
                 .description("**Helicóptero**: " + aircraftType.getDisplayName() + "\nDefina o tipo de operação (ex.: Patrulha, Ação Tática ou Outros).")
                 .color(Color.of(0, 102, 204))
-                .addField("💡 Dica", "Patrulhamento refere-se às ocasiões em que o helicóptero está em operação nas ruas, independentemente de ser em prioridade, código 0 ou outras situações. Já ações são momentos em que a equipe GRA ou os operadores de combate atuam diretamente em intervenções táticas. Outros abrange atividades como recrutamento ou formação.", false)
+                .addField("💡 Dica", "Patrulhamento refere-se às ocasiões em que o helicóptero está em operação nas ruas, independentemente de ser em prioridade, código 0 ou outras situações. Já ações são momentos em que a equipe GRA ou os operadores de combate atuam diretamente em intervenções táticas. Outros permite especificar uma missão personalizada.", false)
                 .footer(FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
                 .timestamp(Instant.now())
                 .build();
@@ -88,7 +88,7 @@ public class EmbedFactory {
         return EmbedCreateSpec.builder()
                 .image(aircraftImageUrl)
                 .title("✅ Finalize a Operação")
-                .description("**Helicóptero**: " + aircraftType.getDisplayName() + "\n**Subtipo**: " + (subType != null ? subType.getDisplayName() : "N/A") + "\nSelecione a ação (ex: Joalheria).")
+                .description("**Helicóptero**: " + aircraftType.getDisplayName() + "\n**Subtipo**: " + subType.getDisplayName() + "\nSelecione a ação (ex: Joalheria).")
                 .color(Color.of(0, 102, 204))
                 .addField("💡 Dica", "Confira todos os detalhes antes de finalizar!", false)
                 .footer(FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
@@ -106,14 +106,18 @@ public class EmbedFactory {
                 .addField("🚁 Helicóptero", aircraftType.getDisplayName(), true)
                 .addField("🚨 Operação", missionType.getDisplayName(), true);
 
-        if (missionType == MissionType.OTHER) {
-            builder.addField("🔧 Descrição", actionOption != null ? actionOption : "Não especificado", true);
+        if (missionType == MissionType.OUTROS) {
+            builder.addField("⚙️ Descrição", actionOption != null ? actionOption : "Não especificado", true)
+                    .addField("🔧 Subtipo", "Não aplicável", true);
+        } else if (missionType == MissionType.ACTION && actionSubType != null && actionOption != null) {
+            builder.addField("⚙️ Subtipo", actionSubType.getDisplayName(), true)
+                    .addField("🔧 Opção", actionOption, true);
         } else {
-            builder.addField("⚙️ Subtipo", actionSubType != null ? actionSubType.getDisplayName() : "Não especificado", true)
-                    .addField("🔧 Opção", actionOption != null ? actionOption : "Não especificado", true);
+            builder.addField("⚙️ Subtipo", "Não especificado", true)
+                    .addField("🔧 Opção", "Não especificado", true);
         }
 
-        return builder.color(getMissionColor(missionType)) // Use mission-specific color
+        return builder.color(Color.of(0, 153, 0)) // Green for confirmation
                 .footer(FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
                 .timestamp(Instant.now())
                 .build();
@@ -131,8 +135,9 @@ public class EmbedFactory {
                 .addField("🚁 Helicóptero", schedule.getAircraftType().getDisplayName(), true)
                 .addField("🚨 Operação", schedule.getMissionType().getDisplayName(), true);
 
-        if (schedule.getMissionType() == MissionType.OTHER) {
-            builder.addField("🔧 Descrição", schedule.getActionOption() != null ? schedule.getActionOption() : "Não especificado", true);
+        if (schedule.getMissionType() == MissionType.OUTROS) {
+            builder.addField("⚙️ Descrição", schedule.getOutrosDescription() != null ? schedule.getOutrosDescription() : "Não especificado", true)
+                    .addField("🔧 Subtipo", "Não aplicável", true);
         } else {
             builder.addField("⚙️ Subtipo", schedule.getActionSubType() != null ? schedule.getActionSubType().getDisplayName() : "Não especificado", true)
                     .addField("🔧 Opção", schedule.getActionOption() != null ? schedule.getActionOption() : "Não especificado", true);
@@ -152,7 +157,7 @@ public class EmbedFactory {
         return switch (missionType) {
             case PATROL -> Color.of(0, 102, 204); // Dark blue for patrol
             case ACTION -> Color.of(204, 0, 0); // Red for action
-            case OTHER -> Color.YELLOW; // Yellow for other
+            case OUTROS -> Color.of(0, 153, 153); // Teal for outros
             default -> Color.of(0, 153, 153); // Teal for fallback
         };
     }

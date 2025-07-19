@@ -20,6 +20,11 @@ import org.springframework.context.annotation.Configuration;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Configuração do cliente Discord para o bot de attendance.
+ *
+ * @author Tiago Holanda
+ */
 @Configuration
 @RequiredArgsConstructor
 public class DiscordConfig {
@@ -86,11 +91,17 @@ public class DiscordConfig {
 
     public String getLogChannelId(String guildId, MissionType missionType) {
         return guildConfigRepository.findById(guildId)
-                .map(config -> switch (missionType) {
-                    case ACTION -> config.getActionLogChannelId();
-                    case PATROL -> config.getPatrolLogChannelId();
-                    case OTHER -> config.getOtherLogChannelId();
-                    default -> config.getSystemChannelId(); // Fallback to system channel if mission type is unknown
+                .map(config -> {
+                    if (missionType == MissionType.ACTION) {
+                        return config.getActionLogChannelId();
+                    } else if (missionType == MissionType.PATROL) {
+                        return config.getPatrolLogChannelId();
+                    } else if (missionType == MissionType.OUTROS) {
+                        return config.getOutrosLogChannelId();
+                    } else {
+                        // Fallback to system channel if mission type is null or unknown
+                        return config.getSystemChannelId();
+                    }
                 })
                 .orElse(null);
     }

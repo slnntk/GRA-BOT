@@ -38,6 +38,9 @@ public class Schedule {
     @Column(nullable = true)
     private String actionOption;
 
+    @Column(nullable = true)
+    private String outrosDescription;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "schedule_crew",
@@ -107,6 +110,7 @@ public class Schedule {
                 ", missionType=" + missionType +
                 ", actionSubType=" + actionSubType +
                 ", actionOption='" + actionOption + '\'' +
+                ", outrosDescription='" + outrosDescription + '\'' +
                 ", messageId='" + messageId + '\'' +
                 ", channelId='" + channelId + '\'' +
                 '}';

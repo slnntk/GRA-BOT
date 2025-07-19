@@ -1,14 +1,15 @@
 package com.gra.paradise.botattendance.discord.buttons;
 
 import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.interaction.SelectMenuInteractionEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
@@ -74,6 +75,27 @@ public class ButtonDispatcher {
         log.warn("Menu não reconhecido: {}", customId);
         return event.reply()
                 .withContent("Este menu não está implementado.")
+                .withEphemeral(true);
+    }
+
+    public Mono<Void> handleModalSubmitEvent(ModalSubmitInteractionEvent event) {
+        String interactionId = event.getInteraction().getId().asString();
+        if (acknowledgedInteractions.contains(interactionId)) {
+            log.debug("Interaction {} already processed", interactionId);
+            return Mono.empty();
+        }
+        acknowledgedInteractions.add(interactionId);
+
+        String customId = event.getCustomId();
+        log.debug("Modal enviado: {}", customId);
+
+        if (customId.startsWith("outros_description_modal:")) {
+            return interactionHandler.handleOutrosDescription(event);
+        }
+
+        log.warn("Modal não reconhecido: {}", customId);
+        return event.reply()
+                .withContent("Este modal não está implementado.")
                 .withEphemeral(true);
     }
 }

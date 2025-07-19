@@ -41,10 +41,13 @@ public class ScheduleManager {
                                    String actionOption) {
         if (guildId == null || title == null || aircraftType == null || missionType == null ||
                 creatorId == null || creatorNickname == null) {
-            throw new MissingRequiredParametersException("Parâmetros obrigatórios não fornecidos.");
+            throw new MissingRequiredParametersException();
         }
-        if (missionType == MissionType.OTHER && (actionOption == null || actionOption.trim().isEmpty())) {
-            throw new MissingRequiredParametersException("O campo de descrição é obrigatório para missões do tipo 'Outros'.");
+        if (missionType == MissionType.OUTROS && (actionOption == null || actionOption.trim().isEmpty())) {
+            throw new IllegalArgumentException("Descrição é obrigatória para missões do tipo OUTROS");
+        }
+        if (missionType != MissionType.OUTROS && actionOption != null && actionOption.trim().isEmpty()) {
+            throw new IllegalArgumentException("Opção de ação inválida para o tipo de missão " + missionType);
         }
 
         Schedule schedule = new Schedule();
@@ -52,8 +55,9 @@ public class ScheduleManager {
         schedule.setTitle(title.trim());
         schedule.setAircraftType(aircraftType);
         schedule.setMissionType(missionType);
-        schedule.setActionSubType(missionType == MissionType.OTHER ? null : actionSubType); // Não usar actionSubType para OUTROS
-        schedule.setActionOption(actionOption != null ? actionOption.trim() : null);
+        schedule.setActionSubType(actionSubType);
+        schedule.setActionOption(missionType == MissionType.OUTROS ? null : (actionOption != null ? actionOption.trim() : null));
+        schedule.setOutrosDescription(missionType == MissionType.OUTROS ? actionOption : null);
         schedule.setStartTime(Instant.now());
         schedule.setCreatedById(creatorId.trim());
         schedule.setCreatedByUsername(creatorNickname.trim());
@@ -137,7 +141,7 @@ public class ScheduleManager {
                 saved.getAircraftType(),
                 saved.getMissionType(),
                 saved.getActionSubType(),
-                saved.getActionOption(),
+                saved.getMissionType() == MissionType.OUTROS ? saved.getOutrosDescription() : saved.getActionOption(),
                 saved.getStartTime(),
                 endTime,
                 saved.getCreatedByUsername(),
@@ -181,9 +185,5 @@ public class ScheduleManager {
     public Schedule findByIdAndGuildIdWithCrew(Long scheduleId, String guildId) {
         return scheduleRepository.findByIdAndGuildIdWithCrew(scheduleId, guildId)
                 .orElseThrow(() -> new ScheduleNotFoundException(scheduleId));
-    }
-
-    public List<String> getOtherMissionSuggestions() {
-        return OtherMissionSuggestions.getSuggestions();
     }
 }
