@@ -55,8 +55,8 @@ public class ScheduleManager {
         schedule.setTitle(title.trim());
         schedule.setAircraftType(aircraftType);
         schedule.setMissionType(missionType);
-        schedule.setActionSubType(actionSubType);
-        schedule.setActionOption(missionType == MissionType.OUTROS ? null : (actionOption != null ? actionOption.trim() : null));
+        schedule.setActionSubType(missionType == MissionType.ACTION ? actionSubType : null);
+        schedule.setActionOption(missionType == MissionType.ACTION ? (actionOption != null ? actionOption.trim() : null) : null);
         schedule.setOutrosDescription(missionType == MissionType.OUTROS ? actionOption : null);
         schedule.setStartTime(Instant.now());
         schedule.setCreatedById(creatorId.trim());

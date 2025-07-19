@@ -492,7 +492,7 @@ public class ScheduleInteractionHandler {
                 .orElseThrow(() -> new IllegalStateException("Comando deve ser executado em um servidor"));
 
         ActionSubType finalActionSubType = actionSubType;
-        String finalActionOption = actionOption;
+        String finalActionOption = (missionType == MissionType.OUTROS) ? null : actionOption; // Forçar null para OUTROS
         log.info("Tentando criar escala para usuário {} com title: {}, aircraft: {}, mission: {}, actionSubType: {}, actionOption: {}",
                 userId, title, aircraftType, missionType, finalActionSubType, finalActionOption);
 
