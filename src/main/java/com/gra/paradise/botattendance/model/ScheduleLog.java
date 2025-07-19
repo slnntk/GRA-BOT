@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Data
 @Entity
@@ -27,7 +28,7 @@ public class ScheduleLog {
 
     public ScheduleLog(Schedule schedule, String action, String userId, String username, String details) {
         this.schedule = schedule;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now(ZoneId.of("America/Fortaleza"));
         this.action = action;
         this.userId = userId;
         this.username = username;

@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,11 +83,11 @@ public class ScheduleInteractionHandler {
                 .withComponents(ActionRow.of(aircraftSelect))
                 .onErrorResume(ClientException.class, e -> {
                     log.error("Erro ao exibir menu de seleção de aeronave para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-                    return event.createFollowup("❌ Erro ao iniciar criação da escala. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+                    return event.createFollowup("❌ Erro ao iniciar criação da escala. Tente novamente. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
                 })
                 .onErrorResume(e -> {
                     log.error("Erro inesperado ao processar botão criar escala: {}", e.getMessage(), e);
-                    return event.createFollowup("❌ Erro inesperado. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+                    return event.createFollowup("❌ Erro inesperado. Contate o suporte. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
                 });
     }
 
@@ -219,7 +220,7 @@ public class ScheduleInteractionHandler {
                             return event.createFollowup()
                                     .withEphemeral(true)
                                     .withContent("❌ Erro ao abrir modal de descrição. Tente novamente. (Hora: " +
-                                            LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")")
+                                            LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")")
                                     .then();
                         }
                     })
@@ -228,7 +229,7 @@ public class ScheduleInteractionHandler {
                         return event.createFollowup()
                                 .withEphemeral(true)
                                 .withContent("❌ Erro inesperado. Contate o suporte. (Hora: " +
-                                        LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")")
+                                        LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")")
                                 .then();
                     });
         } else {
@@ -240,11 +241,11 @@ public class ScheduleInteractionHandler {
                     .withComponents(ActionRow.of(confirmButton, cancelButton))
                     .onErrorResume(ClientException.class, e -> {
                         log.error("Erro ao exibir confirmação de escala para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-                        return event.createFollowup("❌ Erro ao confirmar escala. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+                        return event.createFollowup("❌ Erro ao confirmar escala. Tente novamente. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
                     })
                     .onErrorResume(e -> {
                         log.error("Erro inesperado ao processar confirmação de escala: {}", e.getMessage(), e);
-                        return event.createFollowup("❌ Erro inesperado. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+                        return event.createFollowup("❌ Erro inesperado. Contate o suporte. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
                     });
         }
     }
@@ -255,13 +256,13 @@ public class ScheduleInteractionHandler {
         String customId = event.getCustomId();
         if (!customId.startsWith("outros_description_modal:")) {
             log.error("CustomId inválido '{}' para modal de descrição por usuário {}", customId, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Erro: ID de modal inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ Erro: ID de modal inválido. Reinicie o processo. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String[] parts = customId.split(":");
         if (parts.length < 4) {
             log.error("Formato de customId inválido '{}' para usuário {}. Partes: {}", customId, event.getInteraction().getUser().getId().asString(), parts.length);
-            return event.createFollowup("❌ Erro: Formato inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ Erro: Formato inválido. Reinicie o processo. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String aircraftTypeStr = parts[1];
@@ -273,7 +274,7 @@ public class ScheduleInteractionHandler {
             aircraftType = AircraftType.valueOf(aircraftTypeStr);
         } catch (IllegalArgumentException e) {
             log.error("Tipo de aeronave inválido '{}' para usuário {}: {}", aircraftTypeStr, event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-            return event.createFollowup("❌ Tipo de aeronave inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ Tipo de aeronave inválido. Reinicie o processo. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         Optional<String> descriptionOpt = event.getComponents(TextInput.class)
@@ -297,7 +298,7 @@ public class ScheduleInteractionHandler {
             return event.presentModal(modal)
                     .onErrorResume(ClientException.class, e -> {
                         log.error("Erro ao reabrir modal para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-                        return event.createFollowup("❌ Erro ao reabrir modal. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+                        return event.createFollowup("❌ Erro ao reabrir modal. Tente novamente. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
                     });
         }
 
@@ -307,7 +308,7 @@ public class ScheduleInteractionHandler {
             return event.presentModal(modal)
                     .onErrorResume(ClientException.class, e -> {
                         log.error("Erro ao reabrir modal para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-                        return event.createFollowup("❌ Erro ao reabrir modal. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+                        return event.createFollowup("❌ Erro ao reabrir modal. Tente novamente. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
                     });
         }
 
@@ -331,11 +332,11 @@ public class ScheduleInteractionHandler {
                 .doOnError(e -> log.error("Falha ao enviar embed de confirmação para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e))
                 .onErrorResume(ClientException.class, e -> {
                     log.error("Erro ao processar edição do modal para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-                    return event.createFollowup("❌ Erro ao processar o formulário. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
+                    return event.createFollowup("❌ Erro ao processar o formulário. Tente novamente. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
                 })
                 .onErrorResume(e -> {
                     log.error("Erro inesperado ao processar edição do modal para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-                    return event.createFollowup("❌ Erro inesperado ao processar o formulário. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
+                    return event.createFollowup("❌ Erro inesperado ao processar o formulário. Contate o suporte. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
                 }).then();
     }
 
@@ -467,13 +468,13 @@ public class ScheduleInteractionHandler {
         String customId = event.getCustomId();
         if (!customId.startsWith("confirm_schedule:")) {
             log.error("CustomId inválido '{}' para confirmação de escala por usuário {}: {}", customId, event.getInteraction().getUser().getId().asString(), customId);
-            return event.createFollowup("❌ Erro: ID de confirmação inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ Erro: ID de confirmação inválido. Reinicie o processo. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String[] parts = customId.split(":");
         if (parts.length < 4) {
             log.error("Formato de customId inválido '{}' para usuário {}. Partes: {}", customId, event.getInteraction().getUser().getId().asString(), parts.length);
-            return event.createFollowup("❌ Erro: Formato inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ Erro: Formato inválido. Reinicie o processo. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String aircraftTypeStr = parts[1];
@@ -502,7 +503,7 @@ public class ScheduleInteractionHandler {
             aircraftType = AircraftType.valueOf(aircraftTypeStr);
         } catch (IllegalArgumentException e) {
             log.error("Tipo de aeronave inválido '{}' para usuário {}: {}", aircraftTypeStr, event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-            return event.createFollowup("❌ Tipo de aeronave inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ Tipo de aeronave inválido. Reinicie o processo. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         MissionType missionType;
@@ -510,7 +511,7 @@ public class ScheduleInteractionHandler {
             missionType = MissionType.valueOf(missionTypeStr);
         } catch (IllegalArgumentException e) {
             log.error("Tipo de missão inválido '{}' para usuário {}: {}", missionTypeStr, event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-            return event.createFollowup("❌ Tipo de missão inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ Tipo de missão inválido. Reinicie o processo. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         if (missionType == MissionType.ACTION && (actionSubType == null || actionOption == null)) {
@@ -546,7 +547,7 @@ public class ScheduleInteractionHandler {
                 .flatMap(schedule -> messagePublisher.createSchedulePublicMessage(event, schedule)
                         .thenReturn(schedule))
                 .flatMap(schedule -> scheduleMessageManager.updateSystemMessage(guildId))
-                .then(event.createFollowup("✅ Escala criada com sucesso! (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
+                .then(event.createFollowup("✅ Escala criada com sucesso! (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
                 .onErrorResume(e -> {
                     log.error("Erro ao confirmar escala para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
                     String errorMessage = "❌ Erro ao criar escala: ";
@@ -555,7 +556,7 @@ public class ScheduleInteractionHandler {
                     } else if (e instanceof RuntimeException) {
                         errorMessage += "Falha ao criar escala devido a erro no banco de dados. Tente novamente ou contate o suporte.";
                     } else {
-                        errorMessage += "Erro inesperado. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")";
+                        errorMessage += "Erro inesperado. Contate o suporte. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")";
                     }
                     return event.createFollowup(errorMessage).withEphemeral(true);
                 }).then();
@@ -564,14 +565,14 @@ public class ScheduleInteractionHandler {
     public Mono<Void> handleCancelSchedule(ButtonInteractionEvent event) {
         return event.deferEdit()
                 .then(event.deleteReply())
-                .then(event.createFollowup("❌ Criação de escala cancelada. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
+                .then(event.createFollowup("❌ Criação de escala cancelada. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
                 .onErrorResume(ClientException.class, e -> {
                     log.error("Erro ao cancelar escala para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-                    return event.createFollowup("❌ Erro ao cancelar escala. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
+                    return event.createFollowup("❌ Erro ao cancelar escala. Tente novamente. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
                 })
                 .onErrorResume(e -> {
                     log.error("Erro inesperado ao cancelar escala: {}", e.getMessage(), e);
-                    return event.createFollowup("❌ Erro inesperado. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
+                    return event.createFollowup("❌ Erro inesperado. Contate o suporte. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
                 }).then();
     }
 
@@ -579,7 +580,7 @@ public class ScheduleInteractionHandler {
         String customId = event.getCustomId();
         if (!customId.startsWith("board_schedule:")) {
             log.error("CustomId inválido '{}' para embarcar em escala por usuário {}", customId, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Erro: ID de botão inválido. Verifique a escala. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ Erro: ID de botão inválido. Verifique a escala. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String scheduleIdStr = customId.split(":")[1];
@@ -588,7 +589,7 @@ public class ScheduleInteractionHandler {
             scheduleId = Long.parseLong(scheduleIdStr);
         } catch (NumberFormatException e) {
             log.error("ID de escala inválido '{}' para usuário {}", scheduleIdStr, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ ID de escala inválido. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ ID de escala inválido. Tente novamente. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String userId = event.getInteraction().getUser().getId().asString();
@@ -603,7 +604,7 @@ public class ScheduleInteractionHandler {
 
         return Mono.fromCallable(() -> scheduleService.addCrewMember(guildId, scheduleId, userId, username, nickname))
                 .flatMap(schedule -> scheduleMessageManager.updateScheduleMessage(String.valueOf(schedule.getId()), schedule.getCrewMembers().stream().map(User::getNickname).toList()))
-                .then(event.createFollowup("✅ Você embarcou na escala com sucesso! (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
+                .then(event.createFollowup("✅ Você embarcou na escala com sucesso! (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
                 .onErrorResume(e -> {
                     log.error("Erro ao processar botão board_schedule para escala {}: {}", scheduleId, e.getMessage(), e);
                     String errorMessage = "❌ ";
@@ -614,7 +615,7 @@ public class ScheduleInteractionHandler {
                     } else if (e instanceof RuntimeException) {
                         errorMessage += "Falha ao embarcar devido a erro no banco de dados. Tente novamente ou contate o suporte.";
                     } else {
-                        errorMessage += "Erro inesperado ao embarcar. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")";
+                        errorMessage += "Erro inesperado ao embarcar. Contate o suporte. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")";
                     }
                     return event.createFollowup(errorMessage).withEphemeral(true);
                 }).then();
@@ -624,7 +625,7 @@ public class ScheduleInteractionHandler {
         String customId = event.getCustomId();
         if (!customId.startsWith("leave_schedule:")) {
             log.error("CustomId inválido '{}' para deixar escala por usuário {}", customId, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Erro: ID de botão inválido. Verifique a escala. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ Erro: ID de botão inválido. Verifique a escala. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String scheduleIdStr = customId.split(":")[1];
@@ -633,7 +634,7 @@ public class ScheduleInteractionHandler {
             scheduleId = Long.parseLong(scheduleIdStr);
         } catch (NumberFormatException e) {
             log.error("ID de escala inválido '{}' para usuário {}", scheduleIdStr, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ ID de escala inválido. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ ID de escala inválido. Tente novamente. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String userId = event.getInteraction().getUser().getId().asString();
@@ -647,7 +648,7 @@ public class ScheduleInteractionHandler {
 
         return Mono.fromCallable(() -> scheduleService.removeCrewMember(guildId, scheduleId, userId, nickname))
                 .flatMap(schedule -> scheduleMessageManager.updateScheduleMessage(String.valueOf(schedule.getId()), schedule.getCrewMembers().stream().map(User::getNickname).toList()))
-                .then(event.createFollowup("✅ Você desembarcou da escala com sucesso! (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
+                .then(event.createFollowup("✅ Você desembarcou da escala com sucesso! (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
                 .onErrorResume(e -> {
                     log.error("Erro ao processar botão leave_schedule para escala {}: {}", scheduleId, e.getMessage(), e);
                     String errorMessage = "❌ ";
@@ -658,7 +659,7 @@ public class ScheduleInteractionHandler {
                     } else if (e instanceof RuntimeException) {
                         errorMessage += "Falha ao desembarcar devido a erro no banco de dados. Tente novamente ou contate o suporte.";
                     } else {
-                        errorMessage += "Erro inesperado ao desembarcar. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")";
+                        errorMessage += "Erro inesperado ao desembarcar. Contate o suporte. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")";
                     }
                     return event.createFollowup(errorMessage).withEphemeral(true);
                 }).then();
@@ -668,7 +669,7 @@ public class ScheduleInteractionHandler {
         String customId = event.getCustomId();
         if (!customId.startsWith("end_schedule:")) {
             log.error("CustomId inválido '{}' para encerrar escala por usuário {}", customId, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Erro: ID de botão inválido. Verifique a escala. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ Erro: ID de botão inválido. Verifique a escala. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String scheduleIdStr = customId.split(":")[1];
@@ -677,7 +678,7 @@ public class ScheduleInteractionHandler {
             scheduleId = Long.parseLong(scheduleIdStr);
         } catch (NumberFormatException e) {
             log.error("ID de escala inválido '{}' para usuário {}", scheduleIdStr, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ ID de escala inválido. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+            return event.createFollowup("❌ ID de escala inválido. Tente novamente. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String userId = event.getInteraction().getUser().getId().asString();
@@ -696,7 +697,7 @@ public class ScheduleInteractionHandler {
                             return Mono.empty();
                         }))
                 .then(scheduleMessageManager.updateSystemMessage(guildId))
-                .then(event.createFollowup("✅ Escala encerrada com sucesso! (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
+                .then(event.createFollowup("✅ Escala encerrada com sucesso! (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
                 .onErrorResume(e -> {
                     log.error("Erro ao processar botão end_schedule para escala {}: {}", scheduleId, e.getMessage(), e);
                     String errorMessage = "❌ ";
@@ -707,7 +708,7 @@ public class ScheduleInteractionHandler {
                     } else if (e instanceof RuntimeException) {
                         errorMessage += "Falha ao encerrar escala devido a erro no banco de dados. Tente novamente ou contate o suporte.";
                     } else {
-                        errorMessage += "Erro inesperado ao encerrar escala. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")";
+                        errorMessage += "Erro inesperado ao encerrar escala. Contate o suporte. (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")";
                     }
                     return event.createFollowup(errorMessage).withEphemeral(true);
                 }).then();

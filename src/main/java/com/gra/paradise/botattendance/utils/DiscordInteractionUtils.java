@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class DiscordInteractionUtils {
     }
 
     public static String now() {
-        return LocalDateTime.now().format(FORMATTER);
+        return LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(FORMATTER);
     }
 
     public static Optional<AircraftType> parseAircraft(String raw) {
