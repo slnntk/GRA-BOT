@@ -16,6 +16,7 @@ import discord4j.core.object.component.ActionRow;
 import discord4j.core.object.component.Button;
 import discord4j.core.object.component.SelectMenu;
 import discord4j.core.object.component.TextInput;
+import discord4j.core.object.entity.Message;
 import discord4j.core.spec.InteractionPresentModalSpec;
 import discord4j.rest.http.client.ClientException;
 import lombok.RequiredArgsConstructor;
@@ -199,16 +200,31 @@ public class ScheduleInteractionHandler {
                     .addComponent(ActionRow.of(descriptionInput))
                     .build();
 
-            return event.deferEdit()
-                    .then(event.deleteReply())
-                    .then(event.presentModal(modal))
+            return event.presentModal(modal)
+                    .then(Mono.defer(() -> {
+                        Optional<Message> optionalMessage = event.getMessage();
+                        if (optionalMessage.isPresent()) {
+                            return optionalMessage.get().delete().then();
+                        } else {
+                            return Mono.empty();
+                        }
+                    }))
                     .onErrorResume(ClientException.class, e -> {
-                        log.error("Erro ao exibir modal de descrição para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-                        return event.createFollowup("❌ Erro ao abrir modal de descrição. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+                        log.error("Erro ao exibir modal de descrição ou deletar mensagem para usuário {}: {}",
+                                event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
+                        return event.createFollowup()
+                                .withEphemeral(true)
+                                .withContent("❌ Erro ao abrir modal de descrição. Tente novamente. (Hora: " +
+                                        LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")")
+                                .then();
                     })
-                    .onErrorResume(e -> {
+                    .onErrorResume(Throwable.class, e -> {
                         log.error("Erro inesperado ao processar seleção de missão OUTROS: {}", e.getMessage(), e);
-                        return event.createFollowup("❌ Erro inesperado. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+                        return event.createFollowup()
+                                .withEphemeral(true)
+                                .withContent("❌ Erro inesperado. Contate o suporte. (Hora: " +
+                                        LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")")
+                                .then();
                     });
         } else {
             Button confirmButton = Button.success("confirm_schedule:" + aircraftTypeStr + ":" + missionTypeStr + ":" + title, "Confirmar");
