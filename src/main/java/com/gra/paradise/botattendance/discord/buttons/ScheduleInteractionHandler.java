@@ -445,9 +445,9 @@ public class ScheduleInteractionHandler {
         } else if (missionTypeStr.equals("OUTROS") && parts.length == 5) {
             String sessionId = parts[4];
             actionOption = outrosDescriptionCache.get(sessionId);
-            if (actionOption == null) {
-                log.error("Descrição não encontrada para sessionId {} para usuário {}. Cache: {}", sessionId, event.getInteraction().getUser().getId().asString(), outrosDescriptionCache);
-                return event.createFollowup("❌ Descrição da missão OUTROS não encontrada. Reinicie o processo.").withEphemeral(true).then();
+            if (actionOption == null || actionOption.trim().isEmpty()) {
+                log.error("Descrição não encontrada ou inválida para sessionId {} para usuário {}. Cache: {}", sessionId, event.getInteraction().getUser().getId().asString(), outrosDescriptionCache);
+                return event.createFollowup("❌ Descrição da missão OUTROS não encontrada ou inválida. Reinicie o processo.").withEphemeral(true).then();
             }
             outrosDescriptionCache.remove(sessionId); // Limpar o cache após uso
         } else {
