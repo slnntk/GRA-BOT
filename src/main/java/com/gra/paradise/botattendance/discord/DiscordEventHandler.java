@@ -127,7 +127,7 @@ public class DiscordEventHandler {
                                         .build(),
                                 ApplicationCommandOptionChoiceData.builder()
                                         .name("Outros")
-                                        .value("OTHER")
+                                        .value("OUTROS")
                                         .build()
                         ))
                         .build())
