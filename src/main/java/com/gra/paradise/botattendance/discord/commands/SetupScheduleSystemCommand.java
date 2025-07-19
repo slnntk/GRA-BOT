@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_GRA_BLUE_URL;
 
@@ -23,6 +25,7 @@ import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_GRA_BLU
 @RequiredArgsConstructor
 public class SetupScheduleSystemCommand implements Command {
 
+    private static final ZoneId FORTALEZA_ZONE = ZoneId.of("America/Fortaleza");
     private final ScheduleMessageManager scheduleMessageManager;
     private final GuildConfigRepository guildConfigRepository;
 
@@ -87,7 +90,7 @@ public class SetupScheduleSystemCommand implements Command {
                                 "4. Confirme sua escala", false)
                 .addField("Escalas Ativas", "Nenhuma escala ativa no momento. Que tal criar uma agora?", false)
                 .footer("G.R.A Bot - Escala de Voo", FOOTER_GRA_BLUE_URL)
-                .timestamp(Instant.now())
+                .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant())
                 .build();
     }
 }

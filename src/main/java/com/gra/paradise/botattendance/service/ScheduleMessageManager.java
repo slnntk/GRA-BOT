@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,7 @@ import static com.gra.paradise.botattendance.config.DiscordConfig.GRA_IMAGE_URL;
 @RequiredArgsConstructor
 public class ScheduleMessageManager {
 
+    private static final ZoneId FORTALEZA_ZONE = ZoneId.of("America/Fortaleza");;
     private final GatewayDiscordClient discordClient;
     private final EmbedFactory embedFactory;
     private final ScheduleRepository scheduleRepository;
@@ -96,7 +99,7 @@ public class ScheduleMessageManager {
                         """, false)
                 .addField("🔔 Status", "Nenhuma escala ativa. Crie uma agora! 🚁", false)
                 .footer(EmbedFactory.FOOTER_TEXT, GRA_IMAGE_URL)
-                .timestamp(Instant.now())
+                .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant())
                 .build();
 
         Button createButton = Button.primary("create_schedule", "Iniciar Escala");
@@ -242,7 +245,7 @@ public class ScheduleMessageManager {
                                     """, false)
                             .addField("🔔 Status", statusMessage, false)
                             .footer(EmbedFactory.FOOTER_TEXT, GRA_IMAGE_URL)
-                            .timestamp(Instant.now())
+                            .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant())
                             .build();
 
                     Button createButton = Button.primary("create_schedule", "Iniciar Escala");

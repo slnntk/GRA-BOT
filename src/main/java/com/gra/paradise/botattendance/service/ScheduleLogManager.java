@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ScheduleLogManager {
 
+    private static final ZoneId FORTALEZA_ZONE = ZoneId.of("America/Fortaleza");
     private final ScheduleLogRepository scheduleLogRepository;
     private final GatewayDiscordClient discordClient;
     private final DiscordConfig discordConfig;
@@ -84,7 +86,7 @@ public class ScheduleLogManager {
                 .addField("Tripulação", crewList, false)
                 .color(schedule.getOutrosDescription() != null ? Color.DISCORD_WHITE : Color.GREEN)
                 .footer(EmbedFactory.FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
-                .timestamp(Instant.now());
+                .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant());
 
         // Add initial activity
         String initialActivity = formatActivity(
@@ -143,7 +145,7 @@ public class ScheduleLogManager {
                 .addField("Tripulação", crewList, false)
                 .color(Color.GREEN)
                 .footer(EmbedFactory.FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
-                .timestamp(Instant.now());
+                .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant());
 
         // Add activity history chunks as separate fields
         for (int i = 0; i < activityHistoryChunks.size(); i++) {
@@ -194,7 +196,7 @@ public class ScheduleLogManager {
                 .addField("Tripulantes", crewList, false)
                 .color(Color.RED)
                 .footer(EmbedFactory.FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
-                .timestamp(Instant.now());
+                .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant());
 
         // Add activity history chunks as separate fields
         for (int i = 0; i < activityHistoryChunks.size(); i++) {

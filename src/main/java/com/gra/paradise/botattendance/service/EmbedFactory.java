@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class EmbedFactory {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
             .withZone(ZoneId.of("America/Sao_Paulo"));
     public static final String FOOTER_TEXT = "G.R.A - Controle Operacional | v1.0 | by Tiago Holanda";
+    private static final ZoneId FORTALEZA_ZONE = ZoneId.of("America/Fortaleza");
 
     public EmbedCreateSpec createSystemOverviewEmbed() {
         return EmbedCreateSpec.builder()
@@ -41,7 +43,7 @@ public class EmbedFactory {
                     """, false)
                 .addField("🔔 Status Atual", "Nenhuma escala ativa. Inicie uma operação agora! 🚁", false)
                 .footer(FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
-                .timestamp(Instant.now())
+                .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant())
                 .build();
     }
 
@@ -53,7 +55,7 @@ public class EmbedFactory {
                 .color(Color.of(0, 102, 204))
                 .addField("💡 Dica", "Verifique a disponibilidade do helicóptero antes de selecionar.", false)
                 .footer(FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
-                .timestamp(Instant.now())
+                .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant())
                 .build();
     }
 
@@ -66,7 +68,7 @@ public class EmbedFactory {
                 .color(Color.of(0, 102, 204))
                 .addField("💡 Dica", "Patrulhamento refere-se às ocasiões em que o helicóptero está em operação nas ruas, independentemente de ser em prioridade, código 0 ou outras situações. Já ações são momentos em que a equipe GRA ou os operadores de combate atuam diretamente em intervenções táticas. Outros permite especificar uma missão personalizada.", false)
                 .footer(FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
-                .timestamp(Instant.now())
+                .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant())
                 .build();
     }
 
@@ -79,7 +81,7 @@ public class EmbedFactory {
                 .color(Color.of(0, 102, 204))
                 .addField("💡 Dica", "O subtipo define o tipo da operação. Escolha com precisão!", false)
                 .footer(FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
-                .timestamp(Instant.now())
+                .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant())
                 .build();
     }
 
@@ -92,7 +94,7 @@ public class EmbedFactory {
                 .color(Color.of(0, 102, 204))
                 .addField("💡 Dica", "Confira todos os detalhes antes de finalizar!", false)
                 .footer(FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
-                .timestamp(Instant.now())
+                .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant())
                 .build();
     }
 
@@ -118,7 +120,7 @@ public class EmbedFactory {
 
         return builder.color(Color.of(0, 153, 0)) // Green for confirmation
                 .footer(FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
-                .timestamp(Instant.now())
+                .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant())
                 .build();
     }
 
@@ -147,7 +149,7 @@ public class EmbedFactory {
                 .addField("👥 Tripulação", crewList, false)
                 .color(getMissionColor(schedule.getMissionType()))
                 .footer(FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
-                .timestamp(Instant.now())
+                .timestamp(ZonedDateTime.now(FORTALEZA_ZONE).toInstant())
                 .build();
     }
 

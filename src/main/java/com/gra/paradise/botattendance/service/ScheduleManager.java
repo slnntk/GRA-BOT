@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @Slf4j
@@ -20,6 +22,7 @@ public class ScheduleManager {
     private final UserService userService;
     private final ScheduleLogManager logManager;
     private final DiscordService discordService;
+    private static final ZoneId FORTALEZA_ZONE = ZoneId.of("America/Fortaleza");
 
     private Schedule validateScheduleForModification(String guildId, Long scheduleId) {
         return scheduleRepository.findById(scheduleId)
@@ -58,7 +61,7 @@ public class ScheduleManager {
         schedule.setActionSubType(missionType == MissionType.ACTION ? actionSubType : null);
         schedule.setActionOption(missionType == MissionType.ACTION ? (actionOption != null ? actionOption.trim() : null) : null);
         schedule.setOutrosDescription(missionType == MissionType.OUTROS ? actionOption : null);
-        schedule.setStartTime(Instant.now());
+        schedule.setStartTime(ZonedDateTime.now(FORTALEZA_ZONE).toInstant());
         schedule.setCreatedById(creatorId.trim());
         schedule.setCreatedByUsername(creatorNickname.trim());
         schedule.setActive(true);
@@ -127,7 +130,7 @@ public class ScheduleManager {
             throw new OnlyCreatorCanCloseScheduleException();
         }
 
-        Instant endTime = Instant.now();
+        Instant endTime = ZonedDateTime.now(FORTALEZA_ZONE).toInstant();
         schedule.setActive(false);
         schedule.setEndTime(endTime);
         schedule.setCrewMembers(Optional.ofNullable(schedule.getCrewMembers()).orElseGet(ArrayList::new));
