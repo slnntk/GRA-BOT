@@ -13,6 +13,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+import static com.gra.paradise.botattendance.config.DiscordConfig.FORTALEZA_ZONE;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,7 +24,6 @@ public class ScheduleManager {
     private final UserService userService;
     private final ScheduleLogManager logManager;
     private final DiscordService discordService;
-    private static final ZoneId FORTALEZA_ZONE = ZoneId.of("America/Fortaleza");
 
     private Schedule validateScheduleForModification(String guildId, Long scheduleId) {
         return scheduleRepository.findById(scheduleId)

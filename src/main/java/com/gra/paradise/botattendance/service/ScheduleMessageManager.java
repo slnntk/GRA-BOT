@@ -27,15 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_GRA_BLUE_URL;
-import static com.gra.paradise.botattendance.config.DiscordConfig.GRA_IMAGE_URL;
+import static com.gra.paradise.botattendance.config.DiscordConfig.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScheduleMessageManager {
 
-    private static final ZoneId FORTALEZA_ZONE = ZoneId.of("America/Fortaleza");;
     private final GatewayDiscordClient discordClient;
     private final EmbedFactory embedFactory;
     private final ScheduleRepository scheduleRepository;

@@ -29,12 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.gra.paradise.botattendance.config.DiscordConfig.FORTALEZA_ZONE;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScheduleLogManager {
 
-    private static final ZoneId FORTALEZA_ZONE = ZoneId.of("America/Fortaleza");
     private final ScheduleLogRepository scheduleLogRepository;
     private final GatewayDiscordClient discordClient;
     private final DiscordConfig discordConfig;

@@ -17,8 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_CHOOSE_HELI_FIRST_SCREEN_URL;
-import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_GRA_BLUE_URL;
+import static com.gra.paradise.botattendance.config.DiscordConfig.*;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +26,7 @@ public class EmbedFactory {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")
             .withZone(ZoneId.of("America/Sao_Paulo"));
     public static final String FOOTER_TEXT = "G.R.A - Controle Operacional | v1.0 | by Tiago Holanda";
-    private static final ZoneId FORTALEZA_ZONE = ZoneId.of("America/Fortaleza");
+
 
     public EmbedCreateSpec createSystemOverviewEmbed() {
         return EmbedCreateSpec.builder()
