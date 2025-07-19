@@ -135,8 +135,7 @@ public class EmbedFactory {
                 .addField("🚨 Operação", schedule.getMissionType().getDisplayName(), true);
 
         if (schedule.getMissionType() == MissionType.OUTROS) {
-            builder.addField("⚙️ Descrição", schedule.getOutrosDescription() != null ? schedule.getOutrosDescription() : "Não especificado", true)
-                    .addField("🔧 Subtipo", "Não aplicável", true);
+            builder.addField("⚙️ Descrição", schedule.getOutrosDescription() != null ? schedule.getOutrosDescription() : "Não especificado", true);
         } else {
             builder.addField("⚙️ Subtipo", schedule.getActionSubType() != null ? schedule.getActionSubType().getDisplayName() : "Não especificado", true)
                     .addField("🔧 Opção", schedule.getActionOption() != null ? schedule.getActionOption() : "Não especificado", true);

@@ -212,15 +212,16 @@ public class ScheduleInteractionHandler {
                     .onErrorResume(ClientException.class, e -> {
                         if (e.getStatus().code() == 404) {
                             log.warn("Mensagem já deletada ou não encontrada para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage());
+                            return Mono.empty();
                         } else {
                             log.error("Erro ao exibir modal de descrição ou deletar mensagem para usuário {}: {}",
                                     event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
+                            return event.createFollowup()
+                                    .withEphemeral(true)
+                                    .withContent("❌ Erro ao abrir modal de descrição. Tente novamente. (Hora: " +
+                                            LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")")
+                                    .then();
                         }
-                        return event.createFollowup()
-                                .withEphemeral(true)
-                                .withContent("❌ Erro ao abrir modal de descrição. Tente novamente. (Hora: " +
-                                        LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")")
-                                .then();
                     })
                     .onErrorResume(Throwable.class, e -> {
                         log.error("Erro inesperado ao processar seleção de missão OUTROS: {}", e.getMessage(), e);
