@@ -7,6 +7,7 @@ import com.gra.paradise.botattendance.model.MissionType;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.event.domain.interaction.SelectMenuInteractionEvent;
 import discord4j.discordjson.json.ApplicationCommandOptionChoiceData;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
@@ -62,9 +63,18 @@ public class DiscordEventHandler {
                 })
                 .subscribe();
 
+        // Adicionar handler para ModalSubmitInteractionEvent
+        gatewayDiscordClient.on(ModalSubmitInteractionEvent.class)
+                .doOnNext(e -> diagnosticHandler.logInteraction(e)) // Log para rastreamento
+                .flatMap(buttonDispatcher::handleModalSubmitEvent)
+                .onErrorResume(e -> {
+                    log.error("Erro ao processar evento de modal", e);
+                    return Mono.empty(); // Evita crash do bot, mas loga o erro
+                })
+                .subscribe();
+
         log.info("Bot Discord iniciado com sucesso!");
     }
-
     private void registerCommands() {
         final long applicationId = gatewayDiscordClient.getRestClient().getApplicationId().block();
         List<ApplicationCommandRequest> commands = new ArrayList<>();

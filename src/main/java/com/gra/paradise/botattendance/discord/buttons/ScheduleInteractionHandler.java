@@ -189,7 +189,8 @@ public class ScheduleInteractionHandler {
                         return event.createFollowup("❌ Erro inesperado. Contate o suporte.").withEphemeral(true).then();
                     });
         } else if (missionType == MissionType.OUTROS) {
-            String modalId = "outros_description_modal:" + aircraftTypeStr + ":" + title + ":" + UUID.randomUUID();
+            String modalId = "outros_description_modal:" + aircraftTypeStr + ":" + title + ":" + UUID.randomUUID().toString();
+            log.info("Modal criado com customId: {}", modalId);
             TextInput descriptionInput = TextInput.small("outros_description", "Descrição da missão", 1, 100)
                     .placeholder("Digite a descrição da missão (máx. 100 caracteres)");
             InteractionPresentModalSpec modal = InteractionPresentModalSpec.builder()
@@ -226,8 +227,9 @@ public class ScheduleInteractionHandler {
     }
 
     public Mono<Void> handleOutrosDescription(ModalSubmitInteractionEvent event) {
+        log.info("Tentativa de processar submissão de modal por usuário {} com customId: {}",
+                event.getInteraction().getUser().getId().asString(), event.getCustomId());
         String customId = event.getCustomId();
-        log.info("Modal submetido com customId: {}", customId);
         if (!customId.startsWith("outros_description_modal:")) {
             log.error("CustomId inválido '{}' para modal de descrição por usuário {}", customId, event.getInteraction().getUser().getId().asString());
             return event.reply("❌ Erro: ID de modal inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();

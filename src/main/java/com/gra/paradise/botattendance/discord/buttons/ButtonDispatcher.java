@@ -91,7 +91,9 @@ public class ButtonDispatcher {
         log.debug("Modal enviado: {}", customId);
 
         if (customId.startsWith("outros_description_modal:")) {
-            return interactionHandler.handleOutrosDescription(event);
+            return interactionHandler.handleOutrosDescription(event)
+                    .doOnSuccess(success -> log.info("Submissão de modal processada com sucesso para customId: {}", customId))
+                    .doOnError(e -> log.error("Falha ao processar submissão de modal com customId {}: {}", customId, e.getMessage(), e));
         }
 
         log.warn("Modal não reconhecido: {}", customId);
