@@ -107,8 +107,7 @@ public class EmbedFactory {
                 .addField("🚨 Operação", missionType.getDisplayName(), true);
 
         if (missionType == MissionType.OUTROS) {
-            builder.addField("⚙️ Descrição", actionOption != null ? actionOption : "Não especificado", true)
-                    .addField("🔧 Subtipo", "Não aplicável", true);
+            builder.addField("⚙️ Atividade", actionOption != null ? actionOption : "Não especificado", true);
         } else if (missionType == MissionType.ACTION && actionSubType != null && actionOption != null) {
             builder.addField("⚙️ Subtipo", actionSubType.getDisplayName(), true)
                     .addField("🔧 Opção", actionOption, true);
