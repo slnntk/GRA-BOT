@@ -222,13 +222,13 @@ public class ScheduleInteractionHandler {
         String customId = event.getCustomId();
         if (!customId.startsWith("outros_description_modal:")) {
             log.error("CustomId inválido '{}' para modal de descrição por usuário {}", customId, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Erro: ID de modal inválido. Reinicie o processo.").withEphemeral(true).then();
+            return event.reply("❌ Erro: ID de modal inválido. Reinicie o processo.").withEphemeral(true).then();
         }
 
         String[] parts = customId.split(":");
         if (parts.length < 3) {
             log.error("Formato de customId inválido '{}' para usuário {}", customId, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Erro: Formato inválido. Reinicie o processo.").withEphemeral(true).then();
+            return event.reply("❌ Erro: Formato inválido. Reinicie o processo.").withEphemeral(true).then();
         }
 
         String aircraftTypeStr = parts[1];
@@ -238,36 +238,43 @@ public class ScheduleInteractionHandler {
             aircraftType = AircraftType.valueOf(aircraftTypeStr);
         } catch (IllegalArgumentException e) {
             log.error("Tipo de aeronave inválido '{}' para usuário {}: {}", aircraftTypeStr, event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-            return event.createFollowup("❌ Tipo de aeronave inválido. Reinicie o processo.").withEphemeral(true).then();
+            return event.reply("❌ Tipo de aeronave inválido. Reinicie o processo.").withEphemeral(true).then();
         }
 
-        Optional<String> description = event.getComponents(TextInput.class)
+        Optional<String> descriptionOpt = event.getComponents(TextInput.class)
                 .stream()
                 .filter(t -> t.getCustomId().equals("outros_description"))
                 .findFirst()
-                .map(TextInput::getValue)
-                .orElse(null);
+                .flatMap(TextInput::getValue);
 
-        if (description.isEmpty() || description.get().trim().isEmpty()) {
-            log.error("Descrição não fornecida pelo usuário {}", event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Forneça uma descrição válida para a missão.").withEphemeral(true).then();
+        if (!descriptionOpt.isPresent() || descriptionOpt.get().trim().isEmpty()) {
+            log.error("Descrição não fornecida ou vazia pelo usuário {}", event.getInteraction().getUser().getId().asString());
+            return event.reply("❌ Forneça uma descrição válida para a missão.").withEphemeral(true).then();
         }
+
+        String description = descriptionOpt.get().trim();
+        if (description.length() > 100) {
+            log.error("Descrição excede o limite de 100 caracteres para usuário {}. Comprimento: {}", event.getInteraction().getUser().getId().asString(), description.length());
+            return event.reply("❌ A descrição deve ter no máximo 100 caracteres.").withEphemeral(true).then();
+        }
+
+        log.info("Descrição fornecida pelo usuário {}: '{}'", event.getInteraction().getUser().getId().asString(), description);
 
         Button confirmButton = Button.success("confirm_schedule:" + aircraftTypeStr + ":OUTROS:" + title + "::" + description, "Confirmar");
         Button cancelButton = Button.danger("cancel_schedule", "Cancelar");
 
-        return event.deferEdit()
-                .then(event.editReply()
-                        .withEmbeds(embedFactory.createScheduleConfirmationEmbed(aircraftType, MissionType.OUTROS, title, null, description.orElse(null)))
-                        .withComponents(ActionRow.of(confirmButton, cancelButton)))
+        return event.reply()
+                .withEphemeral(true)
+                .withEmbeds(embedFactory.createScheduleConfirmationEmbed(aircraftType, MissionType.OUTROS, title, null, description))
+                .withComponents(ActionRow.of(confirmButton, cancelButton))
                 .onErrorResume(ClientException.class, e -> {
                     log.error("Erro ao exibir confirmação de escala para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-                    return event.createFollowup("❌ Erro ao confirmar escala. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
+                    return event.reply("❌ Erro ao confirmar escala. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
                 })
                 .onErrorResume(e -> {
                     log.error("Erro inesperado ao processar descrição de missão OUTROS: {}", e.getMessage(), e);
-                    return event.createFollowup("❌ Erro inesperado. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
-                }).then();
+                    return event.reply("❌ Erro inesperado. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
+                });
     }
 
     public Mono<Void> handleActionSubTypeSelection(SelectMenuInteractionEvent event) {
