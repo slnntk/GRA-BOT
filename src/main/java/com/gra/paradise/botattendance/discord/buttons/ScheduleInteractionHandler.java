@@ -28,6 +28,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -38,6 +41,9 @@ public class ScheduleInteractionHandler {
     private final ScheduleMessageManager scheduleMessageManager;
     private final EmbedFactory embedFactory;
     private final ScheduleMessagePublisher messagePublisher;
+
+    // Mapa temporário para armazenar descrições de OUTROS
+    private final Map<String, String> outrosDescriptionCache = new ConcurrentHashMap<>();
 
     private static final List<String> FUGA_OPTIONS = List.of(
             "Fleeca 68",
@@ -183,10 +189,11 @@ public class ScheduleInteractionHandler {
                         return event.createFollowup("❌ Erro inesperado. Contate o suporte.").withEphemeral(true).then();
                     });
         } else if (missionType == MissionType.OUTROS) {
+            String modalId = "outros_description_modal:" + aircraftTypeStr + ":" + title + ":" + UUID.randomUUID();
             TextInput descriptionInput = TextInput.small("outros_description", "Descrição da missão", 1, 100)
                     .placeholder("Digite a descrição da missão (máx. 100 caracteres)");
             InteractionPresentModalSpec modal = InteractionPresentModalSpec.builder()
-                    .customId("outros_description_modal:" + aircraftTypeStr + ":" + title)
+                    .customId(modalId)
                     .title("Descrição da Missão Outros")
                     .addComponent(ActionRow.of(descriptionInput))
                     .build();
@@ -226,13 +233,15 @@ public class ScheduleInteractionHandler {
         }
 
         String[] parts = customId.split(":");
-        if (parts.length < 3) {
+        if (parts.length < 4) {
             log.error("Formato de customId inválido '{}' para usuário {}", customId, event.getInteraction().getUser().getId().asString());
             return event.reply("❌ Erro: Formato inválido. Reinicie o processo.").withEphemeral(true).then();
         }
 
         String aircraftTypeStr = parts[1];
         String title = parts[2];
+        String sessionId = parts[3];
+
         AircraftType aircraftType;
         try {
             aircraftType = AircraftType.valueOf(aircraftTypeStr);
@@ -247,7 +256,7 @@ public class ScheduleInteractionHandler {
                 .findFirst()
                 .flatMap(TextInput::getValue);
 
-        if (!descriptionOpt.isPresent() || descriptionOpt.get().trim().isEmpty()) {
+        if (descriptionOpt.isEmpty() || descriptionOpt.get().trim().isEmpty()) {
             log.error("Descrição não fornecida ou vazia pelo usuário {}", event.getInteraction().getUser().getId().asString());
             return event.reply("❌ Forneça uma descrição válida para a missão.").withEphemeral(true).then();
         }
@@ -260,7 +269,10 @@ public class ScheduleInteractionHandler {
 
         log.info("Descrição fornecida pelo usuário {}: '{}'", event.getInteraction().getUser().getId().asString(), description);
 
-        Button confirmButton = Button.success("confirm_schedule:" + aircraftTypeStr + ":OUTROS:" + title + "::" + description, "Confirmar");
+        // Armazenar a descrição no cache com o sessionId
+        outrosDescriptionCache.put(sessionId, description);
+
+        Button confirmButton = Button.success("confirm_schedule:" + aircraftTypeStr + ":OUTROS:" + title + ":" + sessionId, "Confirmar");
         Button cancelButton = Button.danger("cancel_schedule", "Cancelar");
 
         return event.reply()
@@ -424,7 +436,13 @@ public class ScheduleInteractionHandler {
             actionSubType = parseActionSubType(parts[4]);
             actionOption = parts[5];
         } else if (missionTypeStr.equals("OUTROS") && parts.length == 5) {
-            actionOption = parts[4]; // Description for OUTROS
+            String sessionId = parts[4];
+            actionOption = outrosDescriptionCache.get(sessionId);
+            if (actionOption == null) {
+                log.error("Descrição não encontrada para sessionId {} para usuário {}", sessionId, event.getInteraction().getUser().getId().asString());
+                return event.createFollowup("❌ Descrição da missão OUTROS não encontrada. Reinicie o processo.").withEphemeral(true).then();
+            }
+            outrosDescriptionCache.remove(sessionId); // Limpar o cache após uso
         }
 
         AircraftType aircraftType;

@@ -29,11 +29,12 @@ public class ButtonDispatcher {
         acknowledgedInteractions.add(interactionId);
 
         String customId = event.getCustomId();
-        log.debug("Botão clicado: {}", customId);
+        log.info("Botão clicado por usuário {}: {}", event.getInteraction().getUser().getId().asString(), customId);
 
         if (customId.equals("create_schedule")) {
             return interactionHandler.handleCreateScheduleButton(event);
         } else if (customId.startsWith("confirm_schedule:")) {
+            log.debug("Processando confirmação de escala com customId: {}", customId);
             return interactionHandler.handleConfirmSchedule(event);
         } else if (customId.equals("cancel_schedule")) {
             return interactionHandler.handleCancelSchedule(event);
@@ -45,9 +46,9 @@ public class ButtonDispatcher {
             return actionHandler.handleEndSchedule(event);
         }
 
-        log.warn("Botão não reconhecido: {}", customId);
+        log.warn("Botão não reconhecido: {} para usuário {}", customId, event.getInteraction().getUser().getId().asString());
         return event.reply()
-                .withContent("Este botão não está implementado.")
+                .withContent("❌ Este botão não está implementado. Contate o suporte.")
                 .withEphemeral(true);
     }
 
@@ -74,7 +75,7 @@ public class ButtonDispatcher {
 
         log.warn("Menu não reconhecido: {}", customId);
         return event.reply()
-                .withContent("Este menu não está implementado.")
+                .withContent("❌ Este menu não está implementado.")
                 .withEphemeral(true);
     }
 
@@ -95,7 +96,7 @@ public class ButtonDispatcher {
 
         log.warn("Modal não reconhecido: {}", customId);
         return event.reply()
-                .withContent("Este modal não está implementado.")
+                .withContent("❌ Este modal não está implementado.")
                 .withEphemeral(true);
     }
 }
