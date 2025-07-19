@@ -11,9 +11,12 @@ import com.gra.paradise.botattendance.service.ScheduleMessagePublisher;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
 import discord4j.core.event.domain.interaction.SelectMenuInteractionEvent;
+import discord4j.core.event.domain.interaction.ModalSubmitInteractionEvent;
 import discord4j.core.object.component.ActionRow;
 import discord4j.core.object.component.Button;
 import discord4j.core.object.component.SelectMenu;
+import discord4j.core.object.component.TextInput;
+import discord4j.core.spec.InteractionPresentModalSpec;
 import discord4j.rest.http.client.ClientException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -53,7 +57,7 @@ public class ScheduleInteractionHandler {
             "Fleeca Praia (Heli Drone)"
     );
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"); // Corrigido
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     public Mono<Void> handleCreateScheduleButton(ButtonInteractionEvent event) {
         List<SelectMenu.Option> aircraftOptions = new ArrayList<>();
@@ -178,6 +182,24 @@ public class ScheduleInteractionHandler {
                         log.error("Erro inesperado ao processar seleção de missão: {}", e.getMessage(), e);
                         return event.createFollowup("❌ Erro inesperado. Contate o suporte.").withEphemeral(true).then();
                     });
+        } else if (missionType == MissionType.OUTROS) {
+            TextInput descriptionInput = TextInput.small("outros_description", "Descrição da missão", 1, 100)
+                    .placeholder("Digite a descrição da missão (máx. 100 caracteres)");
+            InteractionPresentModalSpec modal = InteractionPresentModalSpec.builder()
+                    .customId("outros_description_modal:" + aircraftTypeStr + ":" + title)
+                    .title("Descrição da Missão Outros")
+                    .addComponent(ActionRow.of(descriptionInput))
+                    .build();
+
+            return event.presentModal(modal)
+                    .onErrorResume(ClientException.class, e -> {
+                        log.error("Erro ao exibir modal de descrição para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
+                        return event.createFollowup("❌ Erro ao abrir modal de descrição. Tente novamente.").withEphemeral(true).then();
+                    })
+                    .onErrorResume(e -> {
+                        log.error("Erro inesperado ao processar seleção de missão OUTROS: {}", e.getMessage(), e);
+                        return event.createFollowup("❌ Erro inesperado. Contate o suporte.").withEphemeral(true).then();
+                    });
         } else {
             Button confirmButton = Button.success("confirm_schedule:" + aircraftTypeStr + ":" + missionTypeStr + ":" + title, "Confirmar");
             Button cancelButton = Button.danger("cancel_schedule", "Cancelar");
@@ -194,6 +216,58 @@ public class ScheduleInteractionHandler {
                         return event.createFollowup("❌ Erro inesperado. Contate o suporte.").withEphemeral(true).then();
                     });
         }
+    }
+
+    public Mono<Void> handleOutrosDescription(ModalSubmitInteractionEvent event) {
+        String customId = event.getCustomId();
+        if (!customId.startsWith("outros_description_modal:")) {
+            log.error("CustomId inválido '{}' para modal de descrição por usuário {}", customId, event.getInteraction().getUser().getId().asString());
+            return event.createFollowup("❌ Erro: ID de modal inválido. Reinicie o processo.").withEphemeral(true).then();
+        }
+
+        String[] parts = customId.split(":");
+        if (parts.length < 3) {
+            log.error("Formato de customId inválido '{}' para usuário {}", customId, event.getInteraction().getUser().getId().asString());
+            return event.createFollowup("❌ Erro: Formato inválido. Reinicie o processo.").withEphemeral(true).then();
+        }
+
+        String aircraftTypeStr = parts[1];
+        String title = parts[2];
+        AircraftType aircraftType;
+        try {
+            aircraftType = AircraftType.valueOf(aircraftTypeStr);
+        } catch (IllegalArgumentException e) {
+            log.error("Tipo de aeronave inválido '{}' para usuário {}: {}", aircraftTypeStr, event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
+            return event.createFollowup("❌ Tipo de aeronave inválido. Reinicie o processo.").withEphemeral(true).then();
+        }
+
+        Optional<String> description = event.getComponents(TextInput.class)
+                .stream()
+                .filter(t -> t.getCustomId().equals("outros_description"))
+                .findFirst()
+                .map(TextInput::getValue)
+                .orElse(null);
+
+        if (description.isEmpty() || description.get().trim().isEmpty()) {
+            log.error("Descrição não fornecida pelo usuário {}", event.getInteraction().getUser().getId().asString());
+            return event.createFollowup("❌ Forneça uma descrição válida para a missão.").withEphemeral(true).then();
+        }
+
+        Button confirmButton = Button.success("confirm_schedule:" + aircraftTypeStr + ":OUTROS:" + title + "::" + description, "Confirmar");
+        Button cancelButton = Button.danger("cancel_schedule", "Cancelar");
+
+        return event.deferEdit()
+                .then(event.editReply()
+                        .withEmbeds(embedFactory.createScheduleConfirmationEmbed(aircraftType, MissionType.OUTROS, title, null, description.orElse(null)))
+                        .withComponents(ActionRow.of(confirmButton, cancelButton)))
+                .onErrorResume(ClientException.class, e -> {
+                    log.error("Erro ao exibir confirmação de escala para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
+                    return event.createFollowup("❌ Erro ao confirmar escala. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
+                })
+                .onErrorResume(e -> {
+                    log.error("Erro inesperado ao processar descrição de missão OUTROS: {}", e.getMessage(), e);
+                    return event.createFollowup("❌ Erro inesperado. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
+                }).then();
     }
 
     public Mono<Void> handleActionSubTypeSelection(SelectMenuInteractionEvent event) {
@@ -324,27 +398,34 @@ public class ScheduleInteractionHandler {
         String customId = event.getCustomId();
         if (!customId.startsWith("confirm_schedule:")) {
             log.error("CustomId inválido '{}' para confirmação de escala por usuário {}", customId, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Erro: ID de confirmação inválido. Reinicie o processo.").withEphemeral(true).then();
+            return event.createFollowup("❌ Erro: ID de confirmação inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String[] parts = customId.split(":");
         if (parts.length < 4) {
             log.error("Formato de customId inválido '{}' para usuário {}", customId, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Erro: Formato inválido. Reinicie o processo.").withEphemeral(true).then();
+            return event.createFollowup("❌ Erro: Formato inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String aircraftTypeStr = parts[1];
         String missionTypeStr = parts[2];
         String title = parts[3];
-        ActionSubType actionSubType = parts.length > 4 ? parseActionSubType(parts[4]) : null;
-        String actionOption = parts.length > 5 ? parts[5] : null;
+        ActionSubType actionSubType = null;
+        String actionOption = null;
+
+        if (missionTypeStr.equals("ACTION") && parts.length == 6) {
+            actionSubType = parseActionSubType(parts[4]);
+            actionOption = parts[5];
+        } else if (missionTypeStr.equals("OUTROS") && parts.length == 5) {
+            actionOption = parts[4]; // Description for OUTROS
+        }
 
         AircraftType aircraftType;
         try {
             aircraftType = AircraftType.valueOf(aircraftTypeStr);
         } catch (IllegalArgumentException e) {
             log.error("Tipo de aeronave inválido '{}' para usuário {}: {}", aircraftTypeStr, event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-            return event.createFollowup("❌ Tipo de aeronave inválido. Reinicie o processo.").withEphemeral(true).then();
+            return event.createFollowup("❌ Tipo de aeronave inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         MissionType missionType;
@@ -352,15 +433,18 @@ public class ScheduleInteractionHandler {
             missionType = MissionType.valueOf(missionTypeStr);
         } catch (IllegalArgumentException e) {
             log.error("Tipo de missão inválido '{}' para usuário {}: {}", missionTypeStr, event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-            return event.createFollowup("❌ Tipo de missão inválido. Reinicie o processo.").withEphemeral(true).then();
+            return event.createFollowup("❌ Tipo de missão inválido. Reinicie o processo. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
-        if (missionType == MissionType.ACTION && actionSubType != null && actionOption != null) {
-            List<String> validOptions = actionSubType == ActionSubType.FUGA ? FUGA_OPTIONS : TIRO_OPTIONS;
-            if (!validOptions.contains(actionOption)) {
-                log.error("Opção de ação inválida '{}' para usuário {}: Opção não encontrada em {}", actionOption, event.getInteraction().getUser().getId().asString(), validOptions);
-                return event.createFollowup("❌ Opção de ação inválida. Escolha uma opção válida.").withEphemeral(true).then();
-            }
+        if (missionType == MissionType.ACTION && (actionSubType == null || actionOption == null)) {
+            log.error("Subtipo ou opção de ação não fornecidos para missão ACTION pelo usuário {}", event.getInteraction().getUser().getId().asString());
+            return event.createFollowup("❌ Subtipo e opção de ação são obrigatórios para missões de ação. Reinicie o processo.").withEphemeral(true).then();
+        } else if (missionType == MissionType.OUTROS && (actionOption == null || actionOption.trim().isEmpty())) {
+            log.error("Descrição não fornecida para missão OUTROS pelo usuário {}", event.getInteraction().getUser().getId().asString());
+            return event.createFollowup("❌ Descrição da missão OUTROS é obrigatória. Reinicie o processo.").withEphemeral(true).then();
+        } else if (missionType == MissionType.PATROL && actionOption != null) {
+            log.error("Opção de ação fornecida para missão PATROL pelo usuário {}", event.getInteraction().getUser().getId().asString());
+            return event.createFollowup("❌ Missões de patrulha não devem ter descrição ou subtipo. Reinicie o processo.").withEphemeral(true).then();
         }
 
         String userId = event.getInteraction().getUser().getId().asString();
@@ -372,9 +456,11 @@ public class ScheduleInteractionHandler {
                 .map(Snowflake::asString)
                 .orElseThrow(() -> new IllegalStateException("Comando deve ser executado em um servidor"));
 
+        ActionSubType finalActionSubType = actionSubType;
+        String finalActionOption = actionOption;
         return event.deferEdit()
                 .then(event.deleteReply())
-                .then(Mono.fromCallable(() -> scheduleService.createSchedule(guildId, title, aircraftType, missionType, userId, nickname, actionSubType, actionOption)))
+                .then(Mono.fromCallable(() -> scheduleService.createSchedule(guildId, title, aircraftType, missionType, userId, nickname, finalActionSubType, finalActionOption)))
                 .flatMap(schedule -> messagePublisher.createSchedulePublicMessage(event, schedule)
                         .thenReturn(schedule))
                 .flatMap(schedule -> scheduleMessageManager.updateSystemMessage(guildId))
@@ -399,7 +485,7 @@ public class ScheduleInteractionHandler {
                 .then(event.createFollowup("❌ Criação de escala cancelada. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
                 .onErrorResume(ClientException.class, e -> {
                     log.error("Erro ao cancelar escala para usuário {}: {}", event.getInteraction().getUser().getId().asString(), e.getMessage(), e);
-                    return event.createFollowup("❌ Erro ao cancelar escala. Tente novamente.").withEphemeral(true);
+                    return event.createFollowup("❌ Erro ao cancelar escala. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true);
                 })
                 .onErrorResume(e -> {
                     log.error("Erro inesperado ao cancelar escala: {}", e.getMessage(), e);
@@ -411,7 +497,7 @@ public class ScheduleInteractionHandler {
         String customId = event.getCustomId();
         if (!customId.startsWith("board_schedule:")) {
             log.error("CustomId inválido '{}' para embarcar em escala por usuário {}", customId, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Erro: ID de botão inválido. Verifique a escala.").withEphemeral(true).then();
+            return event.createFollowup("❌ Erro: ID de botão inválido. Verifique a escala. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String scheduleIdStr = customId.split(":")[1];
@@ -420,7 +506,7 @@ public class ScheduleInteractionHandler {
             scheduleId = Long.parseLong(scheduleIdStr);
         } catch (NumberFormatException e) {
             log.error("ID de escala inválido '{}' para usuário {}", scheduleIdStr, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ ID de escala inválido. Tente novamente.").withEphemeral(true).then();
+            return event.createFollowup("❌ ID de escala inválido. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String userId = event.getInteraction().getUser().getId().asString();
@@ -446,7 +532,7 @@ public class ScheduleInteractionHandler {
                     } else if (e instanceof RuntimeException) {
                         errorMessage += "Falha ao embarcar devido a erro no banco de dados. Tente novamente ou contate o suporte.";
                     } else {
-                        errorMessage += "Erro inesperado ao embarcar. Contate o suporte.";
+                        errorMessage += "Erro inesperado ao embarcar. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")";
                     }
                     return event.createFollowup(errorMessage).withEphemeral(true);
                 }).then();
@@ -456,7 +542,7 @@ public class ScheduleInteractionHandler {
         String customId = event.getCustomId();
         if (!customId.startsWith("leave_schedule:")) {
             log.error("CustomId inválido '{}' para deixar escala por usuário {}", customId, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Erro: ID de botão inválido. Verifique a escala.").withEphemeral(true).then();
+            return event.createFollowup("❌ Erro: ID de botão inválido. Verifique a escala. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String scheduleIdStr = customId.split(":")[1];
@@ -465,7 +551,7 @@ public class ScheduleInteractionHandler {
             scheduleId = Long.parseLong(scheduleIdStr);
         } catch (NumberFormatException e) {
             log.error("ID de escala inválido '{}' para usuário {}", scheduleIdStr, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ ID de escala inválido. Tente novamente.").withEphemeral(true).then();
+            return event.createFollowup("❌ ID de escala inválido. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String userId = event.getInteraction().getUser().getId().asString();
@@ -490,7 +576,7 @@ public class ScheduleInteractionHandler {
                     } else if (e instanceof RuntimeException) {
                         errorMessage += "Falha ao desembarcar devido a erro no banco de dados. Tente novamente ou contate o suporte.";
                     } else {
-                        errorMessage += "Erro inesperado ao desembarcar. Contate o suporte.";
+                        errorMessage += "Erro inesperado ao desembarcar. Contate o suporte. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")";
                     }
                     return event.createFollowup(errorMessage).withEphemeral(true);
                 }).then();
@@ -500,7 +586,7 @@ public class ScheduleInteractionHandler {
         String customId = event.getCustomId();
         if (!customId.startsWith("end_schedule:")) {
             log.error("CustomId inválido '{}' para encerrar escala por usuário {}", customId, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ Erro: ID de botão inválido. Verifique a escala.").withEphemeral(true).then();
+            return event.createFollowup("❌ Erro: ID de botão inválido. Verifique a escala. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String scheduleIdStr = customId.split(":")[1];
@@ -509,7 +595,7 @@ public class ScheduleInteractionHandler {
             scheduleId = Long.parseLong(scheduleIdStr);
         } catch (NumberFormatException e) {
             log.error("ID de escala inválido '{}' para usuário {}", scheduleIdStr, event.getInteraction().getUser().getId().asString());
-            return event.createFollowup("❌ ID de escala inválido. Tente novamente.").withEphemeral(true).then();
+            return event.createFollowup("❌ ID de escala inválido. Tente novamente. (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true).then();
         }
 
         String userId = event.getInteraction().getUser().getId().asString();
@@ -522,13 +608,11 @@ public class ScheduleInteractionHandler {
                 .orElseThrow(() -> new IllegalStateException("Comando deve ser executado em um servidor"));
 
         return Mono.fromCallable(() -> scheduleService.closeSchedule(guildId, scheduleId, userId, nickname))
-                .flatMap(schedule -> {
-                    return scheduleMessageManager.removeScheduleMessage(String.valueOf(schedule.getId()), guildId)
-                            .onErrorResume(e -> {
-                                log.warn("Falha ao remover mensagem da escala {}: {}. Tentando prosseguir.", schedule.getId(), e.getMessage());
-                                return Mono.empty();
-                            });
-                })
+                .flatMap(schedule -> scheduleMessageManager.removeScheduleMessage(String.valueOf(schedule.getId()), guildId)
+                        .onErrorResume(e -> {
+                            log.warn("Falha ao remover mensagem da escala {}: {}. Tentando prosseguir.", schedule.getId(), e.getMessage());
+                            return Mono.empty();
+                        }))
                 .then(scheduleMessageManager.updateSystemMessage(guildId))
                 .then(event.createFollowup("✅ Escala encerrada com sucesso! (Hora: " + LocalDateTime.now().format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
                 .onErrorResume(e -> {

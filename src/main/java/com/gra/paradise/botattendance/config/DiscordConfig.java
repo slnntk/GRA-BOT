@@ -96,6 +96,8 @@ public class DiscordConfig {
                         return config.getActionLogChannelId();
                     } else if (missionType == MissionType.PATROL) {
                         return config.getPatrolLogChannelId();
+                    } else if (missionType == MissionType.OUTROS) {
+                        return config.getOutrosLogChannelId();
                     } else {
                         // Fallback to system channel if mission type is null or unknown
                         return config.getSystemChannelId();
@@ -103,5 +105,4 @@ public class DiscordConfig {
                 })
                 .orElse(null);
     }
-
 }

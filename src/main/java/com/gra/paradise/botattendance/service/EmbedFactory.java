@@ -62,9 +62,9 @@ public class EmbedFactory {
         return EmbedCreateSpec.builder()
                 .image(aircraftImageUrl)
                 .title("🚨 Escolha o Tipo de Operação")
-                .description("**Helicóptero**: " + aircraftType.getDisplayName() + "\nDefina o tipo de operação (ex.: Patrulha ou Ação Tática).")
+                .description("**Helicóptero**: " + aircraftType.getDisplayName() + "\nDefina o tipo de operação (ex.: Patrulha, Ação Tática ou Outros).")
                 .color(Color.of(0, 102, 204))
-                .addField("💡 Dica", "Patrulhamento refere-se às ocasiões em que o helicóptero está em operação nas ruas, independentemente de ser em prioridade, código 0 ou outras situações. Já ações são momentos em que a equipe GRA ou os operadores de combate atuam diretamente em intervenções táticas.", false)
+                .addField("💡 Dica", "Patrulhamento refere-se às ocasiões em que o helicóptero está em operação nas ruas, independentemente de ser em prioridade, código 0 ou outras situações. Já ações são momentos em que a equipe GRA ou os operadores de combate atuam diretamente em intervenções táticas. Outros permite especificar uma missão personalizada.", false)
                 .footer(FOOTER_TEXT, DiscordConfig.GRA_IMAGE_URL)
                 .timestamp(Instant.now())
                 .build();
@@ -106,7 +106,10 @@ public class EmbedFactory {
                 .addField("🚁 Helicóptero", aircraftType.getDisplayName(), true)
                 .addField("🚨 Operação", missionType.getDisplayName(), true);
 
-        if (actionSubType != null && actionOption != null) {
+        if (missionType == MissionType.OUTROS) {
+            builder.addField("⚙️ Descrição", actionOption != null ? actionOption : "Não especificado", true)
+                    .addField("🔧 Subtipo", "Não aplicável", true);
+        } else if (missionType == MissionType.ACTION && actionSubType != null && actionOption != null) {
             builder.addField("⚙️ Subtipo", actionSubType.getDisplayName(), true)
                     .addField("🔧 Opção", actionOption, true);
         } else {
@@ -125,15 +128,22 @@ public class EmbedFactory {
         updatedCrewNicknames.add("**" + schedule.getCreatedByUsername() + "** 👨‍✈️");
         String crewList = updatedCrewNicknames.isEmpty() ? "Nenhum tripulante designado 🚶" : String.join("\n", updatedCrewNicknames);
         String aircraftImageUrl = DiscordConfig.AIRCRAFT_IMAGE_URLS.getOrDefault(schedule.getAircraftType(), FOOTER_GRA_BLUE_URL);
-        return EmbedCreateSpec.builder()
+        EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder()
                 .image(aircraftImageUrl)
                 .title("📅 Escala Ativa: " + schedule.getTitle())
                 .description("Detalhes da operação! 🚁")
                 .addField("🚁 Helicóptero", schedule.getAircraftType().getDisplayName(), true)
-                .addField("🚨 Operação", schedule.getMissionType().getDisplayName(), true)
-                .addField("⚙️ Subtipo", schedule.getActionSubType() != null ? schedule.getActionSubType().getDisplayName() : "Não especificado", true)
-                .addField("🔧 Opção", schedule.getActionOption() != null ? schedule.getActionOption() : "Não especificado", true)
-                .addField("👨‍✈️ Piloto", "**" + schedule.getCreatedByUsername() + "**", true)
+                .addField("🚨 Operação", schedule.getMissionType().getDisplayName(), true);
+
+        if (schedule.getMissionType() == MissionType.OUTROS) {
+            builder.addField("⚙️ Descrição", schedule.getOutrosDescription() != null ? schedule.getOutrosDescription() : "Não especificado", true)
+                    .addField("🔧 Subtipo", "Não aplicável", true);
+        } else {
+            builder.addField("⚙️ Subtipo", schedule.getActionSubType() != null ? schedule.getActionSubType().getDisplayName() : "Não especificado", true)
+                    .addField("🔧 Opção", schedule.getActionOption() != null ? schedule.getActionOption() : "Não especificado", true);
+        }
+
+        return builder.addField("👨‍✈️ Piloto", "**" + schedule.getCreatedByUsername() + "**", true)
                 .addField("📅 Início", DATE_TIME_FORMATTER.format(schedule.getStartTime()), true)
                 .addField("🔄 Status", schedule.isActive() ? "Ativa   ✅" : "Encerrada   🛑", true)
                 .addField("👥 Tripulação", crewList, false)
@@ -147,6 +157,7 @@ public class EmbedFactory {
         return switch (missionType) {
             case PATROL -> Color.of(0, 102, 204); // Dark blue for patrol
             case ACTION -> Color.of(204, 0, 0); // Red for action
+            case OUTROS -> Color.of(0, 153, 153); // Teal for outros
             default -> Color.of(0, 153, 153); // Teal for fallback
         };
     }

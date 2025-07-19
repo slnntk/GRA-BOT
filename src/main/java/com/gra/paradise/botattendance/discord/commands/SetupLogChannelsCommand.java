@@ -60,7 +60,7 @@ public class SetupLogChannelsCommand implements Command {
             log.error("Tipo de missão inválido: {}", missionTypeStr.orElse("não especificado"));
             return event.reply()
                     .withEphemeral(true)
-                    .withContent("❌ Tipo de missão inválido ou não especificado. Valores permitidos: ACTION, PATROL");
+                    .withContent("❌ Tipo de missão inválido ou não especificado. Valores permitidos: ACTION, PATROL, OUTROS");
         }
 
         // Configurar o canal no banco de dados
@@ -72,6 +72,8 @@ public class SetupLogChannelsCommand implements Command {
                 config.setActionLogChannelId(channelId);
             } else if (missionType == MissionType.PATROL) {
                 config.setPatrolLogChannelId(channelId);
+            } else if (missionType == MissionType.OUTROS) {
+                config.setOutrosLogChannelId(channelId);
             }
             guildConfigRepository.save(config);
             return config;

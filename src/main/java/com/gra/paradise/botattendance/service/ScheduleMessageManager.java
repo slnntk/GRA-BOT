@@ -1,6 +1,7 @@
 package com.gra.paradise.botattendance.service;
 
 import com.gra.paradise.botattendance.config.DiscordConfig;
+import com.gra.paradise.botattendance.model.MissionType;
 import com.gra.paradise.botattendance.model.Schedule;
 import com.gra.paradise.botattendance.model.SystemMessage;
 import com.gra.paradise.botattendance.repository.ScheduleRepository;
@@ -217,9 +218,10 @@ public class ScheduleMessageManager {
                         statusMessage = "Nenhuma escala ativa. Crie uma agora! 🚁";
                     } else {
                         statusMessage = activeSchedules.stream()
-                                .map(schedule -> String.format("**%s**: Piloto %s",
+                                .map(schedule -> String.format("**%s**: Piloto %s (%s)",
                                         schedule.getTitle(),
-                                        schedule.getCreatedByUsername()))
+                                        schedule.getCreatedByUsername(),
+                                        schedule.getMissionType() == MissionType.OUTROS ? schedule.getOutrosDescription() : schedule.getMissionType().getDisplayName()))
                                 .collect(Collectors.joining("\n"));
                     }
 
@@ -252,12 +254,6 @@ public class ScheduleMessageManager {
                 .then();
     }
 
-    /**
-     * Recupera os detalhes de uma mensagem de escala com base no scheduleId.
-     *
-     * @param scheduleId O ID da escala
-     * @return Mono contendo o channelId e messageId, ou Mono.empty() se não encontrados
-     */
     public Mono<Map<String, String>> getScheduleMessageDetails(String scheduleId) {
         return Mono.justOrEmpty(scheduleChannelMap.get(scheduleId))
                 .map(channelId -> {
