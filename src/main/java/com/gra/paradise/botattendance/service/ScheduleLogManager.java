@@ -23,7 +23,10 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.gra.paradise.botattendance.config.DiscordConfig.FORTALEZA_ZONE;
@@ -186,20 +189,24 @@ public class ScheduleLogManager {
         List<String> activityHistoryChunks = splitActivityHistory(getRecentLogs(scheduleId));
         log.info("Histórico de atividades para escala final {}: {}", scheduleId, String.join("\n", activityHistoryChunks));
 
-        Optional<ScheduleLog> schedule = scheduleLogRepository.findById(scheduleId);
+        Schedule schedule = scheduleLogRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("Schedule não encontrado: " + scheduleId)).getSchedule();
+        Hibernate.initialize(schedule);
+        Hibernate.initialize(schedule.getCrewMembers());
+        schedule.initializeCrewMembers();
 
         EmbedCreateSpec.Builder finalLogEmbedBuilder = EmbedCreateSpec.builder()
                 .title("🏁 Escala Encerrada: " + title)
                 .description("Esta escala de voo foi concluída")
                 .addField("Aeronave", aircraftType.getDisplayName(), true)
+                .addField("Tipo de Missão", missionType.getDisplayName(), true)
                 .addField(
-                        schedule.get().getSchedule().getOutrosDescription() != null ? "Motivo" : "Subtipo de Ação",
-                        schedule.get().getSchedule().getOutrosDescription() != null
-                                ? schedule.get().getSchedule().getOutrosDescription()
-                                : (schedule.get().getSchedule().getActionSubType() != null ? schedule.get().getSchedule().getActionSubType().getDisplayName() : "N/A"),
+                        schedule.getOutrosDescription() != null ? "Motivo" : "Subtipo de Ação",
+                        schedule.getOutrosDescription() != null
+                                ? schedule.getOutrosDescription()
+                                : (schedule.getActionSubType() != null ? schedule.getActionSubType().getDisplayName() : "N/A"),
                         true
                 )
-                .addField("Subtipo de Ação", actionSubType != null ? actionSubType.getDisplayName() : "N/A", true)
                 .addField("Opção", actionOption != null ? actionOption : "N/A", true)
                 .addField("Piloto", pilotName, true)
                 .addField("Duração Total", duration, true)
