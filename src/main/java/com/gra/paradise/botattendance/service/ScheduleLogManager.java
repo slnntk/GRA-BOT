@@ -4,6 +4,7 @@ import com.gra.paradise.botattendance.config.DiscordConfig;
 import com.gra.paradise.botattendance.model.*;
 import com.gra.paradise.botattendance.repository.GuildConfigRepository;
 import com.gra.paradise.botattendance.repository.ScheduleLogRepository;
+import com.gra.paradise.botattendance.repository.ScheduleRepository;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Message;
@@ -37,6 +38,7 @@ import static com.gra.paradise.botattendance.config.DiscordConfig.FORTALEZA_ZONE
 public class ScheduleLogManager {
 
     private final ScheduleLogRepository scheduleLogRepository;
+    private final ScheduleRepository scheduleRepository;
     private final GatewayDiscordClient discordClient;
     private final DiscordConfig discordConfig;
     private final GuildConfigRepository guildConfigRepository;
@@ -189,8 +191,8 @@ public class ScheduleLogManager {
         List<String> activityHistoryChunks = splitActivityHistory(getRecentLogs(scheduleId));
         log.info("Histórico de atividades para escala final {}: {}", scheduleId, String.join("\n", activityHistoryChunks));
 
-        Schedule schedule = scheduleLogRepository.findById(scheduleId)
-                .orElseThrow(() -> new IllegalArgumentException("Schedule não encontrado: " + scheduleId)).getSchedule();
+        Schedule schedule = scheduleRepository.findByIdAndGuildId(scheduleId, guildId)
+                .orElseThrow(() -> new IllegalArgumentException("Schedule não encontrado: " + scheduleId));
         Hibernate.initialize(schedule);
         Hibernate.initialize(schedule.getCrewMembers());
         schedule.initializeCrewMembers();
