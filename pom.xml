@@ -100,7 +100,7 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
-                    <mainClass>com.gra.paradise.botattendance.AviationDiscordBotApplication</mainClass>
+                    <mainClass>com.gra.paradise.botattendance.BotAttendanceApplication</mainClass>
                     <executable>true</executable>
                     <jvmArguments>-Xms256m -Xmx512m</jvmArguments>
                 </configuration>
