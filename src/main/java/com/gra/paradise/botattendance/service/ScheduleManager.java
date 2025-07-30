@@ -2,10 +2,12 @@ package com.gra.paradise.botattendance.service;
 
 import com.gra.paradise.botattendance.exception.*;
 import com.gra.paradise.botattendance.model.*;
+import com.gra.paradise.botattendance.repository.ScheduleLogRepository;
 import com.gra.paradise.botattendance.repository.ScheduleRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -21,9 +23,22 @@ import static com.gra.paradise.botattendance.config.DiscordConfig.FORTALEZA_ZONE
 public class ScheduleManager {
 
     private final ScheduleRepository scheduleRepository;
+    private final ScheduleLogRepository scheduleLogRepository;
     private final UserService userService;
     private final ScheduleLogManager logManager;
     private final DiscordService discordService;
+
+    @org.springframework.transaction.annotation.Transactional
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void cleanOldLogs() {
+        ZonedDateTime threshold = ZonedDateTime.now(FORTALEZA_ZONE).minusDays(30);
+        List<Schedule> oldSchedules = scheduleRepository.findByEndTimeBefore(threshold.toInstant());
+        for (Schedule schedule : oldSchedules) {
+            scheduleLogRepository.deleteByScheduleId(schedule.getId());
+            scheduleRepository.delete(schedule);
+            log.info("Escala {} e seus logs foram deletados (mais de 30 dias)", schedule.getId());
+        }
+    }
 
     private Schedule validateScheduleForModification(String guildId, Long scheduleId) {
         return scheduleRepository.findById(scheduleId)

@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum AircraftType {
     EC135("EC135"),
     MAVERICK("Maverick"),
-    VALKYRE("Valkyre");
+    VALKYRE("Valkyre"),
+    VECTREII("Vectre II");
 
     private final String displayName;
 

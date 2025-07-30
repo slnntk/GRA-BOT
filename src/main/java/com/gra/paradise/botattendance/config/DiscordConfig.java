@@ -4,11 +4,17 @@ import com.gra.paradise.botattendance.model.AircraftType;
 import com.gra.paradise.botattendance.model.GuildConfig;
 import com.gra.paradise.botattendance.model.MissionType;
 import com.gra.paradise.botattendance.repository.GuildConfigRepository;
+import discord4j.common.store.Store;
+import discord4j.common.store.impl.LocalStoreLayout;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.presence.ClientActivity;
 import discord4j.core.object.presence.ClientPresence;
+import discord4j.gateway.intent.Intent;
+import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.RestClient;
+import discord4j.store.api.service.StoreService;
+import discord4j.store.jdk.JdkStoreService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -49,6 +55,8 @@ public class DiscordConfig {
     private String ec135ImageUrl;
     @Value("${aircraft.maverick.url:https://raw.githubusercontent.com/slnntk/GRA-BOT/main/src/main/resources/images/image.png}")
     private String maverickImageUrl;
+    @Value("${aircraft.vectre2.url:https://raw.githubusercontent.com/slnntk/GRA-BOT/main/src/main/resources/images/image.png}")
+    private String vectre2ImageUrl;
 
     public static final Map<AircraftType, String> AIRCRAFT_IMAGE_URLS = new HashMap<>();
     public static String GRA_IMAGE_URL;
@@ -63,6 +71,7 @@ public class DiscordConfig {
         AIRCRAFT_IMAGE_URLS.put(AircraftType.VALKYRE, valkyreImageUrl);
         AIRCRAFT_IMAGE_URLS.put(AircraftType.EC135, ec135ImageUrl);
         AIRCRAFT_IMAGE_URLS.put(AircraftType.MAVERICK, maverickImageUrl);
+        AIRCRAFT_IMAGE_URLS.put(AircraftType.VECTREII, vectre2ImageUrl);
         logger.debug("Initialized URLs: GRA_IMAGE_URL={}, FOOTER_GRA_BLUE_URL={}, FOOTER_CHOOSE_HELI_FIRST_SCREEN_URL={}",
                 GRA_IMAGE_URL, FOOTER_GRA_BLUE_URL, FOOTER_CHOOSE_HELI_FIRST_SCREEN_URL);
         logger.debug("AIRCRAFT_IMAGE_URLS: {}", AIRCRAFT_IMAGE_URLS);
@@ -73,6 +82,11 @@ public class DiscordConfig {
         return DiscordClientBuilder.create(token)
                 .build()
                 .gateway()
+                .setEnabledIntents(IntentSet.of(
+                        Intent.GUILDS,
+                        Intent.GUILD_MEMBERS
+                ))
+                .setStore(Store.fromLayout(LocalStoreLayout.create()))
                 .setInitialPresence(shardInfo ->
                         ClientPresence.online(ClientActivity.playing("Desenvolvido por Tiago Holanda")))
                 .login()
