@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  discordId String @id @map("discord_id")
+  username  String
+  nickname  String
+  
+  // Many-to-many relationship with schedules
+  schedules Schedule[] @relation("ScheduleCrewMembers")
+  
+  // Schedules created by this user
+  createdSchedules Schedule[] @relation("ScheduleCreator")
+  
+  @@map("aviation_users")
+}
+
+model Schedule {
+  id               Int       @id @default(autoincrement())
+  guildId          String    @map("guild_id")
+  title            String
+  aircraftType     String    @map("aircraft_type")
+  missionType      String    @map("mission_type")
+  actionSubType    String?   @map("action_sub_type")
+  actionOption     String?   @map("action_option")
+  outrosDescription String?  @map("outros_description")
+  startTime        DateTime  @default(now()) @map("start_time")
+  endTime          DateTime? @map("end_time")
+  active           Boolean   @default(true)
+  
+  // Creator relationship
+  createdById      String    @map("created_by_id")
+  createdByUsername String   @map("created_by_username")
+  creator          User      @relation("ScheduleCreator", fields: [createdById], references: [discordId])
+  
+  // Many-to-many relationship with crew members
+  crewMembers      User[]    @relation("ScheduleCrewMembers")
+  
+  // Schedule logs
+  logs             ScheduleLog[]
+  
+  @@map("schedules")
+  @@index([guildId, active])
+  @@index([endTime])
+}
+
+model ScheduleLog {
+  id         Int      @id @default(autoincrement())
+  scheduleId Int      @map("schedule_id")
+  action     String
+  userId     String   @map("user_id")
+  username   String
+  message    String
+  timestamp  DateTime @default(now())
+  
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  
+  @@map("schedule_logs")
+  @@index([scheduleId])
+}
