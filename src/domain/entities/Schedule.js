@@ -79,33 +79,61 @@ class Schedule {
    * Validates mission-specific fields
    * @private
    */
-  _validateMissionSpecificFields({ missionType, actionSubType, actionOption, outrosDescription }) {
+  _validateMissionSpecificFields({ missionType, actionSubType, actionOption: _actionOption, outrosDescription }) {
     if (missionType === MissionType.OUTROS) {
       if (!outrosDescription || outrosDescription.trim() === '') {
         throw new Error('Description is required for OUTROS missions');
       }
     }
-    
+
     if (missionType === MissionType.ACTION && actionSubType && !Object.values(ActionSubType).includes(actionSubType)) {
       throw new Error(`Invalid action sub type: ${actionSubType}`);
     }
   }
 
   // Getters
-  get id() { return this._id; }
-  get guildId() { return this._guildId; }
-  get title() { return this._title; }
-  get aircraftType() { return this._aircraftType; }
-  get missionType() { return this._missionType; }
-  get actionSubType() { return this._actionSubType; }
-  get actionOption() { return this._actionOption; }
-  get outrosDescription() { return this._outrosDescription; }
-  get startTime() { return this._startTime; }
-  get endTime() { return this._endTime; }
-  get createdById() { return this._createdById; }
-  get createdByUsername() { return this._createdByUsername; }
-  get active() { return this._active; }
-  get crewMembers() { return [...this._crewMembers]; } // Return copy to prevent mutations
+  get id() {
+    return this._id;
+  }
+  get guildId() {
+    return this._guildId;
+  }
+  get title() {
+    return this._title;
+  }
+  get aircraftType() {
+    return this._aircraftType;
+  }
+  get missionType() {
+    return this._missionType;
+  }
+  get actionSubType() {
+    return this._actionSubType;
+  }
+  get actionOption() {
+    return this._actionOption;
+  }
+  get outrosDescription() {
+    return this._outrosDescription;
+  }
+  get startTime() {
+    return this._startTime;
+  }
+  get endTime() {
+    return this._endTime;
+  }
+  get createdById() {
+    return this._createdById;
+  }
+  get createdByUsername() {
+    return this._createdByUsername;
+  }
+  get active() {
+    return this._active;
+  }
+  get crewMembers() {
+    return [...this._crewMembers];
+  } // Return copy to prevent mutations
 
   /**
    * Sets the schedule ID (used by repository)
@@ -148,15 +176,15 @@ class Schedule {
     if (!this._active) {
       throw new Error('Cannot modify inactive schedule');
     }
-    
+
     if (this.isCreator(user.discordId)) {
       throw new Error('Creator cannot be added as crew member');
     }
-    
+
     if (this.hasCrewMember(user.discordId)) {
       throw new Error('User is already in crew');
     }
-    
+
     this._crewMembers.push({
       discordId: user.discordId,
       username: user.username,
@@ -173,16 +201,16 @@ class Schedule {
     if (!this._active) {
       throw new Error('Cannot modify inactive schedule');
     }
-    
+
     if (this.isCreator(discordId)) {
       throw new Error('Creator cannot leave schedule');
     }
-    
+
     const memberIndex = this._crewMembers.findIndex(member => member.discordId === discordId);
     if (memberIndex === -1) {
       throw new Error('User is not in crew');
     }
-    
+
     this._crewMembers.splice(memberIndex, 1);
   }
 
@@ -191,11 +219,11 @@ class Schedule {
    * @param {string} closedById - Discord ID of user closing the schedule
    * @throws {Error} If schedule is already closed
    */
-  close(closedById) {
+  close(_closedById) {
     if (!this._active) {
       throw new Error('Schedule is already closed');
     }
-    
+
     this._active = false;
     this._endTime = new Date();
   }

@@ -34,7 +34,7 @@ class UserUseCase {
 
       // Try to find existing user
       const existingUser = await this._userRepository.findById(discordId);
-      
+
       if (existingUser) {
         // Update nickname if it has changed
         if (existingUser.nickname !== nickname) {

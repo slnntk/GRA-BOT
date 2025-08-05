@@ -12,7 +12,7 @@ class AppError extends Error {
     this.name = this.constructor.name;
     this.statusCode = statusCode;
     this.isOperational = isOperational;
-    
+
     Error.captureStackTrace(this, this.constructor);
   }
 }
@@ -145,15 +145,15 @@ class ErrorHandler {
     if (error instanceof ValidationError) {
       return `❌ **Erro de validação:** ${error.message}`;
     }
-    
+
     if (error instanceof NotFoundError) {
       return `❌ **Não encontrado:** ${error.message}`;
     }
-    
+
     if (error instanceof ScheduleError) {
       return `❌ **Erro na escala:** ${error.message}`;
     }
-    
+
     if (error instanceof DiscordError) {
       return `❌ **Erro do Discord:** ${error.message}`;
     }

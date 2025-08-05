@@ -9,7 +9,7 @@ class IUserRepository {
    * @param {string} discordId - Discord user ID
    * @returns {Promise<User|null>} User instance or null if not found
    */
-  async findById(discordId) {
+  async findById(_discordId) {
     throw new Error('Method must be implemented by concrete repository');
   }
 
@@ -18,7 +18,7 @@ class IUserRepository {
    * @param {User} user - User instance to save
    * @returns {Promise<User>} Saved user instance
    */
-  async save(user) {
+  async save(_user) {
     throw new Error('Method must be implemented by concrete repository');
   }
 
@@ -27,7 +27,7 @@ class IUserRepository {
    * @param {string} discordId - Discord user ID
    * @returns {Promise<boolean>} True if deleted, false if not found
    */
-  async delete(discordId) {
+  async delete(_discordId) {
     throw new Error('Method must be implemented by concrete repository');
   }
 
@@ -36,7 +36,7 @@ class IUserRepository {
    * @param {string} usernamePattern - Pattern to search for
    * @returns {Promise<User[]>} Array of matching users
    */
-  async findByUsernamePattern(usernamePattern) {
+  async findByUsernamePattern(_usernamePattern) {
     throw new Error('Method must be implemented by concrete repository');
   }
 }

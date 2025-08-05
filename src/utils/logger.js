@@ -47,7 +47,7 @@ class Logger {
           format: winston.format.json()
         })
       );
-      
+
       this._logger.add(
         new winston.transports.File({
           filename: 'logs/combined.log',

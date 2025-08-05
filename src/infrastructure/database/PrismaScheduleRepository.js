@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import IScheduleRepository from '../../domain/repositories/IScheduleRepository.js';
 import Schedule from '../../domain/entities/Schedule.js';
 import { DatabaseError } from '../../utils/errors.js';
@@ -53,7 +52,7 @@ class PrismaScheduleRepository extends IScheduleRepository {
   async findByIdAndGuildId(id, guildId) {
     try {
       const scheduleData = await this._prisma.schedule.findFirst({
-        where: { 
+        where: {
           id,
           guildId
         },

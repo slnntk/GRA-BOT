@@ -1,5 +1,5 @@
 /**
- * Schedule repository interface  
+ * Schedule repository interface
  * Follows Interface Segregation Principle - specific to schedule operations
  * Follows Dependency Inversion Principle - defines abstraction for data access
  */
@@ -9,7 +9,7 @@ class IScheduleRepository {
    * @param {number} id - Schedule ID
    * @returns {Promise<Schedule|null>} Schedule instance or null if not found
    */
-  async findById(id) {
+  async findById(_id) {
     throw new Error('Method must be implemented by concrete repository');
   }
 
@@ -19,7 +19,7 @@ class IScheduleRepository {
    * @param {string} guildId - Discord guild ID
    * @returns {Promise<Schedule|null>} Schedule instance or null if not found
    */
-  async findByIdAndGuildId(id, guildId) {
+  async findByIdAndGuildId(_id, _guildId) {
     throw new Error('Method must be implemented by concrete repository');
   }
 
@@ -28,7 +28,7 @@ class IScheduleRepository {
    * @param {string} guildId - Discord guild ID
    * @returns {Promise<Schedule[]>} Array of active schedules
    */
-  async findActiveByGuildId(guildId) {
+  async findActiveByGuildId(_guildId) {
     throw new Error('Method must be implemented by concrete repository');
   }
 
@@ -37,7 +37,7 @@ class IScheduleRepository {
    * @param {Date} endTime - End time threshold
    * @returns {Promise<Schedule[]>} Array of old schedules
    */
-  async findByEndTimeBefore(endTime) {
+  async findByEndTimeBefore(_endTime) {
     throw new Error('Method must be implemented by concrete repository');
   }
 
@@ -46,7 +46,7 @@ class IScheduleRepository {
    * @param {Schedule} schedule - Schedule instance to save
    * @returns {Promise<Schedule>} Saved schedule instance
    */
-  async save(schedule) {
+  async save(_schedule) {
     throw new Error('Method must be implemented by concrete repository');
   }
 
@@ -55,7 +55,7 @@ class IScheduleRepository {
    * @param {number} id - Schedule ID
    * @returns {Promise<boolean>} True if deleted, false if not found
    */
-  async delete(id) {
+  async delete(_id) {
     throw new Error('Method must be implemented by concrete repository');
   }
 
@@ -64,7 +64,7 @@ class IScheduleRepository {
    * @param {string} guildId - Discord guild ID
    * @returns {Promise<number>} Number of active schedules
    */
-  async countActiveByGuildId(guildId) {
+  async countActiveByGuildId(_guildId) {
     throw new Error('Method must be implemented by concrete repository');
   }
 }

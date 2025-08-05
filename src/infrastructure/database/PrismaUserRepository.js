@@ -1,4 +1,3 @@
-import { PrismaClient } from '@prisma/client';
 import IUserRepository from '../../domain/repositories/IUserRepository.js';
 import User from '../../domain/entities/User.js';
 import { DatabaseError } from '../../utils/errors.js';
@@ -134,7 +133,7 @@ class PrismaUserRepository extends IUserRepository {
    */
   _mapToEntity(userData) {
     const user = new User(userData.discordId, userData.username, userData.nickname);
-    
+
     // Add schedule IDs if available
     if (userData.schedules) {
       userData.schedules.forEach(schedule => {

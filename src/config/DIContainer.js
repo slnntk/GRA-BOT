@@ -34,13 +34,13 @@ class DIContainer {
     try {
       // Initialize database connection
       await this._initializeDatabase();
-      
+
       // Register repositories
       this._registerRepositories();
-      
+
       // Register use cases
       this._registerUseCases();
-      
+
       this._initialized = true;
       logger.info('Dependency injection container initialized successfully');
     } catch (error) {
@@ -66,12 +66,12 @@ class DIContainer {
     if (this._dependencies.has(name)) {
       const factory = this._dependencies.get(name);
       const instance = factory();
-      
+
       // Store as singleton if marked as such
       if (factory.singleton) {
         this._singletons.set(name, instance);
       }
-      
+
       return instance;
     }
 
@@ -195,7 +195,7 @@ class DIContainer {
 
     // Check if critical dependencies are available
     const criticalDeps = ['userRepository', 'scheduleRepository', 'userUseCase', 'scheduleUseCase'];
-    
+
     for (const dep of criticalDeps) {
       try {
         this.get(dep);

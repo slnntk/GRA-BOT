@@ -19,7 +19,7 @@ class ScheduleUseCase {
     if (!userUseCase) {
       throw new Error('User use case is required');
     }
-    
+
     this._scheduleRepository = scheduleRepository;
     this._userUseCase = userUseCase;
   }
@@ -61,7 +61,7 @@ class ScheduleUseCase {
 
       // Save schedule
       const savedSchedule = await this._scheduleRepository.save(schedule);
-      
+
       return savedSchedule;
     } catch (error) {
       throw new Error(`Failed to create schedule: ${error.message}`);
@@ -203,7 +203,7 @@ class ScheduleUseCase {
       thresholdDate.setDate(thresholdDate.getDate() - daysThreshold);
 
       const oldSchedules = await this._scheduleRepository.findByEndTimeBefore(thresholdDate);
-      
+
       let cleanedCount = 0;
       for (const schedule of oldSchedules) {
         await this._scheduleRepository.delete(schedule.id);
@@ -225,7 +225,7 @@ class ScheduleUseCase {
    */
   async _findAndValidateSchedule(scheduleId, guildId) {
     const schedule = await this._scheduleRepository.findByIdAndGuildId(scheduleId, guildId);
-    
+
     if (!schedule) {
       throw new Error(`Schedule with ID ${scheduleId} not found`);
     }
