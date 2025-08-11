@@ -1,0 +1,90 @@
+[
+  {
+    "crime": "Roubo a Mão Armada",
+    "description": "Roubo cometido com uso de arma de fogo ou arma branca"
+  },
+  {
+    "crime": "Furto de Veículo",
+    "description": "Subtração de veículo sem violência ou grave ameaça"
+  },
+  {
+    "crime": "Roubo de Veículo",
+    "description": "Subtração de veículo com violência ou grave ameaça"
+  },
+  {
+    "crime": "Homicídio Doloso",
+    "description": "Morte intencional de pessoa"
+  },
+  {
+    "crime": "Homicídio Culposo",
+    "description": "Morte não intencional por negligência, imprudência ou imperícia"
+  },
+  {
+    "crime": "Tentativa de Homicídio",
+    "description": "Tentativa de cometer homicídio doloso"
+  },
+  {
+    "crime": "Lesão Corporal",
+    "description": "Ofender a integridade corporal ou a saúde de outrem"
+  },
+  {
+    "crime": "Tráfico de Drogas",
+    "description": "Importar, exportar, remeter, preparar, produzir, fabricar, adquirir, vender, expor à venda, oferecer, ter em depósito, transportar, trazer consigo, guardar, prescrever, ministrar, entregar a consumo ou fornecer drogas"
+  },
+  {
+    "crime": "Porte Ilegal de Arma",
+    "description": "Possuir, deter, portar, adquirir, fornecer, receber, ter em depósito, transportar, ceder, ainda que gratuitamente, emprestar, remeter, empregar, manter sob guarda ou ocultar arma de fogo"
+  },
+  {
+    "crime": "Formação de Quadrilha",
+    "description": "Associarem-se mais de três pessoas, em quadrilha ou bando, para o fim de cometer crimes"
+  },
+  {
+    "crime": "Sequestro",
+    "description": "Privar alguém de sua liberdade, mediante sequestro ou cárcere privado"
+  },
+  {
+    "crime": "Extorsão",
+    "description": "Constranger alguém, mediante violência ou grave ameaça, e com o intuito de obter para si ou para outrem indevida vantagem econômica"
+  },
+  {
+    "crime": "Estelionato",
+    "description": "Obter, para si ou para outrem, vantagem ilícita, em prejuízo alheio, induzindo ou mantendo alguém em erro, mediante artifício, ardil, ou qualquer outro meio fraudulento"
+  },
+  {
+    "crime": "Falsificação de Documentos",
+    "description": "Falsificar, no todo ou em parte, documento público ou alterar documento público verdadeiro"
+  },
+  {
+    "crime": "Direção Perigosa",
+    "description": "Conduzir veículo automotor de forma que coloque em perigo a vida ou a integridade física de outrem"
+  },
+  {
+    "crime": "Fuga de Prisão",
+    "description": "Promover ou facilitar a fuga de pessoa legalmente presa"
+  },
+  {
+    "crime": "Desacato à Autoridade",
+    "description": "Desacatar funcionário público no exercício da função ou em razão dela"
+  },
+  {
+    "crime": "Resistência à Prisão",
+    "description": "Opor-se à execução de ato legal, mediante violência ou ameaça a funcionário competente para executá-lo ou a quem lhe esteja prestando auxílio"
+  },
+  {
+    "crime": "Corrupção Ativa",
+    "description": "Oferecer ou prometer vantagem indevida a funcionário público, para determiná-lo a praticar, omitir ou retardar ato de ofício"
+  },
+  {
+    "crime": "Vandalismo",
+    "description": "Destruir, inutilizar ou deteriorar coisa alheia"
+  },
+  {
+    "crime": "Perturbação da Ordem",
+    "description": "Perturbar a tranquilidade pública"
+  },
+  {
+    "crime": "Invasão de Propriedade",
+    "description": "Entrar ou permanecer, clandestina ou astuciosamente, ou contra a vontade expressa ou tácita do proprietário, em casa alheia ou em suas dependências"
+  }
+]
