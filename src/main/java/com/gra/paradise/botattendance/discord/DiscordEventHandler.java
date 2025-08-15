@@ -143,6 +143,56 @@ public class DiscordEventHandler {
                         .build())
                 .build());
 
+        // Comando para gerenciar concursos de patrulha
+        commands.add(ApplicationCommandRequest.builder()
+                .name("patrol-contest")
+                .description("Gerencia concursos de patrulha")
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("create")
+                        .description("Criar um novo concurso de patrulha")
+                        .type(1) // SUB_COMMAND
+                        .addOption(ApplicationCommandOptionData.builder()
+                                .name("title")
+                                .description("Título do concurso")
+                                .type(3) // STRING
+                                .required(true)
+                                .build())
+                        .addOption(ApplicationCommandOptionData.builder()
+                                .name("start-date")
+                                .description("Data de início (dd/MM/yyyy)")
+                                .type(3) // STRING
+                                .required(true)
+                                .build())
+                        .addOption(ApplicationCommandOptionData.builder()
+                                .name("end-date")
+                                .description("Data de fim (dd/MM/yyyy)")
+                                .type(3) // STRING
+                                .required(true)
+                                .build())
+                        .addOption(ApplicationCommandOptionData.builder()
+                                .name("description")
+                                .description("Descrição do concurso")
+                                .type(3) // STRING
+                                .required(false)
+                                .build())
+                        .build())
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("status")
+                        .description("Ver status do concurso ativo")
+                        .type(1) // SUB_COMMAND
+                        .build())
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("check")
+                        .description("Verificar suas horas de patrulha")
+                        .type(1) // SUB_COMMAND
+                        .build())
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("leaderboard")
+                        .description("Ver ranking de participantes")
+                        .type(1) // SUB_COMMAND
+                        .build())
+                .build());
+
         // Registra comandos globalmente
         restClient.getApplicationService()
                 .bulkOverwriteGlobalApplicationCommand(applicationId, commands)
