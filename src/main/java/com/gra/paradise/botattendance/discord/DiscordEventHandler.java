@@ -191,6 +191,16 @@ public class DiscordEventHandler {
                         .description("Ver ranking de participantes")
                         .type(1) // SUB_COMMAND
                         .build())
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("draw")
+                        .description("Realizar sorteio dos ganhadores")
+                        .type(1) // SUB_COMMAND
+                        .build())
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("winners")
+                        .description("Ver ganhadores do sorteio")
+                        .type(1) // SUB_COMMAND
+                        .build())
                 .build());
 
         // Registra comandos globalmente

@@ -3,6 +3,7 @@ package com.gra.paradise.botattendance.discord.commands;
 import com.gra.paradise.botattendance.model.PatrolContest;
 import com.gra.paradise.botattendance.model.PatrolParticipant;
 import com.gra.paradise.botattendance.service.PatrolContestService;
+import com.gra.paradise.botattendance.service.PatrolLotteryService;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
@@ -25,6 +26,7 @@ import java.util.Optional;
 public class PatrolContestCommand implements Command {
 
     private final PatrolContestService patrolContestService;
+    private final PatrolLotteryService patrolLotteryService;
     
     @Override
     public String getName() {
@@ -44,6 +46,8 @@ public class PatrolContestCommand implements Command {
             case "status" -> handleContestStatus(event, guildId);
             case "check" -> handleCheckHours(event, guildId);
             case "leaderboard" -> handleLeaderboard(event, guildId);
+            case "draw" -> handleDrawWinners(event, guildId);
+            case "winners" -> handleShowWinners(event, guildId);
             default -> event.reply("❌ Subcomando desconhecido!").withEphemeral(true);
         };
     }
@@ -257,5 +261,117 @@ public class PatrolContestCommand implements Command {
                 .flatMap(ApplicationCommandInteractionOption::getValue)
                 .map(ApplicationCommandInteractionOptionValue::asString)
                 .orElse(null);
+    }
+    
+    private Mono<Void> handleDrawWinners(ChatInputInteractionEvent event, String guildId) {
+        Optional<PatrolContest> activeContest = patrolContestService.getActiveContest(guildId);
+        
+        if (activeContest.isEmpty()) {
+            return event.reply("❌ Não há concurso ativo no momento.").withEphemeral(true);
+        }
+        
+        PatrolContest contest = activeContest.get();
+        
+        // Check if winners were already drawn
+        if (patrolLotteryService.hasDrawnWinners(contest.getId())) {
+            return event.reply("⚠️ O sorteio já foi realizado para este concurso. Use `/patrol-contest winners` para ver os resultados.").withEphemeral(true);
+        }
+        
+        try {
+            // Perform the lottery
+            PatrolLotteryService.LotteryResults results = patrolLotteryService.performFullLottery(contest);
+            
+            StringBuilder description = new StringBuilder();
+            description.append(String.format("**%s**\n\n", contest.getTitle()));
+            
+            // Afternoon winners
+            if (!results.getAfternoonWinners().isEmpty()) {
+                description.append("🏆 **Ganhadores da Tarde** (Diamantes/Skins):\n");
+                for (PatrolParticipant winner : results.getAfternoonWinners()) {
+                    description.append(String.format("• **%s** - %.1fh tarde, %.1fh total\n", 
+                            winner.getNickname() != null ? winner.getNickname() : winner.getUsername(),
+                            winner.getTotalAfternoonHours(), winner.getTotalHours()));
+                }
+                description.append("\n");
+            }
+            
+            // Night VIP winners
+            if (!results.getNightVipWinners().isEmpty()) {
+                description.append("💎 **Ganhadores VIP Diamante**:\n");
+                for (PatrolParticipant winner : results.getNightVipWinners()) {
+                    description.append(String.format("• **%s** - %.1fh noite, %.1fh total\n", 
+                            winner.getNickname() != null ? winner.getNickname() : winner.getUsername(),
+                            winner.getTotalNightHours(), winner.getTotalHours()));
+                }
+                description.append("\n");
+            }
+            
+            if (results.getTotalWinners() == 0) {
+                description.append("❌ Não há participantes elegíveis para o sorteio.");
+            } else {
+                description.append(String.format("🎉 **Total de ganhadores:** %d", results.getTotalWinners()));
+            }
+            
+            EmbedCreateSpec embed = EmbedCreateSpec.builder()
+                    .color(Color.of(255, 215, 0)) // Gold
+                    .title("🎊 Resultado do Sorteio!")
+                    .description(description.toString())
+                    .timestamp(java.time.Instant.now())
+                    .build();
+            
+            return event.reply().withEmbeds(embed);
+            
+        } catch (Exception e) {
+            log.error("Error performing lottery", e);
+            return event.reply("❌ Erro ao realizar o sorteio: " + e.getMessage()).withEphemeral(true);
+        }
+    }
+    
+    private Mono<Void> handleShowWinners(ChatInputInteractionEvent event, String guildId) {
+        Optional<PatrolContest> activeContest = patrolContestService.getActiveContest(guildId);
+        
+        if (activeContest.isEmpty()) {
+            return event.reply("❌ Não há concurso ativo no momento.").withEphemeral(true);
+        }
+        
+        PatrolContest contest = activeContest.get();
+        List<PatrolParticipant> afternoonWinners = patrolLotteryService.getAfternoonWinners(contest.getId());
+        List<PatrolParticipant> nightVipWinners = patrolLotteryService.getNightVipWinners(contest.getId());
+        
+        if (afternoonWinners.isEmpty() && nightVipWinners.isEmpty()) {
+            return event.reply("❌ O sorteio ainda não foi realizado para este concurso.").withEphemeral(true);
+        }
+        
+        StringBuilder description = new StringBuilder();
+        description.append(String.format("**%s**\n\n", contest.getTitle()));
+        
+        // Show afternoon winners
+        if (!afternoonWinners.isEmpty()) {
+            description.append("🏆 **Ganhadores da Tarde** (Diamantes/Skins):\n");
+            for (PatrolParticipant winner : afternoonWinners) {
+                description.append(String.format("• **%s** - %.1fh tarde\n", 
+                        winner.getNickname() != null ? winner.getNickname() : winner.getUsername(),
+                        winner.getTotalAfternoonHours()));
+            }
+            description.append("\n");
+        }
+        
+        // Show night VIP winners
+        if (!nightVipWinners.isEmpty()) {
+            description.append("💎 **Ganhadores VIP Diamante**:\n");
+            for (PatrolParticipant winner : nightVipWinners) {
+                description.append(String.format("• **%s** - %.1fh noite\n", 
+                        winner.getNickname() != null ? winner.getNickname() : winner.getUsername(),
+                        winner.getTotalNightHours()));
+            }
+        }
+        
+        EmbedCreateSpec embed = EmbedCreateSpec.builder()
+                .color(Color.of(255, 215, 0)) // Gold
+                .title("🏆 Ganhadores do Concurso")
+                .description(description.toString())
+                .build();
+        
+        return event.reply().withEmbeds(embed);
     }
 }
