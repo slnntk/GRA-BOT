@@ -27,6 +27,7 @@ public class ScheduleManager {
     private final UserService userService;
     private final ScheduleLogManager logManager;
     private final DiscordService discordService;
+    private final PatrolContestService patrolContestService;
 
     @org.springframework.transaction.annotation.Transactional
     @Scheduled(cron = "0 0 0 * * ?")
@@ -153,6 +154,17 @@ public class ScheduleManager {
 
         Schedule saved = scheduleRepository.save(schedule);
         logManager.createScheduleLog(saved, "CLOSED", discordId, nickname, " encerrou a escala.");
+        
+        // Process patrol hours for contest if this is a patrol mission
+        if (saved.getMissionType() == MissionType.PATROL) {
+            try {
+                patrolContestService.processPatrolSchedule(saved);
+                log.info("Processed patrol hours for closed schedule: {}", saved.getId());
+            } catch (Exception e) {
+                log.error("Error processing patrol hours for schedule {}: {}", saved.getId(), e.getMessage());
+            }
+        }
+        
         logManager.createFinalScheduleLogMessage(
                 guildId,
                 scheduleId,
