@@ -27,12 +27,17 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.ArrayList;
 
 @Slf4j
 @Component
@@ -44,8 +49,37 @@ public class ScheduleInteractionHandler {
     private final EmbedFactory embedFactory;
     private final ScheduleMessagePublisher messagePublisher;
 
-    // Mapa temporário para armazenar descrições de OUTROS
-    private final Map<String, String> outrosDescriptionCache = new ConcurrentHashMap<>();
+    // Cache com TTL para evitar memory leak - auto cleanup após 10 minutos
+    private final Map<String, CacheEntry> outrosDescriptionCache = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService cacheCleanupExecutor = Executors.newScheduledThreadPool(1);
+
+    // Classe interna para cache entry com timestamp para TTL
+    private static class CacheEntry {
+        final String description;
+        final long timestamp;
+        
+        CacheEntry(String description) {
+            this.description = description;
+            this.timestamp = System.currentTimeMillis();
+        }
+        
+        boolean isExpired(long ttlMs) {
+            return System.currentTimeMillis() - timestamp > ttlMs;
+        }
+    }
+
+    // Cleanup automático do cache a cada 5 minutos
+    {
+        cacheCleanupExecutor.scheduleWithFixedDelay(this::cleanupExpiredCacheEntries, 
+                5, 5, TimeUnit.MINUTES);
+    }
+
+    private void cleanupExpiredCacheEntries() {
+        long ttl = TimeUnit.MINUTES.toMillis(10); // TTL de 10 minutos
+        outrosDescriptionCache.entrySet().removeIf(entry -> 
+                entry.getValue().isExpired(ttl));
+        log.debug("Cache cleanup executado. Entradas restantes: {}", outrosDescriptionCache.size());
+    }
 
     private static final List<String> FUGA_OPTIONS = List.of(
             "Fleeca 68",
@@ -68,10 +102,10 @@ public class ScheduleInteractionHandler {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     public Mono<Void> handleCreateScheduleButton(ButtonInteractionEvent event) {
-        List<SelectMenu.Option> aircraftOptions = new ArrayList<>();
-        for (AircraftType aircraftType : AircraftType.values()) {
-            aircraftOptions.add(SelectMenu.Option.of(aircraftType.getDisplayName(), aircraftType.name()));
-        }
+        // Usar stream para melhor performance e legibilidade - evita ArrayList manual
+        List<SelectMenu.Option> aircraftOptions = Arrays.stream(AircraftType.values())
+                .map(aircraftType -> SelectMenu.Option.of(aircraftType.getDisplayName(), aircraftType.name()))
+                .collect(Collectors.toList());
 
         SelectMenu aircraftSelect = SelectMenu.of("aircraft_select", aircraftOptions)
                 .withPlaceholder("Selecione a aeronave")
@@ -314,12 +348,12 @@ public class ScheduleInteractionHandler {
 
         log.info("Descrição fornecida pelo usuário {}: '{}'", event.getInteraction().getUser().getId().asString(), description);
 
-        // Verificar e limpar cache para evitar colisões
-        if (outrosDescriptionCache.containsKey(sessionId)) {
+        // Verificar e limpar cache para evitar colisões - usar nova estrutura de cache com TTL
+        CacheEntry existing = outrosDescriptionCache.get(sessionId);
+        if (existing != null) {
             log.warn("Conflito de sessionId {} para usuário {}. Limpando cache antigo.", sessionId, event.getInteraction().getUser().getId().asString());
-            outrosDescriptionCache.remove(sessionId);
         }
-        outrosDescriptionCache.put(sessionId, description);
+        outrosDescriptionCache.put(sessionId, new CacheEntry(description));
 
         Button confirmButton = Button.success("confirm_schedule:" + aircraftTypeStr + ":OUTROS:" + title + ":" + sessionId, "Confirmar");
         Button cancelButton = Button.danger("cancel_schedule", "Cancelar");
@@ -490,9 +524,10 @@ public class ScheduleInteractionHandler {
             actionOption = parts[5];
         } else if (missionTypeStr.equals("OUTROS") && parts.length == 5) {
             String sessionId = parts[4];
-            actionOption = outrosDescriptionCache.get(sessionId);
+            CacheEntry cacheEntry = outrosDescriptionCache.get(sessionId);
+            actionOption = cacheEntry != null ? cacheEntry.description : null;
             if (actionOption == null || actionOption.trim().isEmpty()) {
-                log.error("Descrição não encontrada ou inválida para sessionId {} para usuário {}. Cache: {}", sessionId, event.getInteraction().getUser().getId().asString(), outrosDescriptionCache);
+                log.error("Descrição não encontrada ou inválida para sessionId {} para usuário {}. Cache: {}", sessionId, event.getInteraction().getUser().getId().asString(), outrosDescriptionCache.size());
                 return event.createFollowup("❌ Descrição da missão OUTROS não encontrada ou inválida. Reinicie o processo.").withEphemeral(true).then();
             }
             outrosDescriptionCache.remove(sessionId); // Limpar o cache após uso

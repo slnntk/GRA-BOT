@@ -193,8 +193,9 @@ public class ScheduleManager {
         if (guildId == null || guildId.trim().isEmpty()) {
             return "G.R.A - 1";
         }
-        int activeCount = getActiveSchedules(guildId).size() + 1;
-        return "G.R.A - " + activeCount;
+        // Usar count ao invés de buscar toda a lista para melhor performance
+        long activeCount = scheduleRepository.countByActiveTrueAndGuildId(guildId);
+        return "G.R.A - " + (activeCount + 1);
     }
 
     public Optional<Schedule> findByIdAndGuildId(Long scheduleId, String guildId) {

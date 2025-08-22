@@ -2,8 +2,6 @@ package com.gra.paradise.botattendance.discord;
 
 import com.gra.paradise.botattendance.discord.buttons.ButtonDispatcher;
 import com.gra.paradise.botattendance.discord.commands.Command;
-import com.gra.paradise.botattendance.model.AircraftType;
-import com.gra.paradise.botattendance.model.MissionType;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
@@ -21,9 +19,9 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
@@ -36,8 +34,14 @@ public class DiscordEventHandler {
     private final RestClient restClient;
     private final DiagnosticHandler diagnosticHandler;
 
+    // Cache para otimizar lookup de comandos - evita busca linear repetida
+    private final Map<String, Command> commandCache = new ConcurrentHashMap<>();
+
     @EventListener
     public void onApplicationReady(ApplicationReadyEvent event) {
+        // Inicializar cache de comandos uma única vez para melhor performance
+        initializeCommandCache();
+        
         // Registrar comandos
         registerCommands();
 
@@ -65,137 +69,159 @@ public class DiscordEventHandler {
 
         // Adicionar handler para ModalSubmitInteractionEvent
         gatewayDiscordClient.on(ModalSubmitInteractionEvent.class)
-                .doOnNext(e -> diagnosticHandler.logInteraction(e)) // Log para rastreamento
+                .doOnNext(e -> diagnosticHandler.logInteraction(e))
                 .flatMap(buttonDispatcher::handleModalSubmitEvent)
                 .onErrorResume(e -> {
                     log.error("Erro ao processar evento de modal", e);
-                    return Mono.empty(); // Evita crash do bot, mas loga o erro
+                    return Mono.empty();
                 })
                 .subscribe();
 
         log.info("Bot Discord iniciado com sucesso!");
     }
+
+    // Inicializa cache de comandos para otimizar lookup - evita buscar no contexto Spring repetidamente
+    private void initializeCommandCache() {
+        Map<String, Command> commands = applicationContext.getBeansOfType(Command.class);
+        commands.values().forEach(command -> 
+            commandCache.put(command.getName(), command));
+        log.info("Cache de comandos inicializado com {} comandos", commandCache.size());
+    }
     private void registerCommands() {
-        final long applicationId = gatewayDiscordClient.getRestClient().getApplicationId().block();
-        List<ApplicationCommandRequest> commands = new ArrayList<>();
+        // Usar flatMap para evitar blocking e melhor tratamento reativo
+        gatewayDiscordClient.getRestClient().getApplicationId()
+                .flatMap(applicationId -> {
+                    // Usar List.of para melhor performance de memória que ArrayList
+                    List<ApplicationCommandRequest> commands = List.of(
+                            // Comando para criar escala
+                            ApplicationCommandRequest.builder()
+                                    .name("criar-escala")
+                                    .description("Cria uma nova escala de voo")
+                                    .addOption(ApplicationCommandOptionData.builder()
+                                            .name("titulo")
+                                            .description("Título da escala")
+                                            .type(3)
+                                            .required(true)
+                                            .build())
+                                    .addOption(ApplicationCommandOptionData.builder()
+                                            .name("aeronave")
+                                            .description("Tipo de aeronave")
+                                            .type(3)
+                                            .required(true)
+                                            .addAllChoices(createAircraftChoices())
+                                            .build())
+                                    .addOption(ApplicationCommandOptionData.builder()
+                                            .name("missao")
+                                            .description("Tipo de missão")
+                                            .type(3)
+                                            .required(true)
+                                            .addAllChoices(createMissionTypeChoices())
+                                            .build())
+                                    .build(),
 
-        // Comando para criar escala
-        commands.add(ApplicationCommandRequest.builder()
-                .name("criar-escala")
-                .description("Cria uma nova escala de voo")
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("titulo")
-                        .description("Título da escala")
-                        .type(3)
-                        .required(true)
-                        .build())
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("aeronave")
-                        .description("Tipo de aeronave")
-                        .type(3)
-                        .required(true)
-                        .addAllChoices(createAircraftChoices())
-                        .build())
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("missao")
-                        .description("Tipo de missão")
-                        .type(3)
-                        .required(true)
-                        .addAllChoices(createMissionTypeChoices())
-                        .build())
-                .build());
+                            // Comando para listar escalas ativas
+                            ApplicationCommandRequest.builder()
+                                    .name("escalas-ativas")
+                                    .description("Lista todas as escalas de voo ativas")
+                                    .build(),
 
-        // Comando para listar escalas ativas
-        commands.add(ApplicationCommandRequest.builder()
-                .name("escalas-ativas")
-                .description("Lista todas as escalas de voo ativas")
-                .build());
+                            // Comando para configurar o sistema de escalas fixo
+                            ApplicationCommandRequest.builder()
+                                    .name("setup-escala")
+                                    .description("Configura o sistema de escalas de voo no canal atual")
+                                    .build(),
 
-        // Comando para configurar o sistema de escalas fixo
-        commands.add(ApplicationCommandRequest.builder()
-                .name("setup-escala")
-                .description("Configura o sistema de escalas de voo no canal atual")
-                .build());
+                            // Comando para configurar canal de logs
+                            ApplicationCommandRequest.builder()
+                                    .name("setup-log-channel")
+                                    .description("Configura o canal atual como um canal de logs de escala")
+                                    .addOption(ApplicationCommandOptionData.builder()
+                                            .name("tipo")
+                                            .description("Tipo de missão para este canal de logs")
+                                            .type(3)
+                                            .required(false)
+                                            .addAllChoices(createLogChannelChoices())
+                                            .build())
+                                    .build()
+                    );
 
-        // Comando para configurar canal de logs - CORRIGIDO
-        commands.add(ApplicationCommandRequest.builder()
-                .name("setup-log-channel")
-                .description("Configura o canal atual como um canal de logs de escala")
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("tipo")
-                        .description("Tipo de missão para este canal de logs")
-                        .type(3) // STRING type
-                        .required(false)
-                        .addAllChoices(List.of(
-                                ApplicationCommandOptionChoiceData.builder()
-                                        .name("Patrulhamento")
-                                        .value("PATROL")
-                                        .build(),
-                                ApplicationCommandOptionChoiceData.builder()
-                                        .name("Ação")
-                                        .value("ACTION")
-                                        .build(),
-                                ApplicationCommandOptionChoiceData.builder()
-                                        .name("Outros")
-                                        .value("OUTROS")
-                                        .build()
-                        ))
-                        .build())
-                .build());
-
-        // Registra comandos globalmente
-        restClient.getApplicationService()
-                .bulkOverwriteGlobalApplicationCommand(applicationId, commands)
-                .doOnNext(cmd -> log.info("Comando registrado: {}", cmd.name()))
+                    // Registra comandos globalmente
+                    return restClient.getApplicationService()
+                            .bulkOverwriteGlobalApplicationCommand(applicationId, commands)
+                            .doOnNext(cmd -> log.info("Comando registrado: {}", cmd.name()))
+                            .then();
+                })
                 .subscribe();
     }
 
+    // Cache estático para choices - evita recriar objetos a cada chamada
+    private static final List<ApplicationCommandOptionChoiceData> AIRCRAFT_CHOICES = List.of(
+            ApplicationCommandOptionChoiceData.builder()
+                    .name("EC135")
+                    .value("EC135")
+                    .build(),
+            ApplicationCommandOptionChoiceData.builder()
+                    .name("Maverick")
+                    .value("MAVERICK")
+                    .build(),
+            ApplicationCommandOptionChoiceData.builder()
+                    .name("Valkyre")
+                    .value("VALKYRE")
+                    .build()
+    );
+
+    private static final List<ApplicationCommandOptionChoiceData> MISSION_TYPE_CHOICES = List.of(
+            ApplicationCommandOptionChoiceData.builder()
+                    .name("Patrulhamento")
+                    .value("PATROL")
+                    .build(),
+            ApplicationCommandOptionChoiceData.builder()
+                    .name("Ação")
+                    .value("ACTION")
+                    .build()
+    );
+
+    private static final List<ApplicationCommandOptionChoiceData> LOG_CHANNEL_CHOICES = List.of(
+            ApplicationCommandOptionChoiceData.builder()
+                    .name("Patrulhamento")
+                    .value("PATROL")
+                    .build(),
+            ApplicationCommandOptionChoiceData.builder()
+                    .name("Ação")
+                    .value("ACTION")
+                    .build(),
+            ApplicationCommandOptionChoiceData.builder()
+                    .name("Outros")
+                    .value("OUTROS")
+                    .build()
+    );
+
     private List<ApplicationCommandOptionChoiceData> createAircraftChoices() {
-        return List.of(
-                ApplicationCommandOptionChoiceData.builder()
-                        .name("EC135")
-                        .value("EC135")
-                        .build(),
-                ApplicationCommandOptionChoiceData.builder()
-                        .name("Maverick")
-                        .value("MAVERICK")
-                        .build(),
-                ApplicationCommandOptionChoiceData.builder()
-                        .name("Valkyre")
-                        .value("VALKYRE")
-                        .build()
-        );
+        return AIRCRAFT_CHOICES; // Retorna cache estático para melhor performance
     }
 
     private List<ApplicationCommandOptionChoiceData> createMissionTypeChoices() {
-        return List.of(
-                ApplicationCommandOptionChoiceData.builder()
-                        .name("Patrulhamento")
-                        .value("PATROL")
-                        .build(),
-                ApplicationCommandOptionChoiceData.builder()
-                        .name("Ação")
-                        .value("ACTION")
-                        .build()
-        );
+        return MISSION_TYPE_CHOICES; // Retorna cache estático para melhor performance
+    }
+
+    private List<ApplicationCommandOptionChoiceData> createLogChannelChoices() {
+        return LOG_CHANNEL_CHOICES; // Retorna cache estático para melhor performance
     }
 
     private Mono<Void> handleSlashCommand(ChatInputInteractionEvent event) {
         String commandName = event.getCommandName();
         log.debug("Comando recebido: {}", commandName);
 
-        // Buscar comando no contexto Spring
-        Map<String, Command> commands = applicationContext.getBeansOfType(Command.class);
-        for (Command command : commands.values()) {
-            if (command.getName().equals(commandName)) {
-                return command.handle(event)
-                        .onErrorResume(e -> {
-                            log.error("Erro ao executar comando {}: {}", commandName, e.getMessage(), e);
-                            return event.createFollowup("Ocorreu um erro ao executar o comando: " + e.getMessage())
-                                    .withEphemeral(true)
-                                    .then();
-                        });
-            }
+        // Usar cache O(1) ao invés de busca linear O(n) para melhor performance
+        Command command = commandCache.get(commandName);
+        if (command != null) {
+            return command.handle(event)
+                    .onErrorResume(e -> {
+                        log.error("Erro ao executar comando {}: {}", commandName, e.getMessage(), e);
+                        return event.createFollowup("Ocorreu um erro ao executar o comando: " + e.getMessage())
+                                .withEphemeral(true)
+                                .then();
+                    });
         }
 
         log.warn("Comando não encontrado: {}", commandName);
@@ -207,9 +233,9 @@ public class DiscordEventHandler {
     @EventListener
     public void verifyCommands(ApplicationReadyEvent event) {
         log.info("Verificando comandos disponíveis:");
-        Map<String, Command> commands = applicationContext.getBeansOfType(Command.class);
-        commands.forEach((beanName, command) -> {
-            log.info("Comando disponível: {} (Bean: {})", command.getName(), beanName);
+        // Usar cache ao invés de buscar novamente no contexto Spring
+        commandCache.forEach((commandName, command) -> {
+            log.info("Comando disponível: {}", commandName);
         });
     }
 }
