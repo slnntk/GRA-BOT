@@ -16,8 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,10 +31,12 @@ public class ScheduleMessagePublisher {
     private final ScheduleRepository scheduleRepository;
 
     public Mono<Void> createSchedulePublicMessage(ButtonInteractionEvent event, Schedule schedule) {
-        List<String> crewNicknames = new ArrayList<>();
-        for (User user : schedule.getInitializedCrewMembers()) {
-            crewNicknames.add(user.getNickname());
-        }
+        // Usar stream ao invés de loop manual para melhor performance e legibilidade
+        List<String> crewNicknames = schedule.getInitializedCrewMembers().stream()
+                .map(User::getNickname)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        
         EmbedCreateSpec embed = embedFactory.createSchedulePublicEmbed(schedule, crewNicknames);
 
         Button boardButton = Button.success("board_schedule:" + schedule.getId(), "Embarcar");

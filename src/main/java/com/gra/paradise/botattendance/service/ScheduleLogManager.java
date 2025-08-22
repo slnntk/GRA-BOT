@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -28,6 +29,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -50,6 +54,7 @@ public class ScheduleLogManager {
     private static final int MAX_FIELD_LENGTH = 1024; // Discord embed field character limit
 
     @Transactional
+    @Async("taskExecutor") // Executar de forma assíncrona para não bloquear eventos Discord
     public void createScheduleLog(Schedule schedule, String action, String userId, String username, String details) {
         ScheduleLog scheduleLog = new ScheduleLog(schedule, action, userId, username, details);
         scheduleLogRepository.save(scheduleLog);
@@ -61,11 +66,16 @@ public class ScheduleLogManager {
         Hibernate.initialize(schedule);
         Hibernate.initialize(schedule.getCrewMembers());
         schedule.initializeCrewMembers();
-        List<String> crewNicknames = schedule.getInitializedCrewMembers().stream()
-                .map(User::getNickname)
-                .filter(nickname -> nickname != null)
-                .collect(Collectors.toList());
-        String crewList = crewNicknames.isEmpty() ? "Nenhum tripulante embarcado" : String.join(", ", crewNicknames);
+        
+        // Otimizar stream processing e usar Optional.ofNullable para null safety
+        String crewList = Optional.ofNullable(schedule.getInitializedCrewMembers())
+                .map(crewMembers -> crewMembers.stream()
+                        .map(User::getNickname)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.joining(", ")))
+                .filter(result -> !result.isEmpty())
+                .orElse("Nenhum tripulante embarcado");
+                
         String aircraftImageUrl = DiscordConfig.AIRCRAFT_IMAGE_URLS.getOrDefault(schedule.getAircraftType(), DiscordConfig.FOOTER_GRA_BLUE_URL);
 
         createScheduleLog(schedule, "CREATED", schedule.getCreatedById(), schedule.getCreatedByUsername(),

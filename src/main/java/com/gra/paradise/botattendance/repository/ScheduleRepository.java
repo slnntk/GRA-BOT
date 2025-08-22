@@ -17,6 +17,9 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     List<Schedule> findByActiveTrueAndGuildId(String guildId);
 
+    // Método otimizado para contar escalas ativas - melhor performance que buscar toda a lista
+    long countByActiveTrueAndGuildId(String guildId);
+
     Optional<Schedule> findByMessageIdAndChannelId(String messageId, String channelId);
 
     @Query("SELECT s FROM Schedule s JOIN FETCH s.crewMembers WHERE s.id = :scheduleId AND s.guildId = :guildId")
