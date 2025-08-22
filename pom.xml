@@ -57,20 +57,20 @@
             <version>${discord4j.version}</version>
         </dependency>
 
-        <!-- Database -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.4</version>
-            <scope>runtime</scope>
-        </dependency>
-        <!-- H2 Database -->
+        <!-- Database - PostgreSQL (commented for cost optimization) -->
 <!--        <dependency>-->
-<!--            <groupId>com.h2database</groupId>-->
-<!--            <artifactId>h2</artifactId>-->
-<!--            <version>2.3.232</version>-->
+<!--            <groupId>org.postgresql</groupId>-->
+<!--            <artifactId>postgresql</artifactId>-->
+<!--            <version>42.7.4</version>-->
 <!--            <scope>runtime</scope>-->
 <!--        </dependency>-->
+        <!-- H2 Database -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.3.232</version>
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- Lombok for reducing boilerplate code -->
         <dependency>
