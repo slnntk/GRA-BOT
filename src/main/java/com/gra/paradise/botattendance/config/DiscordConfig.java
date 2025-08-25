@@ -81,6 +81,7 @@ public class DiscordConfig {
     @Bean
     @ConditionalOnProperty(name = "discord.enabled", havingValue = "true", matchIfMissing = true)
     public GatewayDiscordClient gatewayDiscordClient() {
+        // Memory-optimized configuration for Railway deployment
         return DiscordClientBuilder.create(token)
                 .build()
                 .gateway()
@@ -88,6 +89,7 @@ public class DiscordConfig {
                         Intent.GUILDS,
                         Intent.GUILD_MEMBERS
                 ))
+                // Use local store layout for memory efficiency
                 .setStore(Store.fromLayout(LocalStoreLayout.create()))
                 .setInitialPresence(shardInfo ->
                         ClientPresence.online(ClientActivity.playing("Desenvolvido por Tiago Holanda")))

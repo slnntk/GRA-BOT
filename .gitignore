@@ -37,3 +37,6 @@ data/
 *.db
 *.mv.db
 *.trace.db
+
+### Railway Config (contains sensitive tokens) ###
+railway-config.env.local
