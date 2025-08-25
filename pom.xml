@@ -102,8 +102,7 @@
                     </excludes>
                     <mainClass>com.gra.paradise.botattendance.BotAttendanceApplication</mainClass>
                     <executable>true</executable>
-                    <!-- Memory optimization for Railway deployment -->
-                    <jvmArguments>-Xms128m -Xmx384m -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+UseStringDeduplication -Xss256k</jvmArguments>
+                    <jvmArguments>-Xms256m -Xmx512m</jvmArguments>
                 </configuration>
                 <executions>
                     <execution>
