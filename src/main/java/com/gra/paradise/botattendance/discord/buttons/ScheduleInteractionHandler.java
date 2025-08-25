@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import jakarta.annotation.PreDestroy;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -50,14 +49,9 @@ public class ScheduleInteractionHandler {
     private final EmbedFactory embedFactory;
     private final ScheduleMessagePublisher messagePublisher;
 
-    // Cache com TTL para evitar memory leak - auto cleanup otimizado para Railway
+    // Cache com TTL para evitar memory leak - auto cleanup após 10 minutos
     private final Map<String, CacheEntry> outrosDescriptionCache = new ConcurrentHashMap<>();
-    private final ScheduledExecutorService cacheCleanupExecutor = Executors.newScheduledThreadPool(1, 
-        r -> {
-            Thread t = new Thread(r, "GRA-Cache-Cleanup");
-            t.setDaemon(true); // Thread daemon para não impedir shutdown
-            return t;
-        });
+    private final ScheduledExecutorService cacheCleanupExecutor = Executors.newScheduledThreadPool(1);
 
     // Classe interna para cache entry com timestamp para TTL
     private static class CacheEntry {
@@ -74,24 +68,17 @@ public class ScheduleInteractionHandler {
         }
     }
 
-    // Cleanup automático do cache otimizado - a cada 15 minutos para reduzir CPU
+    // Cleanup automático do cache a cada 5 minutos
     {
         cacheCleanupExecutor.scheduleWithFixedDelay(this::cleanupExpiredCacheEntries, 
-                15, 15, TimeUnit.MINUTES); // Aumentado para 15 minutos
+                5, 5, TimeUnit.MINUTES);
     }
 
     private void cleanupExpiredCacheEntries() {
         long ttl = TimeUnit.MINUTES.toMillis(10); // TTL de 10 minutos
-        int sizeBefore = outrosDescriptionCache.size();
         outrosDescriptionCache.entrySet().removeIf(entry -> 
                 entry.getValue().isExpired(ttl));
-        int sizeAfter = outrosDescriptionCache.size();
-        
-        // Log apenas se houve mudança significativa para reduzir log volume
-        if (sizeBefore > sizeAfter) {
-            log.debug("Cache cleanup executado. Entradas removidas: {}, restantes: {}", 
-                sizeBefore - sizeAfter, sizeAfter);
-        }
+        log.debug("Cache cleanup executado. Entradas restantes: {}", outrosDescriptionCache.size());
     }
 
     private static final List<String> FUGA_OPTIONS = List.of(
@@ -769,28 +756,5 @@ public class ScheduleInteractionHandler {
             log.error("Subtipo de ação inválido '{}': {}", subTypeStr, e.getMessage(), e);
             throw new IllegalArgumentException("Subtipo de ação inválido: " + subTypeStr, e);
         }
-    }
-
-    /**
-     * Método para limpeza adequada do executor quando o bean é destruído
-     */
-    @PreDestroy
-    public void cleanup() {
-        if (cacheCleanupExecutor != null && !cacheCleanupExecutor.isShutdown()) {
-            log.info("Iniciando shutdown do cache cleanup executor");
-            cacheCleanupExecutor.shutdown();
-            try {
-                if (!cacheCleanupExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
-                    log.warn("Cache cleanup executor não terminou dentro do prazo, forçando shutdown");
-                    cacheCleanupExecutor.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                log.warn("Shutdown do cache cleanup executor foi interrompido");
-                cacheCleanupExecutor.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
-        }
-        outrosDescriptionCache.clear();
-        log.info("Cache cleanup executor finalizado");
     }
 }

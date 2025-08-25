@@ -29,26 +29,14 @@ public class ScheduleManager {
     private final DiscordService discordService;
 
     @org.springframework.transaction.annotation.Transactional
-    @Scheduled(cron = "0 30 3 * * ?") // Executar às 3:30 AM para reduzir impacto na performance
+    @Scheduled(cron = "0 0 0 * * ?")
     public void cleanOldLogs() {
-        try {
-            ZonedDateTime threshold = ZonedDateTime.now(FORTALEZA_ZONE).minusDays(30);
-            List<Schedule> oldSchedules = scheduleRepository.findByEndTimeBefore(threshold.toInstant());
-            
-            if (oldSchedules.isEmpty()) {
-                log.debug("Nenhuma escala antiga encontrada para limpeza");
-                return;
-            }
-            
-            int deletedCount = 0;
-            for (Schedule schedule : oldSchedules) {
-                scheduleLogRepository.deleteByScheduleId(schedule.getId());
-                scheduleRepository.delete(schedule);
-                deletedCount++;
-            }
-            log.info("Limpeza concluída: {} escalas antigas deletadas", deletedCount);
-        } catch (Exception e) {
-            log.error("Erro durante limpeza automática de dados antigos: {}", e.getMessage(), e);
+        ZonedDateTime threshold = ZonedDateTime.now(FORTALEZA_ZONE).minusDays(30);
+        List<Schedule> oldSchedules = scheduleRepository.findByEndTimeBefore(threshold.toInstant());
+        for (Schedule schedule : oldSchedules) {
+            scheduleLogRepository.deleteByScheduleId(schedule.getId());
+            scheduleRepository.delete(schedule);
+            log.info("Escala {} e seus logs foram deletados (mais de 30 dias)", schedule.getId());
         }
     }
 
