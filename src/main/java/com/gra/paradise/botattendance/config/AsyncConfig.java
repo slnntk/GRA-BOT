@@ -16,18 +16,21 @@ public class AsyncConfig {
 
     /**
      * Pool de threads otimizado para operações Discord e banco de dados
-     * Configurado para balancear performance e uso de memória
+     * Configurado para balancear performance e uso de memória em ambiente Railway
      */
     @Bean(name = "taskExecutor")
     public Executor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        // Configurações otimizadas para bot Discord com operações de I/O
-        executor.setCorePoolSize(4);  // Threads mínimas
-        executor.setMaxPoolSize(10);  // Threads máximas - evita sobrecarga de memória
-        executor.setQueueCapacity(25); // Fila de tarefas
+        // Configurações otimizadas para Railway - menor uso de memória
+        executor.setCorePoolSize(2);   // Reduzido de 4 para 2 threads mínimas
+        executor.setMaxPoolSize(6);    // Reduzido de 10 para 6 threads máximas
+        executor.setQueueCapacity(15); // Reduzido de 25 para 15 fila de tarefas
         executor.setThreadNamePrefix("GRA-Bot-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(20);
+        // Configuração adicional para reduzir overhead de memória
+        executor.setKeepAliveSeconds(60);
+        executor.setAllowCoreThreadTimeOut(true);
         executor.initialize();
         return executor;
     }
