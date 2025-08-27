@@ -1,5 +1,28 @@
 package com.gra.paradise.botattendance.discord.buttons;
 
+/**
+ * @deprecated This class has been refactored into multiple command classes following the Command Pattern.
+ * The functionality has been distributed across:
+ * - {@link com.gra.paradise.botattendance.discord.buttons.commands.CreateScheduleCommand}
+ * - {@link com.gra.paradise.botattendance.discord.buttons.commands.AircraftSelectionCommand}
+ * - {@link com.gra.paradise.botattendance.discord.buttons.commands.MissionSelectionCommand}
+ * - {@link com.gra.paradise.botattendance.discord.buttons.commands.ActionSubTypeSelectionCommand}
+ * - {@link com.gra.paradise.botattendance.discord.buttons.commands.OutrosDescriptionCommand}
+ * - {@link com.gra.paradise.botattendance.discord.buttons.commands.CancelScheduleCommand}
+ * And coordinated by {@link com.gra.paradise.botattendance.discord.buttons.ScheduleInteractionCoordinator}
+ * 
+ * Supporting classes:
+ * - {@link com.gra.paradise.botattendance.discord.buttons.factories.ComponentFactory} - UI component creation
+ * - {@link com.gra.paradise.botattendance.discord.buttons.config.ScheduleInteractionConfig} - Constants
+ * - {@link com.gra.paradise.botattendance.discord.buttons.cache.DescriptionCacheManager} - Cache management
+ * 
+ * This refactoring improves:
+ * - Single Responsibility Principle adherence
+ * - Code maintainability and readability
+ * - Testability through smaller, focused classes
+ * - Extensibility for adding new interaction types
+ */
+
 import com.gra.paradise.botattendance.model.ActionSubType;
 import com.gra.paradise.botattendance.model.AircraftType;
 import com.gra.paradise.botattendance.model.MissionType;
