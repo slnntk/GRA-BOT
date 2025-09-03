@@ -33,7 +33,20 @@ build/
 .vscode/
 
 ### H2 Database Files ###
-data/
 *.db
 *.mv.db
 *.trace.db
+
+### Olist Data Analysis ###
+# Exclude CSV data files but keep structure
+data/*.csv
+data/sample_*.csv
+# Keep data directory and README
+!data/README.md
+
+### Jupyter Notebooks ###
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+__pycache__/
+*.py[cod]
+*$py.class
