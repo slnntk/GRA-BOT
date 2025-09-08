@@ -37,3 +37,6 @@ data/
 *.db
 *.mv.db
 *.trace.db
+
+### Validation Scripts ###
+src/main/java/com/gra/paradise/botattendance/validation/
