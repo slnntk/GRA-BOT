@@ -79,10 +79,8 @@ public class ScheduleMessageManager {
         String defaultChannelId = discordConfig.getDefaultSystemChannelId(guildId);
         if (defaultChannelId == null) {
             log.error("Canal padrão não configurado para guilda {}. Use /setup-escala para configurar.", guildId);
-            return discordClient.getChannelById(Snowflake.of(guildId))
-                    .ofType(MessageChannel.class)
-                    .flatMap(channel -> channel.createMessage("⚠️ Canal de sistema não configurado. Use o comando `/setup-escala` para configurar."))
-                    .then(Mono.empty());
+            // Return empty instead of trying to use guildId as channelId
+            return Mono.empty();
         }
 
         EmbedCreateSpec embed = EmbedCreateSpec.builder()
