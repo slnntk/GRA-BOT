@@ -726,11 +726,24 @@ public class ScheduleInteractionHandler {
                 .orElseThrow(() -> new IllegalStateException("Comando deve ser executado em um servidor"));
 
         return Mono.fromCallable(() -> scheduleService.closeSchedule(guildId, scheduleId, userId, nickname))
-                .flatMap(schedule -> scheduleMessageManager.removeScheduleMessage(String.valueOf(schedule.getId()), guildId)
-                        .onErrorResume(e -> {
-                            log.warn("Falha ao remover mensagem da escala {}: {}. Tentando prosseguir.", schedule.getId(), e.getMessage());
-                            return Mono.empty();
-                        }))
+                .flatMap(schedule -> {
+                    if (schedule == null) {
+                        // Force close scenario - schedule was not found in DB but user has special role
+                        log.info("Escala {} foi forçadamente fechada por usuário {} com cargo especial", scheduleId, userId);
+                        return scheduleMessageManager.removeScheduleMessage(String.valueOf(scheduleId), guildId)
+                                .onErrorResume(e -> {
+                                    log.warn("Falha ao remover mensagem da escala não mapeada {}: {}. Tentando prosseguir.", scheduleId, e.getMessage());
+                                    return Mono.empty();
+                                });
+                    } else {
+                        // Normal close scenario
+                        return scheduleMessageManager.removeScheduleMessage(String.valueOf(schedule.getId()), guildId)
+                                .onErrorResume(e -> {
+                                    log.warn("Falha ao remover mensagem da escala {}: {}. Tentando prosseguir.", schedule.getId(), e.getMessage());
+                                    return Mono.empty();
+                                });
+                    }
+                })
                 .then(scheduleMessageManager.updateSystemMessage(guildId))
                 .then(event.createFollowup("✅ Escala encerrada com sucesso! (Hora: " + LocalDateTime.now(ZoneId.of("America/Fortaleza")).format(DATE_TIME_FORMATTER) + ")").withEphemeral(true))
                 .onErrorResume(e -> {

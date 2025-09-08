@@ -137,13 +137,28 @@ public class ScheduleManager {
 
     @Transactional
     public Schedule closeSchedule(String guildId, Long scheduleId, String discordId, String nickname) {
-        Schedule schedule = validateScheduleForModification(guildId, scheduleId);
-
-        boolean isCreator = discordId.equals(schedule.getCreatedById());
+        Schedule schedule;
         boolean hasRequiredRole = checkUserHasRole(guildId, discordId, "1393974475321507953");
-
-        if (!isCreator && !hasRequiredRole) {
-            throw new OnlyCreatorCanCloseScheduleException();
+        
+        try {
+            schedule = validateScheduleForModification(guildId, scheduleId);
+            
+            boolean isCreator = discordId.equals(schedule.getCreatedById());
+            if (!isCreator && !hasRequiredRole) {
+                throw new OnlyCreatorCanCloseScheduleException();
+            }
+            
+        } catch (ScheduleNotFoundException e) {
+            // If schedule not found in database but user has special role, allow force close
+            if (hasRequiredRole) {
+                log.warn("Usuário {} com cargo especial forçou fechamento da escala não mapeada {}", discordId, scheduleId);
+                // This is a force close scenario - schedule exists in Discord but not in DB
+                // Return null to indicate this was a force close operation
+                return null;
+            } else {
+                // Re-throw the exception if user doesn't have the special role
+                throw e;
+            }
         }
 
         Instant endTime = ZonedDateTime.now(FORTALEZA_ZONE).toInstant();
