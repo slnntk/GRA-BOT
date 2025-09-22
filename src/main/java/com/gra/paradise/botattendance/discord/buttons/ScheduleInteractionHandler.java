@@ -21,6 +21,7 @@ import discord4j.core.spec.InteractionPresentModalSpec;
 import discord4j.rest.http.client.ClientException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "discord.enabled", havingValue = "true", matchIfMissing = true)
 public class ScheduleInteractionHandler {
 
     private final ScheduleManager scheduleService;

@@ -11,6 +11,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -23,6 +24,7 @@ import static com.gra.paradise.botattendance.config.DiscordConfig.FOOTER_GRA_BLU
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "discord.enabled", havingValue = "true", matchIfMissing = true)
 public class SetupScheduleSystemCommand implements Command {
 
     private static final ZoneId FORTALEZA_ZONE = ZoneId.of("America/Fortaleza");

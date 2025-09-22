@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -40,6 +41,7 @@ import static com.gra.paradise.botattendance.config.DiscordConfig.FORTALEZA_ZONE
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "discord.enabled", havingValue = "true", matchIfMissing = true)
 public class ScheduleLogManager {
 
     private final ScheduleLogRepository scheduleLogRepository;

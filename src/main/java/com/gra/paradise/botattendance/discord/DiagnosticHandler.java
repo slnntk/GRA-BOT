@@ -4,10 +4,12 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
 import discord4j.core.event.domain.interaction.InteractionCreateEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@ConditionalOnProperty(name = "discord.enabled", havingValue = "true", matchIfMissing = true)
 public class DiagnosticHandler {
 
     public DiagnosticHandler(GatewayDiscordClient client) {

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Penal - G.R.A Sistema</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/calculadora-penal.css}">
+</head>
+<body>
+    <div class="container-fluid main-container">
+        <!-- Header -->
+        <header class="header-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <img src="https://raw.githubusercontent.com/slnntk/qru-report/refs/heads/main/src/assets/EMBLEMA%20GRA.png" 
+                         alt="G.R.A Logo" class="logo">
+                </div>
+                <div class="col-md-8 text-center">
+                    <h1 class="main-title">
+                        <i class="fas fa-calculator"></i>
+                        Sistema de Calculadora Penal G.R.A
+                    </h1>
+                    <p class="subtitle">Controle Operacional de Infrações e Relatórios</p>
+                </div>
+                <div class="col-md-2 text-center">
+                    <div class="datetime-display" id="currentDateTime"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content - Split Layout -->
+        <div class="row main-content">
+            <!-- Left Panel - Calculator -->
+            <div class="col-md-6">
+                <div class="card calculator-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calculator"></i> Calculadora de Infrações</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="penalCalculatorForm">
+                            <!-- Agent Information -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-user"></i> Informações do Agente</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="agentName" class="form-label">Nome do Agente</label>
+                                        <input type="text" class="form-control" id="agentName" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="agentBadge" class="form-label">Número da Placa</label>
+                                        <input type="text" class="form-control" id="agentBadge" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Operation Information -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-helicopter"></i> Informações da Operação</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="vehicleType" class="form-label">Tipo de Veículo</label>
+                                        <select class="form-select" id="vehicleType" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="EC135">EC135</option>
+                                            <option value="VALKYRE">Valkyre</option>
+                                            <option value="MAVERICK">Maverick</option>
+                                            <option value="VECTREII">Vectre II</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="missionType" class="form-label">Tipo de Missão</label>
+                                        <select class="form-select" id="missionType" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="PATROL">Patrulha</option>
+                                            <option value="ACTION">Ação Tática</option>
+                                            <option value="OUTROS">Outros</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Infractions -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-exclamation-triangle"></i> Infrações</h5>
+                                <div class="infraction-grid">
+                                    <div class="form-check infraction-item">
+                                        <input class="form-check-input" type="checkbox" id="tardiness" data-points="2">
+                                        <label class="form-check-label" for="tardiness">
+                                            Atraso na Escala <span class="points">(2 pts)</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check infraction-item">
+                                        <input class="form-check-input" type="checkbox" id="absence" data-points="5">
+                                        <label class="form-check-label" for="absence">
+                                            Falta Injustificada <span class="points">(5 pts)</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check infraction-item">
+                                        <input class="form-check-input" type="checkbox" id="misconduct" data-points="3">
+                                        <label class="form-check-label" for="misconduct">
+                                            Conduta Inadequada <span class="points">(3 pts)</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check infraction-item">
+                                        <input class="form-check-input" type="checkbox" id="equipmentDamage" data-points="4">
+                                        <label class="form-check-label" for="equipmentDamage">
+                                            Dano ao Equipamento <span class="points">(4 pts)</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check infraction-item">
+                                        <input class="form-check-input" type="checkbox" id="protocolViolation" data-points="3">
+                                        <label class="form-check-label" for="protocolViolation">
+                                            Violação de Protocolo <span class="points">(3 pts)</span>
+                                        </label>
+                                    </div>
+                                    <div class="form-check infraction-item">
+                                        <input class="form-check-input" type="checkbox" id="insubordination" data-points="6">
+                                        <label class="form-check-label" for="insubordination">
+                                            Insubordinação <span class="points">(6 pts)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Notes -->
+                            <div class="form-section">
+                                <label for="observations" class="form-label">
+                                    <i class="fas fa-sticky-note"></i> Observações Adicionais
+                                </label>
+                                <textarea class="form-control" id="observations" rows="3" 
+                                          placeholder="Descreva detalhes adicionais sobre as infrações..."></textarea>
+                            </div>
+
+                            <!-- Calculate Button -->
+                            <div class="text-center">
+                                <button type="button" class="btn btn-primary btn-lg calculate-btn" onclick="calculatePenalty()">
+                                    <i class="fas fa-calculator"></i> Calcular Penalidade
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Results and Report -->
+            <div class="col-md-6">
+                <!-- Results Card -->
+                <div class="card results-card mb-3">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-bar"></i> Resultado da Calculadora</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="calculationResults" class="results-display">
+                            <div class="no-calculation">
+                                <i class="fas fa-info-circle"></i>
+                                <p>Preencha os dados e clique em "Calcular Penalidade" para ver os resultados.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Generator Card -->
+                <div class="card report-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-file-alt"></i> Gerador de Relatório</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="report-actions">
+                            <button type="button" class="btn btn-success me-2" onclick="generateReport()" id="generateReportBtn" disabled>
+                                <i class="fas fa-file-pdf"></i> Gerar Relatório PDF
+                            </button>
+                            <button type="button" class="btn btn-info me-2" onclick="exportToExcel()" id="exportExcelBtn" disabled>
+                                <i class="fas fa-file-excel"></i> Exportar Excel
+                            </button>
+                            <button type="button" class="btn btn-warning" onclick="clearForm()">
+                                <i class="fas fa-redo"></i> Limpar Formulário
+                            </button>
+                        </div>
+                        
+                        <div id="reportPreview" class="report-preview mt-3">
+                            <div class="no-report">
+                                <i class="fas fa-file"></i>
+                                <p>O relatório será exibido aqui após o cálculo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer-section">
+            <div class="text-center">
+                <p>&copy; 2024 G.R.A - Controle Operacional | Desenvolvido por Tiago Holanda | v1.0</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/calculadora-penal.js}"></script>
+</body>
+</html>

@@ -7,6 +7,7 @@ import com.gra.paradise.botattendance.repository.ScheduleRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import static com.gra.paradise.botattendance.config.DiscordConfig.FORTALEZA_ZONE
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "discord.enabled", havingValue = "true", matchIfMissing = true)
 public class ScheduleManager {
 
     private final ScheduleRepository scheduleRepository;

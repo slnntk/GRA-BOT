@@ -7,11 +7,13 @@ import discord4j.rest.RestClient;
 import discord4j.rest.service.GuildService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@ConditionalOnProperty(name = "discord.enabled", havingValue = "true", matchIfMissing = true)
 public class DiscordService {
     private static final Logger logger = LoggerFactory.getLogger(DiscordService.class);
     private final RestClient restClient;

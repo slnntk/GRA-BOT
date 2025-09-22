@@ -96,6 +96,7 @@ public class DiscordConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(name = "discord.enabled", havingValue = "true", matchIfMissing = true)
     public RestClient discordRestClient(GatewayDiscordClient gatewayDiscordClient) {
         return gatewayDiscordClient.getRestClient();
     }
