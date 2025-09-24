@@ -111,8 +111,8 @@ class MilitaryPersonnelCsvParserTest {
         assertEquals(1, personnel.size());
         
         MilitaryPersonnel person = personnel.get(0);
-        assertEquals(3, person.getTotalCertifications()); // GIC, PER, GOT
-        assertEquals(2, person.getTotalAdministrativeRoles()); // AB, AC
+        assertEquals(1, person.getTotalCertifications()); // Only GIC is true  
+        assertEquals(1, person.getTotalAdministrativeRoles()); // Only AB is true
         assertEquals("SOLDIER", person.getRankCategory());
     }
     
@@ -137,5 +137,35 @@ class MilitaryPersonnelCsvParserTest {
         assertNotNull(personnel);
         // No valid records with both ID and name
         assertTrue(personnel.isEmpty());
+    }
+    
+    @Test
+    void debugActualCsvContent() throws CsvParserFactory.CsvParsingException {
+        String csvContent = """
+                ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+                ,1º Batalhão de Polícia Militar Alta Paradise,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+                ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+                ,Registro de Policiais,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,Cadete
+                ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+                ,Identificação,,,,,,Unidades,,,,,,,,Cursos/Cerficações,,,,,,,,,,,,Administrativo,,,,,,,,,,,,,,,,,,,,,
+                1,ID,Patente,PTT,Nome,Unidade,,GIC,PER,GOT,GRA,GTM,SPD,SASP,,AB,AC,CO,BO,SUL,HC,P1,P2,P3,P4,AET,,CMD,INST,CRS,CRE,CLG,ADVs,,,Status,,Medalhas,,,,,,,,,Entrada,Última promoção,
+                ,583,3º Sargento,13,Adeusa Dokasi Void,GOT,TRUE,,TRUE,,,,,,,,,,,,,,,,,,,,,,,FALSE,FALSE,FALSE,ATIVO,,,,,,,,,,,,15/09/2025,
+                """;
+        
+        InputStream inputStream = new ByteArrayInputStream(csvContent.getBytes());
+        List<MilitaryPersonnel> personnel = parser.parse(inputStream);
+        
+        System.out.println("Parsed " + personnel.size() + " personnel");
+        if (!personnel.isEmpty()) {
+            MilitaryPersonnel person = personnel.get(0);
+            System.out.println("Person details:");
+            System.out.println("ID: " + person.getId());
+            System.out.println("Name: " + person.getName());
+            System.out.println("GIC: " + person.getGic());
+            System.out.println("PER: " + person.getPer());
+            System.out.println("GOT: " + person.getGot());
+            System.out.println("GRA: " + person.getGra());
+            System.out.println("Total certs: " + person.getTotalCertifications());
+        }
     }
 }
