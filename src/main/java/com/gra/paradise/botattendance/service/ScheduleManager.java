@@ -4,6 +4,9 @@ import com.gra.paradise.botattendance.exception.*;
 import com.gra.paradise.botattendance.model.*;
 import com.gra.paradise.botattendance.repository.ScheduleLogRepository;
 import com.gra.paradise.botattendance.repository.ScheduleRepository;
+import com.gra.paradise.botattendance.service.PerformanceMetricsService;
+import com.gra.paradise.botattendance.service.CacheService;
+import com.gra.paradise.botattendance.utils.PerformanceUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,8 @@ public class ScheduleManager {
     private final UserService userService;
     private final ScheduleLogManager logManager;
     private final DiscordService discordService;
+    private final PerformanceMetricsService performanceMetrics;
+    private final CacheService cacheService;
 
     @org.springframework.transaction.annotation.Transactional
     @Scheduled(cron = "0 0 0 * * ?")

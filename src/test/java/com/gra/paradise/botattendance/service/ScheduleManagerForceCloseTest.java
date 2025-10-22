@@ -4,6 +4,7 @@ import com.gra.paradise.botattendance.exception.OnlyCreatorCanCloseScheduleExcep
 import com.gra.paradise.botattendance.exception.ScheduleNotFoundException;
 import com.gra.paradise.botattendance.model.Schedule;
 import com.gra.paradise.botattendance.repository.ScheduleRepository;
+import com.gra.paradise.botattendance.repository.ScheduleLogRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -25,6 +26,9 @@ class ScheduleManagerForceCloseTest {
     private ScheduleRepository scheduleRepository;
 
     @Mock
+    private ScheduleLogRepository scheduleLogRepository;
+
+    @Mock
     private DiscordService discordService;
 
     @Mock
@@ -33,12 +37,18 @@ class ScheduleManagerForceCloseTest {
     @Mock
     private ScheduleLogManager logManager;
 
+    @Mock
+    private PerformanceMetricsService performanceMetrics;
+
+    @Mock
+    private CacheService cacheService;
+
     private ScheduleManager scheduleManager;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        scheduleManager = new ScheduleManager(scheduleRepository, null, userService, logManager, discordService);
+        scheduleManager = new ScheduleManager(scheduleRepository, scheduleLogRepository, userService, logManager, discordService, performanceMetrics, cacheService);
     }
 
     @Test

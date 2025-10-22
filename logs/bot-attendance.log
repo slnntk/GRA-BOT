@@ -1,0 +1,205 @@
+2025-10-22 14:48:39.559 [main] INFO  c.g.p.b.BotAttendanceApplication - Starting BotAttendanceApplication using Java 17.0.17 with PID 33427 (/Users/ccastro/Downloads/GRA-BOT/target/classes started by ccastro in /Users/ccastro/Downloads/GRA-BOT)
+2025-10-22 14:48:39.560 [main] INFO  c.g.p.b.BotAttendanceApplication - No active profile set, falling back to 1 default profile: "default"
+2025-10-22 14:48:40.692 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-22 14:48:41.498 [d4j-limiter-1] ERROR i.n.r.d.DnsServerAddressStreamProviders - Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'. Use DEBUG level to see the full stack: java.lang.UnsatisfiedLinkError: failed to load the required native library
+2025-10-22 14:48:43.888 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-22 14:48:44.218 [main] INFO  c.g.p.b.BotAttendanceApplication - Started BotAttendanceApplication in 4.808 seconds (process running for 4.931)
+2025-10-22 14:48:44.240 [main] INFO  c.g.p.b.s.PerformanceMetricsService - Performance metrics initialized successfully
+2025-10-22 14:48:44.240 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Cache de comandos inicializado com 2 comandos
+2025-10-22 14:48:44.244 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Bot Discord iniciado com sucesso!
+2025-10-22 14:48:44.244 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Verificando comandos disponíveis:
+2025-10-22 14:48:44.244 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: setup-log-channel
+2025-10-22 14:48:44.244 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: setup-escala
+2025-10-22 14:48:45.049 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: criar-escala
+2025-10-22 14:48:45.049 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: escalas-ativas
+2025-10-22 14:48:45.049 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: setup-escala
+2025-10-22 14:48:45.049 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: setup-log-channel
+2025-10-22 14:50:11.738 [d4j-events-3] INFO  c.g.p.b.d.buttons.ButtonDispatcher - Botão clicado por usuário 239402373427101696: create_schedule
+2025-10-22 14:50:18.208 [d4j-events-3] INFO  c.g.p.b.d.buttons.ButtonDispatcher - Botão clicado por usuário 239402373427101696: confirm_schedule:EC135:PATROL:G.R.A - 1
+2025-10-22 14:50:18.211 [d4j-events-3] INFO  c.g.p.b.d.b.ScheduleInteractionHandler - Tentando criar escala para usuário 239402373427101696 com title: G.R.A - 1, aircraft: EC135, mission: PATROL, actionSubType: null, actionOption: null
+2025-10-22 14:50:18.807 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleManager - Escala criada: G.R.A - 1 (ID: 1)
+2025-10-22 14:50:18.810 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Log salvo: CREATED para escala 1 por usuário Tiago Holanda na guilda 1408269205240811600
+2025-10-22 14:50:18.815 [boundedElastic-1] ERROR c.g.p.b.service.ScheduleLogManager - Canal de logs não configurado para guilda 1408269205240811600 e missão PATROL. Use /setup-log-channel.
+2025-10-22 14:50:18.822 [boundedElastic-1] INFO  c.g.p.b.d.b.ScheduleInteractionHandler - Escala criada com sucesso para scheduleId: 1
+2025-10-22 14:50:19.178 [boundedElastic-1] INFO  c.g.p.b.s.ScheduleMessageManager - Mensagem registrada para escala 1: canal 1408269205928804415, mensagem 1430614259968114839
+2025-10-22 14:50:19.178 [boundedElastic-1] INFO  c.g.p.b.s.ScheduleMessagePublisher - Mensagem pública criada para a escala 1 com messageId 1430614259968114839 e channelId 1408269205928804415
+2025-10-22 14:50:19.178 [boundedElastic-1] WARN  c.g.p.b.s.ScheduleMessageManager - Mensagem de sistema não registrada para guilda 1408269205240811600. Tentando recriar.
+2025-10-22 14:50:19.180 [boundedElastic-1] ERROR c.g.p.b.s.ScheduleMessageManager - Canal padrão não configurado para guilda 1408269205240811600. Use /setup-escala para configurar.
+2025-10-22 14:50:29.847 [d4j-events-3] INFO  c.g.p.b.d.buttons.ButtonDispatcher - Botão clicado por usuário 239402373427101696: end_schedule:1
+2025-10-22 14:50:30.477 [GRA-Bot-1] INFO  c.g.p.b.service.ScheduleLogManager - Log salvo: CLOSED para escala 1 por usuário Tiago Holanda na guilda 1408269205240811600
+2025-10-22 14:50:30.483 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Logs encontrados para escala 1: [ScheduleLog{id=1, scheduleId=1, timestamp=2025-10-22T14:50:18.808592, action='CREATED', userId='239402373427101696', username='Tiago Holanda', details='Escala criada: G.R.A - 1'}, ScheduleLog{id=2, scheduleId=1, timestamp=2025-10-22T14:50:30.475204, action='CLOSED', userId='239402373427101696', username='Tiago Holanda', details=' encerrou a escala.'}]
+2025-10-22 14:50:30.487 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Histórico de atividades para escala final 1: 22/10/2025 14:50:18 - Tiago Holanda: Escala criada: G.R.A - 1
+22/10/2025 14:50:30 - Tiago Holanda: encerrou a escala.
+
+2025-10-22 14:50:30.491 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Log final da escala 1 enviado com sucesso na guilda 1408269205240811600
+2025-10-22 14:50:30.494 [boundedElastic-1] WARN  c.g.p.b.s.ScheduleMessageManager - Mensagem de sistema não registrada para guilda 1408269205240811600. Tentando recriar.
+2025-10-22 14:50:30.495 [boundedElastic-1] ERROR c.g.p.b.s.ScheduleMessageManager - Canal padrão não configurado para guilda 1408269205240811600. Use /setup-escala para configurar.
+2025-10-22 14:50:30.502 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Logs encontrados para escala 1: [ScheduleLog{id=1, scheduleId=1, timestamp=2025-10-22T14:50:18.808592, action='CREATED', userId='239402373427101696', username='Tiago Holanda', details='Escala criada: G.R.A - 1'}, ScheduleLog{id=2, scheduleId=1, timestamp=2025-10-22T14:50:30.475204, action='CLOSED', userId='239402373427101696', username='Tiago Holanda', details=' encerrou a escala.'}]
+2025-10-22 14:50:30.502 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Histórico de atividades para escala final 1: 22/10/2025 14:50:18 - Tiago Holanda: Escala criada: G.R.A - 1
+22/10/2025 14:50:30 - Tiago Holanda: encerrou a escala.
+
+2025-10-22 14:50:30.504 [boundedElastic-1] WARN  c.g.p.b.s.ScheduleMessageManager - Mensagem de sistema não registrada para guilda 1408269205240811600. Tentando recriar.
+2025-10-22 14:50:30.505 [boundedElastic-1] ERROR c.g.p.b.s.ScheduleMessageManager - Canal padrão não configurado para guilda 1408269205240811600. Use /setup-escala para configurar.
+2025-10-22 14:50:31.546 [boundedElastic-1] ERROR c.g.p.b.s.ScheduleMessageManager - Erro ao excluir mensagem da escala 1: GET /channels/1408269205928804415/messages/1430614259968114839 returned 404 Not Found with response {code=10008, message=Unknown Message}
+2025-10-22 14:50:31.547 [boundedElastic-1] WARN  c.g.p.b.d.b.ScheduleActionHandler - Erro ao remover referência da escala 1: GET /channels/1408269205928804415/messages/1430614259968114839 returned 404 Not Found with response {code=10008, message=Unknown Message}
+2025-10-22 14:50:31.547 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Log final da escala 1 enviado com sucesso na guilda 1408269205240811600
+2025-10-22 15:00:22.927 [main] INFO  c.g.p.b.BotAttendanceApplication - Starting BotAttendanceApplication using Java 17.0.17 with PID 34825 (/Users/ccastro/Downloads/GRA-BOT/target/classes started by ccastro in /Users/ccastro/Downloads/GRA-BOT)
+2025-10-22 15:00:22.928 [main] INFO  c.g.p.b.BotAttendanceApplication - No active profile set, falling back to 1 default profile: "default"
+2025-10-22 15:00:24.068 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-22 15:00:24.847 [d4j-limiter-1] ERROR i.n.r.d.DnsServerAddressStreamProviders - Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'. Use DEBUG level to see the full stack: java.lang.UnsatisfiedLinkError: failed to load the required native library
+2025-10-22 15:00:32.232 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-22 15:00:32.566 [main] INFO  c.g.p.b.BotAttendanceApplication - Started BotAttendanceApplication in 9.804 seconds (process running for 9.94)
+2025-10-22 15:00:32.583 [main] INFO  c.g.p.b.s.PerformanceMetricsService - Performance metrics initialized successfully
+2025-10-22 15:00:32.584 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Cache de comandos inicializado com 3 comandos
+2025-10-22 15:00:32.587 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Bot Discord iniciado com sucesso!
+2025-10-22 15:00:32.587 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Verificando comandos disponíveis:
+2025-10-22 15:00:32.588 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: setup-log-channel
+2025-10-22 15:00:32.588 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: standby-status
+2025-10-22 15:00:32.588 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: setup-escala
+2025-10-22 15:00:33.576 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: criar-escala
+2025-10-22 15:00:33.576 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: escalas-ativas
+2025-10-22 15:00:33.576 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: setup-escala
+2025-10-22 15:00:33.576 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: setup-log-channel
+2025-10-22 15:00:33.576 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: standby-status
+2025-10-22 15:01:28.704 [d4j-events-2] INFO  c.g.p.b.d.buttons.ButtonDispatcher - Botão clicado por usuário 239402373427101696: create_schedule
+2025-10-22 15:02:09.730 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Comando setup-log-channel recebido de sunli9306
+2025-10-22 15:02:09.735 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Opção recebida: tipo = PATROL
+2025-10-22 15:02:09.737 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Parâmetro tipo recebido: PATROL
+2025-10-22 15:02:09.738 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Tipo de missão configurado: PATROL
+2025-10-22 15:02:09.778 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Canal de log configurado para guilda 1408269205240811600: 1430605594833981551 para missões do tipo Patrulhamento
+2025-10-22 15:02:14.193 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Comando setup-log-channel recebido de sunli9306
+2025-10-22 15:02:14.194 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Opção recebida: tipo = ACTION
+2025-10-22 15:02:14.195 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Parâmetro tipo recebido: ACTION
+2025-10-22 15:02:14.195 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Tipo de missão configurado: ACTION
+2025-10-22 15:02:14.215 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Canal de log configurado para guilda 1408269205240811600: 1430605604384145480 para missões do tipo Ação
+2025-10-22 15:02:18.578 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Comando setup-log-channel recebido de sunli9306
+2025-10-22 15:02:18.580 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Opção recebida: tipo = OUTROS
+2025-10-22 15:02:18.580 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Parâmetro tipo recebido: OUTROS
+2025-10-22 15:02:18.580 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Tipo de missão configurado: OUTROS
+2025-10-22 15:02:18.592 [d4j-events-2] INFO  c.g.p.b.d.c.SetupLogChannelsCommand - Canal de log configurado para guilda 1408269205240811600: 1430605633308201030 para missões do tipo Outros
+2025-10-22 15:02:20.887 [d4j-events-1] INFO  c.g.p.b.d.buttons.ButtonDispatcher - Botão clicado por usuário 239402373427101696: confirm_schedule:EC135:PATROL:G.R.A - 1
+2025-10-22 15:02:20.888 [d4j-events-1] INFO  c.g.p.b.d.b.ScheduleInteractionHandler - Tentando criar escala para usuário 239402373427101696 com title: G.R.A - 1, aircraft: EC135, mission: PATROL, actionSubType: null, actionOption: null
+2025-10-22 15:02:21.435 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleManager - Escala criada: G.R.A - 1 (ID: 2)
+2025-10-22 15:02:21.437 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Log salvo: CREATED para escala 2 por usuário Tiago Holanda na guilda 1408269205240811600
+2025-10-22 15:02:21.818 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Log de criação da escala 2 registrado com mensagem ID 1430617290810065066 na guilda 1408269205240811600
+2025-10-22 15:02:21.827 [boundedElastic-1] INFO  c.g.p.b.d.b.ScheduleInteractionHandler - Escala criada com sucesso para scheduleId: 2
+2025-10-22 15:02:22.179 [boundedElastic-1] INFO  c.g.p.b.s.ScheduleMessageManager - Mensagem registrada para escala 2: canal 1408269205928804415, mensagem 1430617292256841729
+2025-10-22 15:02:22.179 [boundedElastic-1] INFO  c.g.p.b.s.ScheduleMessagePublisher - Mensagem pública criada para a escala 2 com messageId 1430617292256841729 e channelId 1408269205928804415
+2025-10-22 15:02:22.179 [boundedElastic-1] WARN  c.g.p.b.s.ScheduleMessageManager - Mensagem de sistema não registrada para guilda 1408269205240811600. Tentando recriar.
+2025-10-22 15:02:22.182 [boundedElastic-1] ERROR c.g.p.b.s.ScheduleMessageManager - Canal padrão não configurado para guilda 1408269205240811600. Use /setup-escala para configurar.
+2025-10-22 15:02:48.061 [d4j-events-1] INFO  c.g.p.b.d.buttons.ButtonDispatcher - Botão clicado por usuário 537331261690085377: board_schedule:2
+2025-10-22 15:02:48.422 [GRA-Bot-1] INFO  c.g.p.b.service.ScheduleLogManager - Log salvo: EMBARKED para escala 2 por usuário holanda3830 na guilda 1408269205240811600
+2025-10-22 15:02:48.426 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Logs encontrados para escala 2: [ScheduleLog{id=3, scheduleId=2, timestamp=2025-10-22T15:02:21.436511, action='CREATED', userId='239402373427101696', username='Tiago Holanda', details='Escala criada: G.R.A - 1'}, ScheduleLog{id=4, scheduleId=2, timestamp=2025-10-22T15:02:48.420835, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}]
+2025-10-22 15:02:48.427 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Histórico de atividades para escala 2: 22/10/2025 15:02:21 - Tiago Holanda: Escala criada: G.R.A - 1
+22/10/2025 15:02:48 - holanda3830: embarcou.
+
+2025-10-22 15:02:49.256 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Log da escala 2 atualizado com sucesso na guilda 1408269205240811600
+2025-10-22 15:02:49.266 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Logs encontrados para escala 2: [ScheduleLog{id=3, scheduleId=2, timestamp=2025-10-22T15:02:21.436511, action='CREATED', userId='239402373427101696', username='Tiago Holanda', details='Escala criada: G.R.A - 1'}, ScheduleLog{id=4, scheduleId=2, timestamp=2025-10-22T15:02:48.420835, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}]
+2025-10-22 15:02:49.266 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Histórico de atividades para escala 2: 22/10/2025 15:02:21 - Tiago Holanda: Escala criada: G.R.A - 1
+22/10/2025 15:02:48 - holanda3830: embarcou.
+
+2025-10-22 15:02:49.840 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Log da escala 2 atualizado com sucesso na guilda 1408269205240811600
+2025-10-22 15:02:50.381 [boundedElastic-2] INFO  c.g.p.b.s.ScheduleMessageManager - Mensagem da escala 2 atualizada com tripulantes: [holanda3830]
+2025-10-22 15:03:19.977 [d4j-events-1] INFO  c.g.p.b.d.buttons.ButtonDispatcher - Botão clicado por usuário 537331261690085377: end_schedule:2
+2025-10-22 15:03:20.577 [boundedElastic-2] ERROR c.g.p.b.d.b.ScheduleActionHandler - Erro ao encerrar escala 2: Somente o criador pode encerrar a escala.
+com.gra.paradise.botattendance.exception.OnlyCreatorCanCloseScheduleException: Somente o criador pode encerrar a escala.
+	at com.gra.paradise.botattendance.service.ScheduleManager.closeSchedule(ScheduleManager.java:153)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:355)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.gra.paradise.botattendance.service.ScheduleManager$$SpringCGLIB$$0.closeSchedule(<generated>)
+	at com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler.lambda$processEndSchedule$6(ScheduleActionHandler.java:117)
+	at reactor.core.publisher.MonoCallable.call(MonoCallable.java:72)
+	at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:228)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+	at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+2025-10-22 15:03:25.306 [d4j-events-2] INFO  c.g.p.b.d.buttons.ButtonDispatcher - Botão clicado por usuário 537331261690085377: leave_schedule:2
+2025-10-22 15:03:25.674 [GRA-Bot-2] INFO  c.g.p.b.service.ScheduleLogManager - Log salvo: DISEMBARKED para escala 2 por usuário holanda3830 na guilda 1408269205240811600
+2025-10-22 15:03:25.675 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Logs encontrados para escala 2: [ScheduleLog{id=3, scheduleId=2, timestamp=2025-10-22T15:02:21.436511, action='CREATED', userId='239402373427101696', username='Tiago Holanda', details='Escala criada: G.R.A - 1'}, ScheduleLog{id=4, scheduleId=2, timestamp=2025-10-22T15:02:48.420835, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}]
+2025-10-22 15:03:25.676 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Histórico de atividades para escala 2: 22/10/2025 15:02:21 - Tiago Holanda: Escala criada: G.R.A - 1
+22/10/2025 15:02:48 - holanda3830: embarcou.
+
+2025-10-22 15:03:26.322 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Log da escala 2 atualizado com sucesso na guilda 1408269205240811600
+2025-10-22 15:03:26.326 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Logs encontrados para escala 2: [ScheduleLog{id=3, scheduleId=2, timestamp=2025-10-22T15:02:21.436511, action='CREATED', userId='239402373427101696', username='Tiago Holanda', details='Escala criada: G.R.A - 1'}, ScheduleLog{id=4, scheduleId=2, timestamp=2025-10-22T15:02:48.420835, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}, ScheduleLog{id=5, scheduleId=2, timestamp=2025-10-22T15:03:25.673265, action='DISEMBARKED', userId='537331261690085377', username='holanda3830', details=' desembarcou.'}]
+2025-10-22 15:03:26.326 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Histórico de atividades para escala 2: 22/10/2025 15:02:21 - Tiago Holanda: Escala criada: G.R.A - 1
+22/10/2025 15:02:48 - holanda3830: embarcou.
+22/10/2025 15:03:25 - holanda3830: desembarcou.
+
+2025-10-22 15:03:26.864 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Log da escala 2 atualizado com sucesso na guilda 1408269205240811600
+2025-10-22 15:03:27.448 [boundedElastic-1] INFO  c.g.p.b.s.ScheduleMessageManager - Mensagem da escala 2 atualizada com tripulantes: []
+2025-10-22 15:03:34.631 [d4j-events-3] INFO  c.g.p.b.d.buttons.ButtonDispatcher - Botão clicado por usuário 537331261690085377: board_schedule:2
+2025-10-22 15:03:35.047 [GRA-Bot-3] INFO  c.g.p.b.service.ScheduleLogManager - Log salvo: EMBARKED para escala 2 por usuário holanda3830 na guilda 1408269205240811600
+2025-10-22 15:03:35.049 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Logs encontrados para escala 2: [ScheduleLog{id=3, scheduleId=2, timestamp=2025-10-22T15:02:21.436511, action='CREATED', userId='239402373427101696', username='Tiago Holanda', details='Escala criada: G.R.A - 1'}, ScheduleLog{id=4, scheduleId=2, timestamp=2025-10-22T15:02:48.420835, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}, ScheduleLog{id=5, scheduleId=2, timestamp=2025-10-22T15:03:25.673265, action='DISEMBARKED', userId='537331261690085377', username='holanda3830', details=' desembarcou.'}, ScheduleLog{id=6, scheduleId=2, timestamp=2025-10-22T15:03:35.045896, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}]
+2025-10-22 15:03:35.049 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Histórico de atividades para escala 2: 22/10/2025 15:02:21 - Tiago Holanda: Escala criada: G.R.A - 1
+22/10/2025 15:02:48 - holanda3830: embarcou.
+22/10/2025 15:03:25 - holanda3830: desembarcou.
+22/10/2025 15:03:35 - holanda3830: embarcou.
+
+2025-10-22 15:03:35.954 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Log da escala 2 atualizado com sucesso na guilda 1408269205240811600
+2025-10-22 15:03:35.969 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Logs encontrados para escala 2: [ScheduleLog{id=3, scheduleId=2, timestamp=2025-10-22T15:02:21.436511, action='CREATED', userId='239402373427101696', username='Tiago Holanda', details='Escala criada: G.R.A - 1'}, ScheduleLog{id=4, scheduleId=2, timestamp=2025-10-22T15:02:48.420835, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}, ScheduleLog{id=5, scheduleId=2, timestamp=2025-10-22T15:03:25.673265, action='DISEMBARKED', userId='537331261690085377', username='holanda3830', details=' desembarcou.'}, ScheduleLog{id=6, scheduleId=2, timestamp=2025-10-22T15:03:35.045896, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}]
+2025-10-22 15:03:35.969 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Histórico de atividades para escala 2: 22/10/2025 15:02:21 - Tiago Holanda: Escala criada: G.R.A - 1
+22/10/2025 15:02:48 - holanda3830: embarcou.
+22/10/2025 15:03:25 - holanda3830: desembarcou.
+22/10/2025 15:03:35 - holanda3830: embarcou.
+
+2025-10-22 15:03:36.562 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Log da escala 2 atualizado com sucesso na guilda 1408269205240811600
+2025-10-22 15:03:37.180 [boundedElastic-2] INFO  c.g.p.b.s.ScheduleMessageManager - Mensagem da escala 2 atualizada com tripulantes: [holanda3830]
+2025-10-22 15:03:45.890 [d4j-events-3] INFO  c.g.p.b.d.buttons.ButtonDispatcher - Botão clicado por usuário 537331261690085377: leave_schedule:2
+2025-10-22 15:03:46.394 [GRA-Bot-4] INFO  c.g.p.b.service.ScheduleLogManager - Log salvo: DISEMBARKED para escala 2 por usuário holanda3830 na guilda 1408269205240811600
+2025-10-22 15:03:46.395 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Logs encontrados para escala 2: [ScheduleLog{id=3, scheduleId=2, timestamp=2025-10-22T15:02:21.436511, action='CREATED', userId='239402373427101696', username='Tiago Holanda', details='Escala criada: G.R.A - 1'}, ScheduleLog{id=4, scheduleId=2, timestamp=2025-10-22T15:02:48.420835, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}, ScheduleLog{id=5, scheduleId=2, timestamp=2025-10-22T15:03:25.673265, action='DISEMBARKED', userId='537331261690085377', username='holanda3830', details=' desembarcou.'}, ScheduleLog{id=6, scheduleId=2, timestamp=2025-10-22T15:03:35.045896, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}]
+2025-10-22 15:03:46.395 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Histórico de atividades para escala 2: 22/10/2025 15:02:21 - Tiago Holanda: Escala criada: G.R.A - 1
+22/10/2025 15:02:48 - holanda3830: embarcou.
+22/10/2025 15:03:25 - holanda3830: desembarcou.
+22/10/2025 15:03:35 - holanda3830: embarcou.
+
+2025-10-22 15:03:46.891 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Log da escala 2 atualizado com sucesso na guilda 1408269205240811600
+2025-10-22 15:03:46.906 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Logs encontrados para escala 2: [ScheduleLog{id=3, scheduleId=2, timestamp=2025-10-22T15:02:21.436511, action='CREATED', userId='239402373427101696', username='Tiago Holanda', details='Escala criada: G.R.A - 1'}, ScheduleLog{id=4, scheduleId=2, timestamp=2025-10-22T15:02:48.420835, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}, ScheduleLog{id=5, scheduleId=2, timestamp=2025-10-22T15:03:25.673265, action='DISEMBARKED', userId='537331261690085377', username='holanda3830', details=' desembarcou.'}, ScheduleLog{id=6, scheduleId=2, timestamp=2025-10-22T15:03:35.045896, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}, ScheduleLog{id=7, scheduleId=2, timestamp=2025-10-22T15:03:46.394132, action='DISEMBARKED', userId='537331261690085377', username='holanda3830', details=' desembarcou.'}]
+2025-10-22 15:03:46.907 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Histórico de atividades para escala 2: 22/10/2025 15:02:21 - Tiago Holanda: Escala criada: G.R.A - 1
+22/10/2025 15:02:48 - holanda3830: embarcou.
+22/10/2025 15:03:25 - holanda3830: desembarcou.
+22/10/2025 15:03:35 - holanda3830: embarcou.
+22/10/2025 15:03:46 - holanda3830: desembarcou.
+
+2025-10-22 15:03:47.526 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Log da escala 2 atualizado com sucesso na guilda 1408269205240811600
+2025-10-22 15:03:48.126 [boundedElastic-1] INFO  c.g.p.b.s.ScheduleMessageManager - Mensagem da escala 2 atualizada com tripulantes: []
+2025-10-22 15:03:52.543 [d4j-events-2] INFO  c.g.p.b.d.buttons.ButtonDispatcher - Botão clicado por usuário 239402373427101696: end_schedule:2
+2025-10-22 15:03:53.233 [GRA-Bot-1] INFO  c.g.p.b.service.ScheduleLogManager - Log salvo: CLOSED para escala 2 por usuário Tiago Holanda na guilda 1408269205240811600
+2025-10-22 15:03:53.235 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Logs encontrados para escala 2: [ScheduleLog{id=3, scheduleId=2, timestamp=2025-10-22T15:02:21.436511, action='CREATED', userId='239402373427101696', username='Tiago Holanda', details='Escala criada: G.R.A - 1'}, ScheduleLog{id=4, scheduleId=2, timestamp=2025-10-22T15:02:48.420835, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}, ScheduleLog{id=5, scheduleId=2, timestamp=2025-10-22T15:03:25.673265, action='DISEMBARKED', userId='537331261690085377', username='holanda3830', details=' desembarcou.'}, ScheduleLog{id=6, scheduleId=2, timestamp=2025-10-22T15:03:35.045896, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}, ScheduleLog{id=7, scheduleId=2, timestamp=2025-10-22T15:03:46.394132, action='DISEMBARKED', userId='537331261690085377', username='holanda3830', details=' desembarcou.'}, ScheduleLog{id=8, scheduleId=2, timestamp=2025-10-22T15:03:53.230148, action='CLOSED', userId='239402373427101696', username='Tiago Holanda', details=' encerrou a escala.'}]
+2025-10-22 15:03:53.236 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Histórico de atividades para escala final 2: 22/10/2025 15:02:21 - Tiago Holanda: Escala criada: G.R.A - 1
+22/10/2025 15:02:48 - holanda3830: embarcou.
+22/10/2025 15:03:25 - holanda3830: desembarcou.
+22/10/2025 15:03:35 - holanda3830: embarcou.
+22/10/2025 15:03:46 - holanda3830: desembarcou.
+22/10/2025 15:03:53 - Tiago Holanda: encerrou a escala.
+
+2025-10-22 15:03:53.870 [boundedElastic-2] INFO  c.g.p.b.service.ScheduleLogManager - Log final da escala 2 enviado com sucesso na guilda 1408269205240811600
+2025-10-22 15:03:53.876 [boundedElastic-1] WARN  c.g.p.b.s.ScheduleMessageManager - Mensagem de sistema não registrada para guilda 1408269205240811600. Tentando recriar.
+2025-10-22 15:03:53.879 [boundedElastic-1] ERROR c.g.p.b.s.ScheduleMessageManager - Canal padrão não configurado para guilda 1408269205240811600. Use /setup-escala para configurar.
+2025-10-22 15:03:53.884 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Logs encontrados para escala 2: [ScheduleLog{id=3, scheduleId=2, timestamp=2025-10-22T15:02:21.436511, action='CREATED', userId='239402373427101696', username='Tiago Holanda', details='Escala criada: G.R.A - 1'}, ScheduleLog{id=4, scheduleId=2, timestamp=2025-10-22T15:02:48.420835, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}, ScheduleLog{id=5, scheduleId=2, timestamp=2025-10-22T15:03:25.673265, action='DISEMBARKED', userId='537331261690085377', username='holanda3830', details=' desembarcou.'}, ScheduleLog{id=6, scheduleId=2, timestamp=2025-10-22T15:03:35.045896, action='EMBARKED', userId='537331261690085377', username='holanda3830', details=' embarcou.'}, ScheduleLog{id=7, scheduleId=2, timestamp=2025-10-22T15:03:46.394132, action='DISEMBARKED', userId='537331261690085377', username='holanda3830', details=' desembarcou.'}, ScheduleLog{id=8, scheduleId=2, timestamp=2025-10-22T15:03:53.230148, action='CLOSED', userId='239402373427101696', username='Tiago Holanda', details=' encerrou a escala.'}]
+2025-10-22 15:03:53.884 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Histórico de atividades para escala final 2: 22/10/2025 15:02:21 - Tiago Holanda: Escala criada: G.R.A - 1
+22/10/2025 15:02:48 - holanda3830: embarcou.
+22/10/2025 15:03:25 - holanda3830: desembarcou.
+22/10/2025 15:03:35 - holanda3830: embarcou.
+22/10/2025 15:03:46 - holanda3830: desembarcou.
+22/10/2025 15:03:53 - Tiago Holanda: encerrou a escala.
+
+2025-10-22 15:03:53.887 [boundedElastic-1] WARN  c.g.p.b.s.ScheduleMessageManager - Mensagem de sistema não registrada para guilda 1408269205240811600. Tentando recriar.
+2025-10-22 15:03:53.889 [boundedElastic-1] ERROR c.g.p.b.s.ScheduleMessageManager - Canal padrão não configurado para guilda 1408269205240811600. Use /setup-escala para configurar.
+2025-10-22 15:03:54.954 [boundedElastic-1] ERROR c.g.p.b.s.ScheduleMessageManager - Erro ao excluir mensagem da escala 2: GET /channels/1408269205928804415/messages/1430617292256841729 returned 404 Not Found with response {code=10008, message=Unknown Message}
+2025-10-22 15:03:54.954 [boundedElastic-1] WARN  c.g.p.b.d.b.ScheduleActionHandler - Erro ao remover referência da escala 2: GET /channels/1408269205928804415/messages/1430617292256841729 returned 404 Not Found with response {code=10008, message=Unknown Message}
+2025-10-22 15:03:55.536 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Log final da escala 2 enviado com sucesso na guilda 1408269205240811600

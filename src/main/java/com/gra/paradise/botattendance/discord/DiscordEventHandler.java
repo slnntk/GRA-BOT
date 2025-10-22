@@ -2,6 +2,9 @@ package com.gra.paradise.botattendance.discord;
 
 import com.gra.paradise.botattendance.discord.buttons.ButtonDispatcher;
 import com.gra.paradise.botattendance.discord.commands.Command;
+import com.gra.paradise.botattendance.service.PerformanceMetricsService;
+import com.gra.paradise.botattendance.service.StandbyService;
+import io.micrometer.core.instrument.Timer;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
@@ -33,12 +36,17 @@ public class DiscordEventHandler {
     private final ButtonDispatcher buttonDispatcher;
     private final RestClient restClient;
     private final DiagnosticHandler diagnosticHandler;
+    private final PerformanceMetricsService performanceMetrics;
+    private final StandbyService standbyService;
 
     // Cache para otimizar lookup de comandos - evita busca linear repetida
     private final Map<String, Command> commandCache = new ConcurrentHashMap<>();
 
     @EventListener
     public void onApplicationReady(ApplicationReadyEvent event) {
+        // Inicializar métricas de performance
+        performanceMetrics.initializeMetrics();
+        
         // Inicializar cache de comandos uma única vez para melhor performance
         initializeCommandCache();
         
@@ -131,18 +139,24 @@ public class DiscordEventHandler {
                                     .description("Configura o sistema de escalas de voo no canal atual")
                                     .build(),
 
-                            // Comando para configurar canal de logs
-                            ApplicationCommandRequest.builder()
-                                    .name("setup-log-channel")
-                                    .description("Configura o canal atual como um canal de logs de escala")
-                                    .addOption(ApplicationCommandOptionData.builder()
-                                            .name("tipo")
-                                            .description("Tipo de missão para este canal de logs")
-                                            .type(3)
-                                            .required(false)
-                                            .addAllChoices(createLogChannelChoices())
-                                            .build())
-                                    .build()
+                                // Comando para configurar canal de logs
+                                ApplicationCommandRequest.builder()
+                                        .name("setup-log-channel")
+                                        .description("Configura o canal atual como um canal de logs de escala")
+                                        .addOption(ApplicationCommandOptionData.builder()
+                                                .name("tipo")
+                                                .description("Tipo de missão para este canal de logs")
+                                                .type(3)
+                                                .required(false)
+                                                .addAllChoices(createLogChannelChoices())
+                                                .build())
+                                        .build(),
+
+                                // Comando para testar stand-by
+                                ApplicationCommandRequest.builder()
+                                        .name("standby-status")
+                                        .description("Mostra o status do sistema de stand-by do bot")
+                                        .build()
                     );
 
                     // Registra comandos globalmente
@@ -212,11 +226,22 @@ public class DiscordEventHandler {
         String commandName = event.getCommandName();
         log.debug("Comando recebido: {}", commandName);
 
+        // Registrar atividade para stand-by
+        standbyService.recordActivity();
+        
+        // Registrar evento Discord
+        performanceMetrics.recordDiscordEvent();
+        
+        // Medir tempo de resposta
+        Timer.Sample sample = performanceMetrics.startDiscordTimer();
+
         // Usar cache O(1) ao invés de busca linear O(n) para melhor performance
         Command command = commandCache.get(commandName);
         if (command != null) {
             return command.handle(event)
+                    .doOnSuccess(result -> performanceMetrics.recordDiscordResponseTime(sample))
                     .onErrorResume(e -> {
+                        performanceMetrics.recordError();
                         log.error("Erro ao executar comando {}: {}", commandName, e.getMessage(), e);
                         return event.createFollowup("Ocorreu um erro ao executar o comando: " + e.getMessage())
                                 .withEphemeral(true)

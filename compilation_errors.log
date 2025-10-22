@@ -1,0 +1,633 @@
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::staticFieldBase has been called by com.google.inject.internal.aop.HiddenClassDefiner (file:/opt/homebrew/Cellar/maven/3.9.11/libexec/lib/guice-5.1.0-classes.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.inject.internal.aop.HiddenClassDefiner
+WARNING: sun.misc.Unsafe::staticFieldBase will be removed in a future release
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------< com.aviation:aviation-discord-bot >------------------
+[INFO] Building Aviation Discord Bot 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ aviation-discord-bot ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ aviation-discord-bot ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 48 source files with javac [debug release 17] to target/classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/model/Schedule.java:[68,17] cannot find symbol
+  symbol:   method getSchedules()
+  location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/model/Schedule.java:[75,21] cannot find symbol
+  symbol:   method getSchedules()
+  location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/model/ScheduleLog.java:[42,63] cannot find symbol
+  symbol:   method getId()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[61,13] cannot find symbol
+  symbol:   variable log
+  location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[76,54] cannot find symbol
+  symbol:   method isActive()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[77,25] cannot find symbol
+  symbol:   variable log
+  location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[90,93] cannot find symbol
+  symbol:   method getId()
+  location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[90,118] cannot find symbol
+  symbol:   method getTitle()
+  location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[91,84] cannot find symbol
+  symbol:   method getAircraftType()
+  location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[91,119] cannot find symbol
+  symbol:   method getMissionType()
+  location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[92,84] cannot find symbol
+  symbol:   method getActionSubType()
+  location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[92,120] cannot find symbol
+  symbol:   method getActionOption()
+  location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[93,84] cannot find symbol
+  symbol:   method getStartTime()
+  location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[93,116] cannot find symbol
+  symbol:   method getEndTime()
+  location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[94,84] cannot find symbol
+  symbol:   method getCreatedByUsername()
+  location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[101,21] cannot find symbol
+  symbol:   variable log
+  location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[126,13] cannot find symbol
+  symbol:   variable log
+  location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[148,42] cannot find symbol
+  symbol:   method isActive()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[162,139] cannot find symbol
+  symbol:   method isActive()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[162,99] cannot find symbol
+  symbol:   method getId()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[163,141] cannot find symbol
+  symbol:   method isActive()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[163,98] cannot find symbol
+  symbol:   method getId()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[164,146] cannot find symbol
+  symbol:   method isActive()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[164,99] cannot find symbol
+  symbol:   method getId()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[168,135] cannot find symbol
+  symbol:   method getId()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[172,73] cannot find symbol
+  symbol:   variable log
+  location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[180,21] cannot find symbol
+  symbol:   variable log
+  location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[208,13] cannot find symbol
+  symbol:   variable log
+  location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[228,63] cannot find symbol
+  symbol:   method getChannelId()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[229,72] cannot find symbol
+  symbol:   method getMessageId()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[238,45] cannot find symbol
+  symbol:   variable log
+  location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[246,21] cannot find symbol
+  symbol:   variable log
+  location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[260,80] cannot find symbol
+  symbol:   method getDiscordId()
+  location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[261,46] cannot find symbol
+  symbol:   method getNickname()
+  location: variable member of type java.lang.Object
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[261,74] cannot find symbol
+  symbol:   method getUsername()
+  location: variable member of type java.lang.Object
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[262,65] cannot find symbol
+  symbol:   method getNickname()
+  location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[262,92] cannot find symbol
+  symbol:   method getUsername()
+  location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[263,79] cannot find symbol
+  symbol:   method getNickname()
+  location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[263,106] cannot find symbol
+  symbol:   method getUsername()
+  location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[265,24] incompatible types: java.util.List<java.lang.Object> cannot be converted to java.util.List<reactor.core.publisher.Mono<java.lang.String>>
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/config/DiscordConfig.java:[105,22] invalid method reference
+  cannot find symbol
+    symbol:   method getSystemChannelId()
+    location: class com.gra.paradise.botattendance.model.GuildConfig
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/config/DiscordConfig.java:[113,38] cannot find symbol
+  symbol:   method getActionLogChannelId()
+  location: variable config of type com.gra.paradise.botattendance.model.GuildConfig
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/config/DiscordConfig.java:[115,38] cannot find symbol
+  symbol:   method getPatrolLogChannelId()
+  location: variable config of type com.gra.paradise.botattendance.model.GuildConfig
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/config/DiscordConfig.java:[117,38] cannot find symbol
+  symbol:   method getOutrosLogChannelId()
+  location: variable config of type com.gra.paradise.botattendance.model.GuildConfig
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/config/DiscordConfig.java:[120,38] cannot find symbol
+  symbol:   method getSystemChannelId()
+  location: variable config of type com.gra.paradise.botattendance.model.GuildConfig
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/config/DiscordConfig.java:[123,24] incompatible types: java.lang.Object cannot be converted to java.lang.String
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[37,62] cannot find symbol
+  symbol:   method getId()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[39,13] cannot find symbol
+  symbol:   variable log
+  location: class com.gra.paradise.botattendance.service.ScheduleManager
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[39,89] cannot find symbol
+  symbol:   method getId()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[46,33] cannot find symbol
+  symbol:   method getGuildId()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[47,33] cannot find symbol
+  symbol:   method setGuildId(java.lang.String)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[49,34] cannot find symbol
+  symbol:   method isActive()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[73,17] cannot find symbol
+  symbol:   method setGuildId(java.lang.String)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[74,17] cannot find symbol
+  symbol:   method setTitle(java.lang.String)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[75,17] cannot find symbol
+  symbol:   method setAircraftType(com.gra.paradise.botattendance.model.AircraftType)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[76,17] cannot find symbol
+  symbol:   method setMissionType(com.gra.paradise.botattendance.model.MissionType)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[77,17] cannot find symbol
+  symbol:   method setActionSubType(missionTyp[...] null)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[78,17] cannot find symbol
+  symbol:   method setActionOption(missionTyp[...] null)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[79,17] cannot find symbol
+  symbol:   method setOutrosDescription(missionTyp[...] null)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[80,17] cannot find symbol
+  symbol:   method setStartTime(java.time.Instant)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[81,17] cannot find symbol
+  symbol:   method setCreatedById(java.lang.String)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[82,17] cannot find symbol
+  symbol:   method setCreatedByUsername(java.lang.String)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[83,17] cannot find symbol
+  symbol:   method setActive(boolean)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[84,17] cannot find symbol
+  symbol:   method setCrewMembers(java.util.ArrayList<java.lang.Object>)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[87,9] cannot find symbol
+  symbol:   variable log
+  location: class com.gra.paradise.botattendance.service.ScheduleManager
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[87,53] cannot find symbol
+  symbol:   method getTitle()
+  location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[87,71] cannot find symbol
+  symbol:   method getId()
+  location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[96,38] cannot find symbol
+  symbol:   method getCreatedById()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[100,55] cannot find symbol
+  symbol:   method getCrewMembers()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[101,59] cannot find symbol
+  symbol:   method getDiscordId()
+  location: variable u of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[107,17] cannot find symbol
+  symbol:   method setCrewMembers(java.util.List<com.gra.paradise.botattendance.model.User>)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[119,38] cannot find symbol
+  symbol:   method getCreatedById()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[123,55] cannot find symbol
+  symbol:   method getCrewMembers()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[125,48] cannot find symbol
+  symbol:   method getDiscordId()
+  location: variable u of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[130,17] cannot find symbol
+  symbol:   method setCrewMembers(java.util.List<com.gra.paradise.botattendance.model.User>)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[146,58] cannot find symbol
+  symbol:   method getCreatedById()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[154,17] cannot find symbol
+  symbol:   variable log
+  location: class com.gra.paradise.botattendance.service.ScheduleManager
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[165,17] cannot find symbol
+  symbol:   method setActive(boolean)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[166,17] cannot find symbol
+  symbol:   method setEndTime(java.time.Instant)
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[167,61] cannot find symbol
+  symbol:   method getCrewMembers()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[174,22] cannot find symbol
+  symbol:   method getTitle()
+  location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[175,22] cannot find symbol
+  symbol:   method getAircraftType()
+  location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[176,22] cannot find symbol
+  symbol:   method getMissionType()
+  location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[177,22] cannot find symbol
+  symbol:   method getActionSubType()
+  location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[178,22] cannot find symbol
+  symbol:   method getMissionType()
+  location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[178,69] cannot find symbol
+  symbol:   method getOutrosDescription()
+  location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[178,100] cannot find symbol
+  symbol:   method getActionOption()
+  location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[179,22] cannot find symbol
+  symbol:   method getStartTime()
+  location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[181,22] cannot find symbol
+  symbol:   method getCreatedByUsername()
+  location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[183,22] cannot find symbol
+  symbol:   method getCrewMembers()
+  location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[183,53] invalid method reference
+  cannot find symbol
+    symbol:   method getNickname()
+    location: class com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[66,101] cannot find symbol
+  symbol:   method getDisplayName()
+  location: variable aircraftType of type com.gra.paradise.botattendance.model.AircraftType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[79,101] cannot find symbol
+  symbol:   method getDisplayName()
+  location: variable aircraftType of type com.gra.paradise.botattendance.model.AircraftType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[92,101] cannot find symbol
+  symbol:   method getDisplayName()
+  location: variable aircraftType of type com.gra.paradise.botattendance.model.AircraftType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[92,148] cannot find symbol
+  symbol:   method getDisplayName()
+  location: variable subType of type com.gra.paradise.botattendance.model.ActionSubType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[107,89] cannot find symbol
+  symbol:   method getDisplayName()
+  location: variable aircraftType of type com.gra.paradise.botattendance.model.AircraftType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[108,53] cannot find symbol
+  symbol:   method getDisplayName()
+  location: variable missionType of type com.gra.paradise.botattendance.model.MissionType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[113,57] cannot find symbol
+  symbol:   method getDisplayName()
+  location: variable actionSubType of type com.gra.paradise.botattendance.model.ActionSubType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[128,49] cannot find symbol
+  symbol:   method getCreatedByUsername()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[130,90] cannot find symbol
+  symbol:   method getAircraftType()
+  location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.418 s
+[INFO] Finished at: 2025-10-22T14:05:28-03:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project aviation-discord-bot: Compilation failure: Compilation failure: 
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/model/Schedule.java:[68,17] cannot find symbol
+[ERROR]   symbol:   method getSchedules()
+[ERROR]   location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/model/Schedule.java:[75,21] cannot find symbol
+[ERROR]   symbol:   method getSchedules()
+[ERROR]   location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/model/ScheduleLog.java:[42,63] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[61,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[76,54] cannot find symbol
+[ERROR]   symbol:   method isActive()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[77,25] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[90,93] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[90,118] cannot find symbol
+[ERROR]   symbol:   method getTitle()
+[ERROR]   location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[91,84] cannot find symbol
+[ERROR]   symbol:   method getAircraftType()
+[ERROR]   location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[91,119] cannot find symbol
+[ERROR]   symbol:   method getMissionType()
+[ERROR]   location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[92,84] cannot find symbol
+[ERROR]   symbol:   method getActionSubType()
+[ERROR]   location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[92,120] cannot find symbol
+[ERROR]   symbol:   method getActionOption()
+[ERROR]   location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[93,84] cannot find symbol
+[ERROR]   symbol:   method getStartTime()
+[ERROR]   location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[93,116] cannot find symbol
+[ERROR]   symbol:   method getEndTime()
+[ERROR]   location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[94,84] cannot find symbol
+[ERROR]   symbol:   method getCreatedByUsername()
+[ERROR]   location: record component schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[101,21] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[126,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[148,42] cannot find symbol
+[ERROR]   symbol:   method isActive()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[162,139] cannot find symbol
+[ERROR]   symbol:   method isActive()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[162,99] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[163,141] cannot find symbol
+[ERROR]   symbol:   method isActive()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[163,98] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[164,146] cannot find symbol
+[ERROR]   symbol:   method isActive()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[164,99] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[168,135] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[172,73] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[180,21] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[208,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[228,63] cannot find symbol
+[ERROR]   symbol:   method getChannelId()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[229,72] cannot find symbol
+[ERROR]   symbol:   method getMessageId()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[238,45] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[246,21] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.gra.paradise.botattendance.discord.buttons.ScheduleActionHandler
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[260,80] cannot find symbol
+[ERROR]   symbol:   method getDiscordId()
+[ERROR]   location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[261,46] cannot find symbol
+[ERROR]   symbol:   method getNickname()
+[ERROR]   location: variable member of type java.lang.Object
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[261,74] cannot find symbol
+[ERROR]   symbol:   method getUsername()
+[ERROR]   location: variable member of type java.lang.Object
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[262,65] cannot find symbol
+[ERROR]   symbol:   method getNickname()
+[ERROR]   location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[262,92] cannot find symbol
+[ERROR]   symbol:   method getUsername()
+[ERROR]   location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[263,79] cannot find symbol
+[ERROR]   symbol:   method getNickname()
+[ERROR]   location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[263,106] cannot find symbol
+[ERROR]   symbol:   method getUsername()
+[ERROR]   location: variable user of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/discord/buttons/ScheduleActionHandler.java:[265,24] incompatible types: java.util.List<java.lang.Object> cannot be converted to java.util.List<reactor.core.publisher.Mono<java.lang.String>>
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/config/DiscordConfig.java:[105,22] invalid method reference
+[ERROR]   cannot find symbol
+[ERROR]     symbol:   method getSystemChannelId()
+[ERROR]     location: class com.gra.paradise.botattendance.model.GuildConfig
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/config/DiscordConfig.java:[113,38] cannot find symbol
+[ERROR]   symbol:   method getActionLogChannelId()
+[ERROR]   location: variable config of type com.gra.paradise.botattendance.model.GuildConfig
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/config/DiscordConfig.java:[115,38] cannot find symbol
+[ERROR]   symbol:   method getPatrolLogChannelId()
+[ERROR]   location: variable config of type com.gra.paradise.botattendance.model.GuildConfig
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/config/DiscordConfig.java:[117,38] cannot find symbol
+[ERROR]   symbol:   method getOutrosLogChannelId()
+[ERROR]   location: variable config of type com.gra.paradise.botattendance.model.GuildConfig
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/config/DiscordConfig.java:[120,38] cannot find symbol
+[ERROR]   symbol:   method getSystemChannelId()
+[ERROR]   location: variable config of type com.gra.paradise.botattendance.model.GuildConfig
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/config/DiscordConfig.java:[123,24] incompatible types: java.lang.Object cannot be converted to java.lang.String
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[37,62] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[39,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.gra.paradise.botattendance.service.ScheduleManager
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[39,89] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[46,33] cannot find symbol
+[ERROR]   symbol:   method getGuildId()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[47,33] cannot find symbol
+[ERROR]   symbol:   method setGuildId(java.lang.String)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[49,34] cannot find symbol
+[ERROR]   symbol:   method isActive()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[73,17] cannot find symbol
+[ERROR]   symbol:   method setGuildId(java.lang.String)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[74,17] cannot find symbol
+[ERROR]   symbol:   method setTitle(java.lang.String)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[75,17] cannot find symbol
+[ERROR]   symbol:   method setAircraftType(com.gra.paradise.botattendance.model.AircraftType)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[76,17] cannot find symbol
+[ERROR]   symbol:   method setMissionType(com.gra.paradise.botattendance.model.MissionType)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[77,17] cannot find symbol
+[ERROR]   symbol:   method setActionSubType(missionTyp[...] null)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[78,17] cannot find symbol
+[ERROR]   symbol:   method setActionOption(missionTyp[...] null)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[79,17] cannot find symbol
+[ERROR]   symbol:   method setOutrosDescription(missionTyp[...] null)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[80,17] cannot find symbol
+[ERROR]   symbol:   method setStartTime(java.time.Instant)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[81,17] cannot find symbol
+[ERROR]   symbol:   method setCreatedById(java.lang.String)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[82,17] cannot find symbol
+[ERROR]   symbol:   method setCreatedByUsername(java.lang.String)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[83,17] cannot find symbol
+[ERROR]   symbol:   method setActive(boolean)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[84,17] cannot find symbol
+[ERROR]   symbol:   method setCrewMembers(java.util.ArrayList<java.lang.Object>)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[87,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.gra.paradise.botattendance.service.ScheduleManager
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[87,53] cannot find symbol
+[ERROR]   symbol:   method getTitle()
+[ERROR]   location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[87,71] cannot find symbol
+[ERROR]   symbol:   method getId()
+[ERROR]   location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[96,38] cannot find symbol
+[ERROR]   symbol:   method getCreatedById()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[100,55] cannot find symbol
+[ERROR]   symbol:   method getCrewMembers()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[101,59] cannot find symbol
+[ERROR]   symbol:   method getDiscordId()
+[ERROR]   location: variable u of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[107,17] cannot find symbol
+[ERROR]   symbol:   method setCrewMembers(java.util.List<com.gra.paradise.botattendance.model.User>)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[119,38] cannot find symbol
+[ERROR]   symbol:   method getCreatedById()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[123,55] cannot find symbol
+[ERROR]   symbol:   method getCrewMembers()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[125,48] cannot find symbol
+[ERROR]   symbol:   method getDiscordId()
+[ERROR]   location: variable u of type com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[130,17] cannot find symbol
+[ERROR]   symbol:   method setCrewMembers(java.util.List<com.gra.paradise.botattendance.model.User>)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[146,58] cannot find symbol
+[ERROR]   symbol:   method getCreatedById()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[154,17] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.gra.paradise.botattendance.service.ScheduleManager
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[165,17] cannot find symbol
+[ERROR]   symbol:   method setActive(boolean)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[166,17] cannot find symbol
+[ERROR]   symbol:   method setEndTime(java.time.Instant)
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[167,61] cannot find symbol
+[ERROR]   symbol:   method getCrewMembers()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[174,22] cannot find symbol
+[ERROR]   symbol:   method getTitle()
+[ERROR]   location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[175,22] cannot find symbol
+[ERROR]   symbol:   method getAircraftType()
+[ERROR]   location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[176,22] cannot find symbol
+[ERROR]   symbol:   method getMissionType()
+[ERROR]   location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[177,22] cannot find symbol
+[ERROR]   symbol:   method getActionSubType()
+[ERROR]   location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[178,22] cannot find symbol
+[ERROR]   symbol:   method getMissionType()
+[ERROR]   location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[178,69] cannot find symbol
+[ERROR]   symbol:   method getOutrosDescription()
+[ERROR]   location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[178,100] cannot find symbol
+[ERROR]   symbol:   method getActionOption()
+[ERROR]   location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[179,22] cannot find symbol
+[ERROR]   symbol:   method getStartTime()
+[ERROR]   location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[181,22] cannot find symbol
+[ERROR]   symbol:   method getCreatedByUsername()
+[ERROR]   location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[183,22] cannot find symbol
+[ERROR]   symbol:   method getCrewMembers()
+[ERROR]   location: variable saved of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/ScheduleManager.java:[183,53] invalid method reference
+[ERROR]   cannot find symbol
+[ERROR]     symbol:   method getNickname()
+[ERROR]     location: class com.gra.paradise.botattendance.model.User
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[66,101] cannot find symbol
+[ERROR]   symbol:   method getDisplayName()
+[ERROR]   location: variable aircraftType of type com.gra.paradise.botattendance.model.AircraftType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[79,101] cannot find symbol
+[ERROR]   symbol:   method getDisplayName()
+[ERROR]   location: variable aircraftType of type com.gra.paradise.botattendance.model.AircraftType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[92,101] cannot find symbol
+[ERROR]   symbol:   method getDisplayName()
+[ERROR]   location: variable aircraftType of type com.gra.paradise.botattendance.model.AircraftType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[92,148] cannot find symbol
+[ERROR]   symbol:   method getDisplayName()
+[ERROR]   location: variable subType of type com.gra.paradise.botattendance.model.ActionSubType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[107,89] cannot find symbol
+[ERROR]   symbol:   method getDisplayName()
+[ERROR]   location: variable aircraftType of type com.gra.paradise.botattendance.model.AircraftType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[108,53] cannot find symbol
+[ERROR]   symbol:   method getDisplayName()
+[ERROR]   location: variable missionType of type com.gra.paradise.botattendance.model.MissionType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[113,57] cannot find symbol
+[ERROR]   symbol:   method getDisplayName()
+[ERROR]   location: variable actionSubType of type com.gra.paradise.botattendance.model.ActionSubType
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[128,49] cannot find symbol
+[ERROR]   symbol:   method getCreatedByUsername()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] /Users/ccastro/Downloads/GRA-BOT/src/main/java/com/gra/paradise/botattendance/service/EmbedFactory.java:[130,90] cannot find symbol
+[ERROR]   symbol:   method getAircraftType()
+[ERROR]   location: variable schedule of type com.gra.paradise.botattendance.model.Schedule
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
