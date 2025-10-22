@@ -65,10 +65,15 @@ public class StandbyService {
         // Limpa cache para liberar memória
         cacheService.clear();
         
-        // Força garbage collection
+        // Força garbage collection agressivo
+        System.gc();
+        System.runFinalization();
         System.gc();
         
-        log.info("Bot entered standby mode - resources optimized");
+        // Limpa métricas antigas para liberar memória
+        performanceMetrics.clearOldMetrics();
+        
+        log.info("Bot entered standby mode - resources optimized and memory freed");
     }
 
     /**

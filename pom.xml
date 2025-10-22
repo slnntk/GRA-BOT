@@ -126,7 +126,7 @@
                     </excludes>
                     <mainClass>com.gra.paradise.botattendance.BotAttendanceApplication</mainClass>
                     <executable>true</executable>
-                    <jvmArguments>-Xms256m -Xmx512m</jvmArguments>
+                    <jvmArguments>-Xms64m -Xmx256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication -XX:+OptimizeStringConcat</jvmArguments>
                 </configuration>
                 <executions>
                     <execution>

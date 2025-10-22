@@ -203,3 +203,60 @@ com.gra.paradise.botattendance.exception.OnlyCreatorCanCloseScheduleException: S
 2025-10-22 15:03:54.954 [boundedElastic-1] ERROR c.g.p.b.s.ScheduleMessageManager - Erro ao excluir mensagem da escala 2: GET /channels/1408269205928804415/messages/1430617292256841729 returned 404 Not Found with response {code=10008, message=Unknown Message}
 2025-10-22 15:03:54.954 [boundedElastic-1] WARN  c.g.p.b.d.b.ScheduleActionHandler - Erro ao remover referência da escala 2: GET /channels/1408269205928804415/messages/1430617292256841729 returned 404 Not Found with response {code=10008, message=Unknown Message}
 2025-10-22 15:03:55.536 [boundedElastic-1] INFO  c.g.p.b.service.ScheduleLogManager - Log final da escala 2 enviado com sucesso na guilda 1408269205240811600
+2025-10-22 16:01:25.538 [main] INFO  c.g.p.b.BotAttendanceApplication - Starting BotAttendanceApplication using Java 17.0.17 with PID 40508 (/Users/ccastro/Downloads/GRA-BOT/target/classes started by ccastro in /Users/ccastro/Downloads/GRA-BOT)
+2025-10-22 16:01:25.539 [main] INFO  c.g.p.b.BotAttendanceApplication - No active profile set, falling back to 1 default profile: "default"
+2025-10-22 16:01:26.654 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-22 16:01:27.432 [d4j-limiter-1] ERROR i.n.r.d.DnsServerAddressStreamProviders - Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'. Use DEBUG level to see the full stack: java.lang.UnsatisfiedLinkError: failed to load the required native library
+2025-10-22 16:01:29.778 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-22 16:01:30.108 [main] INFO  c.g.p.b.BotAttendanceApplication - Started BotAttendanceApplication in 4.728 seconds (process running for 4.859)
+2025-10-22 16:01:30.128 [main] INFO  c.g.p.b.s.PerformanceMetricsService - Performance metrics initialized successfully
+2025-10-22 16:01:30.129 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Cache de comandos inicializado com 3 comandos
+2025-10-22 16:01:30.132 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Bot Discord iniciado com sucesso!
+2025-10-22 16:01:30.132 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Verificando comandos disponíveis:
+2025-10-22 16:01:30.132 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: setup-log-channel
+2025-10-22 16:01:30.132 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: standby-status
+2025-10-22 16:01:30.132 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: setup-escala
+2025-10-22 16:01:32.729 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: criar-escala
+2025-10-22 16:01:32.730 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: escalas-ativas
+2025-10-22 16:01:32.730 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: setup-escala
+2025-10-22 16:01:32.730 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: setup-log-channel
+2025-10-22 16:01:32.730 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: standby-status
+2025-10-22 16:04:30.117 [async-logging] INFO  c.g.p.b.service.CacheService - All caches cleared
+2025-10-22 16:04:30.203 [async-logging] INFO  c.g.p.b.s.PerformanceMetricsService - Old metrics cleared to free memory
+2025-10-22 16:04:30.203 [async-logging] INFO  c.g.p.b.service.StandbyService - Bot entered standby mode - resources optimized and memory freed
+2025-10-22 16:08:00.314 [main] INFO  c.g.p.b.BotAttendanceApplication - Starting BotAttendanceApplication using Java 17.0.17 with PID 41553 (/Users/ccastro/Downloads/GRA-BOT/target/classes started by ccastro in /Users/ccastro/Downloads/GRA-BOT)
+2025-10-22 16:08:00.315 [main] INFO  c.g.p.b.BotAttendanceApplication - No active profile set, falling back to 1 default profile: "default"
+2025-10-22 16:08:01.574 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-22 16:08:02.314 [d4j-limiter-1] ERROR i.n.r.d.DnsServerAddressStreamProviders - Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'. Use DEBUG level to see the full stack: java.lang.UnsatisfiedLinkError: failed to load the required native library
+2025-10-22 16:08:04.949 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-22 16:08:05.288 [main] INFO  c.g.p.b.BotAttendanceApplication - Started BotAttendanceApplication in 5.118 seconds (process running for 5.237)
+2025-10-22 16:08:05.307 [main] INFO  c.g.p.b.s.PerformanceMetricsService - Performance metrics initialized successfully
+2025-10-22 16:08:05.308 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Cache de comandos inicializado com 3 comandos
+2025-10-22 16:08:05.311 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Bot Discord iniciado com sucesso!
+2025-10-22 16:08:05.311 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Verificando comandos disponíveis:
+2025-10-22 16:08:05.311 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: setup-log-channel
+2025-10-22 16:08:05.311 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: standby-status
+2025-10-22 16:08:05.311 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: setup-escala
+2025-10-22 16:08:06.087 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: criar-escala
+2025-10-22 16:08:06.087 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: escalas-ativas
+2025-10-22 16:08:06.087 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: setup-escala
+2025-10-22 16:08:06.088 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: setup-log-channel
+2025-10-22 16:08:06.088 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: standby-status
+2025-10-22 16:10:48.889 [main] INFO  c.g.p.b.BotAttendanceApplication - Starting BotAttendanceApplication using Java 17.0.17 with PID 43354 (/Users/ccastro/Downloads/GRA-BOT/target/classes started by ccastro in /Users/ccastro/Downloads/GRA-BOT)
+2025-10-22 16:10:48.890 [main] INFO  c.g.p.b.BotAttendanceApplication - No active profile set, falling back to 1 default profile: "default"
+2025-10-22 16:10:50.094 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-10-22 16:10:50.809 [d4j-limiter-1] ERROR i.n.r.d.DnsServerAddressStreamProviders - Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'. Use DEBUG level to see the full stack: java.lang.UnsatisfiedLinkError: failed to load the required native library
+2025-10-22 16:10:53.307 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-10-22 16:10:53.635 [main] INFO  c.g.p.b.BotAttendanceApplication - Started BotAttendanceApplication in 4.884 seconds (process running for 5.0)
+2025-10-22 16:10:53.651 [main] INFO  c.g.p.b.s.PerformanceMetricsService - Performance metrics initialized successfully
+2025-10-22 16:10:53.652 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Cache de comandos inicializado com 3 comandos
+2025-10-22 16:10:53.655 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Bot Discord iniciado com sucesso!
+2025-10-22 16:10:53.655 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Verificando comandos disponíveis:
+2025-10-22 16:10:53.655 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: setup-log-channel
+2025-10-22 16:10:53.655 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: standby-status
+2025-10-22 16:10:53.655 [main] INFO  c.g.p.b.discord.DiscordEventHandler - Comando disponível: setup-escala
+2025-10-22 16:10:54.503 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: criar-escala
+2025-10-22 16:10:54.503 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: escalas-ativas
+2025-10-22 16:10:54.504 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: setup-escala
+2025-10-22 16:10:54.504 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: setup-log-channel
+2025-10-22 16:10:54.504 [boundedElastic-1] INFO  c.g.p.b.discord.DiscordEventHandler - Comando registrado: standby-status

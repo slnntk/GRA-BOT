@@ -23,39 +23,42 @@ public class PerformanceConfig {
 
     /**
      * Cache para mensagens Discord - evita recriar embeds desnecessariamente
-     * TTL: 5 minutos, máximo 1000 entradas
+     * TTL: 2 minutos, máximo 50 entradas (otimizado para baixo uso de memória)
      */
     @Bean
     public Cache<String, Object> discordMessageCache() {
         return Caffeine.newBuilder()
-                .maximumSize(1000)
-                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .maximumSize(50)
+                .expireAfterWrite(2, TimeUnit.MINUTES)
+                .expireAfterAccess(1, TimeUnit.MINUTES)
                 .recordStats()
                 .build();
     }
 
     /**
      * Cache para configurações de guild - dados que mudam raramente
-     * TTL: 1 hora, máximo 100 entradas
+     * TTL: 30 minutos, máximo 20 entradas (otimizado para baixo uso de memória)
      */
     @Bean
     public Cache<String, Object> guildConfigCache() {
         return Caffeine.newBuilder()
-                .maximumSize(100)
-                .expireAfterWrite(1, TimeUnit.HOURS)
+                .maximumSize(20)
+                .expireAfterWrite(30, TimeUnit.MINUTES)
+                .expireAfterAccess(15, TimeUnit.MINUTES)
                 .recordStats()
                 .build();
     }
 
     /**
      * Cache para usuários - dados que mudam raramente
-     * TTL: 2 horas, máximo 5000 entradas
+     * TTL: 1 hora, máximo 100 entradas (otimizado para baixo uso de memória)
      */
     @Bean
     public Cache<String, Object> userCache() {
         return Caffeine.newBuilder()
-                .maximumSize(5000)
-                .expireAfterWrite(2, TimeUnit.HOURS)
+                .maximumSize(100)
+                .expireAfterWrite(1, TimeUnit.HOURS)
+                .expireAfterAccess(30, TimeUnit.MINUTES)
                 .recordStats()
                 .build();
     }
@@ -67,8 +70,9 @@ public class PerformanceConfig {
     public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCaffeine(Caffeine.newBuilder()
-                .maximumSize(1000)
-                .expireAfterWrite(Duration.ofMinutes(5))
+                .maximumSize(50)
+                .expireAfterWrite(Duration.ofMinutes(2))
+                .expireAfterAccess(Duration.ofMinutes(1))
                 .recordStats());
         return cacheManager;
     }

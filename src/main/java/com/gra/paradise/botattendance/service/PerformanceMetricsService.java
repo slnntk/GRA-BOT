@@ -205,4 +205,22 @@ public class PerformanceMetricsService {
             (int) errors.count()
         );
     }
+
+    /**
+     * Limpa métricas antigas para liberar memória
+     */
+    public void clearOldMetrics() {
+        // Limpa contadores antigos
+        if (discordEvents != null) {
+            // Reset contador de eventos Discord
+        }
+        if (errors != null) {
+            // Reset contador de erros
+        }
+        
+        // Força limpeza de métricas antigas
+        meterRegistry.clear();
+        
+        log.info("Old metrics cleared to free memory");
+    }
 }
