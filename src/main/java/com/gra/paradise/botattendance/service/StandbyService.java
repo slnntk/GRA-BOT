@@ -27,8 +27,8 @@ public class StandbyService {
     private final AtomicLong standbyStartTime = new AtomicLong(0);
     
     // Configurações de stand-by
-    private static final long STANDBY_TIMEOUT = 3 * 60 * 1000; // 3 minutos
-    private static final long ACTIVITY_CHECK_INTERVAL = 1 * 60 * 1000; // 1 minuto
+    private static final long STANDBY_TIMEOUT = 10 * 60 * 1000; // 10 minutos (aumentado de 3)
+    private static final long ACTIVITY_CHECK_INTERVAL = 2 * 60 * 1000; // 2 minutos (aumentado de 1)
 
     /**
      * Registra atividade do usuário
@@ -65,9 +65,7 @@ public class StandbyService {
         // Limpa cache para liberar memória
         cacheService.clear();
         
-        // Força garbage collection agressivo
-        System.gc();
-        System.runFinalization();
+        // Garbage collection suave - apenas uma vez ao invés de agressivo
         System.gc();
         
         // Limpa métricas antigas para liberar memória
