@@ -91,6 +91,7 @@ public class DiscordConfig {
                 .setStore(Store.fromLayout(LocalStoreLayout.create()))
                 .setInitialPresence(shardInfo ->
                         ClientPresence.online(ClientActivity.playing("Desenvolvido por Tiago Holanda")))
+                .setMaxMissedHeartbeatAck(3) // Allow up to 3 missed heartbeats before reconnecting
                 .login()
                 .block();
     }
