@@ -16,8 +16,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class ButtonDispatcher {
 
-    private final ScheduleInteractionHandler interactionHandler;
+    private final ScheduleInteractionCoordinator interactionCoordinator;
     private final ScheduleActionHandler actionHandler;
+    // Temporarily keep the old handler as fallback for unmigrated methods
+    private final ScheduleInteractionHandler legacyHandler;
     private final Set<String> acknowledgedInteractions = ConcurrentHashMap.newKeySet();
 
     public Mono<Void> handleButtonEvent(ButtonInteractionEvent event) {
@@ -32,12 +34,12 @@ public class ButtonDispatcher {
         log.info("Botão clicado por usuário {}: {}", event.getInteraction().getUser().getId().asString(), customId);
 
         if (customId.equals("create_schedule")) {
-            return interactionHandler.handleCreateScheduleButton(event);
+            return interactionCoordinator.handleButton(event);
         } else if (customId.startsWith("confirm_schedule:")) {
             log.debug("Processando confirmação de escala com customId: {}", customId);
-            return interactionHandler.handleConfirmSchedule(event);
+            return interactionCoordinator.handleButton(event);
         } else if (customId.equals("cancel_schedule")) {
-            return interactionHandler.handleCancelSchedule(event);
+            return interactionCoordinator.handleButton(event);
         } else if (customId.startsWith("board_schedule:")) {
             return actionHandler.handleBoardSchedule(event);
         } else if (customId.startsWith("leave_schedule:")) {
@@ -64,13 +66,14 @@ public class ButtonDispatcher {
         log.debug("Menu selecionado: {}", customId);
 
         if (customId.equals("aircraft_select")) {
-            return interactionHandler.handleAircraftSelection(event);
+            return interactionCoordinator.handleSelectMenu(event);
         } else if (customId.startsWith("mission_select:")) {
-            return interactionHandler.handleMissionSelection(event);
+            return interactionCoordinator.handleSelectMenu(event);
         } else if (customId.startsWith("action_subtype_select:")) {
-            return interactionHandler.handleActionSubTypeSelection(event);
+            return interactionCoordinator.handleSelectMenu(event);
         } else if (customId.startsWith("action_option_select:")) {
-            return interactionHandler.handleActionOptionSelection(event);
+            // TODO: Create ActionOptionSelectionCommand to complete migration
+            return legacyHandler.handleActionOptionSelection(event);
         }
 
         log.warn("Menu não reconhecido: {}", customId);
@@ -91,7 +94,7 @@ public class ButtonDispatcher {
         log.debug("Modal enviado: {}", customId);
 
         if (customId.startsWith("outros_description_modal:")) {
-            return interactionHandler.handleOutrosDescription(event)
+            return interactionCoordinator.handleModal(event)
                     .doOnSuccess(success -> log.info("Submissão de modal processada com sucesso para customId: {}", customId))
                     .doOnError(e -> log.error("Falha ao processar submissão de modal com customId {}: {}", customId, e.getMessage(), e));
         }
